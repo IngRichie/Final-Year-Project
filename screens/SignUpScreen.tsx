@@ -15,6 +15,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { useNavigation, ParamListBase } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { handleSignUp } from "../utils/auth";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 const { width, height } = Dimensions.get("window");
 
@@ -90,7 +91,7 @@ const SignUpScreen = () => {
               theme={{ colors: { text: "#474747" } }}
             />
             <LinearGradient
-              colors={["#066fd2", "#004e9d"]}
+              colors={["#318CE7", "#1F75FE"]}
               style={styles.signupButton}
             >
               <Pressable style={styles.pressable} onPress={onSignUpPress}>
@@ -103,25 +104,13 @@ const SignUpScreen = () => {
             <Text style={styles.orSignUp}>Or Sign Up with</Text>
             <View style={styles.socialMediaSignup}>
               <Pressable onPress={() => {}}>
-                <Image
-                  style={styles.socialIcon}
-                  resizeMode="contain"
-                  source={require("../assets/image-1.png")}
-                />
+                <FontAwesome name="google" size={responsiveFontSize(7)} color="#DB4437" />
               </Pressable>
               <Pressable onPress={() => {}}>
-                <Image
-                  style={styles.socialIcon}
-                  resizeMode="contain"
-                  source={require("../assets/image-2.png")}
-                />
+                <FontAwesome name="facebook" size={responsiveFontSize(7)} color="#3b5998" />
               </Pressable>
               <Pressable onPress={() => {}}>
-                <Image
-                  style={styles.socialIcon}
-                  resizeMode="contain"
-                  source={require("../assets/image-3.png")}
-                />
+                <FontAwesome name="twitter" size={responsiveFontSize(7)} color="#1DA1F2" />
               </Pressable>
             </View>
           </View>
@@ -187,17 +176,15 @@ const styles = StyleSheet.create({
     marginTop: responsiveHeight(2),
     marginBottom: responsiveHeight(5),
   },
-
   haveAnAccountText: {
     fontSize: responsiveFontSize(4.0),
   },
   loginBtn: {
-    color: "#004d9a",
+    color: "#1F75FE",
     fontSize: responsiveFontSize(4.0),
     fontWeight: "600",
     marginLeft: responsiveWidth(1),
   },
-
   socialMediaSignupContainer: {
     marginBottom: responsiveHeight(8),
     marginTop: responsiveHeight(2),

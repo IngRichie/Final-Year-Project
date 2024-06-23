@@ -7,6 +7,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation, ParamListBase } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { handleLogin } from '../utils/auth';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const { width, height } = Dimensions.get('window');
 
@@ -100,7 +101,7 @@ const LoginScreen = () => {
               }}
             />
             <LinearGradient
-              colors={['#066fd1', '#0050a0']}
+              colors={["#318CE7", "#1F75FE"]}
               style={styles.loginButton}
             >
               <Pressable style={styles.pressable} onPress={onLoginPress}>
@@ -111,25 +112,13 @@ const LoginScreen = () => {
           <Text style={styles.orLoginWith}>Or Login with</Text>
           <View style={styles.socialMediaLogin}>
             <Pressable onPress={onGoogleLoginPress}>
-              <Image
-                style={styles.socialIcon}
-                resizeMode="contain"
-                source={require('../assets/google.png')}
-              />
+              <FontAwesome name="google" size={responsiveFontSize(7)} color="#DB4437" />
             </Pressable>
             <Pressable onPress={onFacebookLoginPress}>
-              <Image
-                style={styles.socialIcon}
-                resizeMode="contain"
-                source={require('../assets/image-2.png')}
-              />
+              <FontAwesome name="facebook" size={responsiveFontSize(7)} color="#3b5998" />
             </Pressable>
             <Pressable onPress={onXLoginPress}>
-              <Image
-                style={styles.socialIcon}
-                resizeMode="contain"
-                source={require('../assets/x.png')}
-              />
+              <FontAwesome name="twitter" size={responsiveFontSize(7)} color="#1DA1F2" />
             </Pressable>
           </View>
           <View style={styles.dontHaveAnContainer}>
@@ -210,14 +199,14 @@ const styles = StyleSheet.create({
     marginLeft: responsiveWidth(1),
   },
   signUpBtn: {
-    color: "#004d9a",
+    color: "#1F75FE",
     fontWeight: 'bold',
     fontSize: responsiveFontSize(4.0),
   },
   errorText: {
     color: 'red',
     marginBottom: responsiveHeight(2),
-    fontSize: responsiveFontSize(3),
+    fontSize: responsiveFontSize(4),
   },
 });
 

@@ -33,28 +33,28 @@ const FitnessNutrition = () => {
               style={styles.button}
               onPress={() => handlePress("Workout Plans")}
             >
-              <FontAwesome name="heartbeat" size={24} color="#01509f" style={styles.buttonIcon} />
+              <FontAwesome name="heartbeat" size={24} color="#1F75FE" style={styles.buttonIcon} />
               <Text style={styles.buttonText}>Workout Plans</Text>
             </Pressable>
             <Pressable
               style={styles.button}
               onPress={() => handlePress("Meal Plans")}
             >
-              <FontAwesome name="cutlery" size={24} color="#01509f" style={styles.buttonIcon} />
+              <FontAwesome name="cutlery" size={24} color="#1F75FE" style={styles.buttonIcon} />
               <Text style={styles.buttonText}>Meal Plans</Text>
             </Pressable>
             <Pressable
               style={styles.button}
               onPress={() => handlePress("Healthy Tips")}
             >
-              <FontAwesome name="lightbulb-o" size={24} color="#01509f" style={styles.buttonIcon} />
+              <FontAwesome name="lightbulb-o" size={24} color="#1F75FE" style={styles.buttonIcon} />
               <Text style={styles.buttonText}>Healthy Tips</Text>
             </Pressable>
             <Pressable
               style={styles.button}
               onPress={() => handlePress("Grocery Lists")}
             >
-              <FontAwesome name="shopping-basket" size={24} color="#01509f" style={styles.buttonIcon} />
+              <FontAwesome name="shopping-basket" size={24} color="#1F75FE" style={styles.buttonIcon} />
               <Text style={styles.buttonText}>Grocery Lists</Text>
             </Pressable>
           </View>
@@ -67,13 +67,13 @@ const FitnessNutrition = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#01509f",
+    backgroundColor: "#318CE7",
   },
   scrollContainer: {
     flexGrow: 1,
   },
   section: {
-    backgroundColor: "#01509f",
+    backgroundColor: "#1F75FE",
     paddingHorizontal: responsiveWidth(5),
     paddingVertical: responsiveHeight(5),
   },

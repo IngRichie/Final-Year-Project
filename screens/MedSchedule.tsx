@@ -40,35 +40,35 @@ const MedSchedule = () => {
             style={styles.button}
             onPress={() => handlePress("Medication List")}
           >
-            <FontAwesome name="list" size={24} color="#01509f" style={styles.buttonIcon} />
+            <FontAwesome name="list" size={24} color="#1F75FE" style={styles.buttonIcon} />
             <Text style={styles.buttonText}>Medication List</Text>
           </Pressable>
           <Pressable
             style={styles.button}
             onPress={() => handlePress("Add/Edit Medication")}
           >
-            <FontAwesome name="edit" size={24} color="#01509f" style={styles.buttonIcon} />
+            <FontAwesome name="edit" size={24} color="#1F75FE" style={styles.buttonIcon} />
             <Text style={styles.buttonText}>Add/Edit Medication</Text>
           </Pressable>
           <Pressable
             style={styles.button}
             onPress={() => handlePress("Schedule Overview")}
           >
-            <FontAwesome name="calendar" size={24} color="#01509f" style={styles.buttonIcon} />
+            <FontAwesome name="calendar" size={24} color="#1F75FE" style={styles.buttonIcon} />
             <Text style={styles.buttonText}>Schedule Overview</Text>
           </Pressable>
           <Pressable
             style={styles.button}
             onPress={() => handlePress("Reminders & Notifications")}
           >
-            <FontAwesome name="bell" size={24} color="#01509f" style={styles.buttonIcon} />
+            <FontAwesome name="bell" size={24} color="#1F75FE" style={styles.buttonIcon} />
             <Text style={styles.buttonText}>Reminders & Notifications</Text>
           </Pressable>
           <Pressable
             style={styles.button}
             onPress={() => handlePress("Medication Logging")}
           >
-            <FontAwesome name="book" size={24} color="#01509f" style={styles.buttonIcon} />
+            <FontAwesome name="book" size={24} color="#1F75FE" style={styles.buttonIcon} />
             <Text style={styles.buttonText}>Medication Logging</Text>
           </Pressable>
         </View>

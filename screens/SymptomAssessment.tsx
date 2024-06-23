@@ -89,7 +89,7 @@ const SymptomAssessment = () => {
 const styles = StyleSheet.create({
   safeAreaView: {
     flex: 1,
-    backgroundColor: "#01509f",
+    backgroundColor: "#1F75FE",
   },
   scrollContainer: {
     flexGrow: 1,
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     paddingBottom: responsiveHeight(5),
   },
   section: {
-    backgroundColor: "#01509f",
+    backgroundColor: "#1F75FE",
     paddingVertical: responsiveHeight(5),
     height: "40%",
   },

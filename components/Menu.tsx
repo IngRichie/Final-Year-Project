@@ -43,7 +43,7 @@ const Menu: React.FC<MenuProps> = ({ navigation }) => {
       <LinearGradient
         style={styles.header}
         locations={[0, 1]}
-        colors={["#066fd1", "#004f9e"]}
+        colors={["#318CE7", "#1F75FE"]}
       >
         <View style={styles.profileContainer}>
           <Ionicons
@@ -73,7 +73,7 @@ const Menu: React.FC<MenuProps> = ({ navigation }) => {
           <Ionicons
             name="pulse-outline"
             size={responsiveFontSize(7)}
-            color="#004f9e"
+            color="#1F75FE"
             style={styles.menuIcon}
           />
           <Text style={styles.menuItemText}>Symptom Assessment</Text>
@@ -89,7 +89,7 @@ const Menu: React.FC<MenuProps> = ({ navigation }) => {
           <Ionicons
             name="calendar-outline"
             size={responsiveFontSize(7)}
-            color="#004f9e"
+            color="#1F75FE"
             style={styles.menuIcon}
           />
           <Text style={styles.menuItemText}>Medication Schedule</Text>
@@ -105,7 +105,7 @@ const Menu: React.FC<MenuProps> = ({ navigation }) => {
           <Ionicons
             name="people-outline"
             size={responsiveFontSize(7)}
-            color="#004f9e"
+            color="#1F75FE"
             style={styles.menuIcon}
           />
           <Text style={styles.menuItemText}>Counselor Session</Text>
@@ -121,7 +121,7 @@ const Menu: React.FC<MenuProps> = ({ navigation }) => {
           <Ionicons
             name="fitness-outline"
             size={responsiveFontSize(7)}
-            color="#004f9e"
+            color="#1F75FE"
             style={styles.menuIcon}
           />
           <Text style={styles.menuItemText}>Fitness & Nutrition</Text>
@@ -139,7 +139,7 @@ const Menu: React.FC<MenuProps> = ({ navigation }) => {
           <Ionicons
             name="medkit-outline"
             size={responsiveFontSize(7)}
-            color="#004f9e"
+            color="#1F75FE"
             style={styles.menuIcon}
           />
           <Text style={styles.menuItemText}>Clinic Appointment</Text>
@@ -154,7 +154,7 @@ const Menu: React.FC<MenuProps> = ({ navigation }) => {
           <Ionicons
             name="settings-outline"
             size={responsiveFontSize(7)}
-            color="#004f9e"
+            color="#1F75FE"
             style={styles.menuIcon}
           />
           <Text style={styles.menuItemText}>Settings</Text>
@@ -167,7 +167,7 @@ const Menu: React.FC<MenuProps> = ({ navigation }) => {
           <Ionicons
             name="log-out-outline"
             size={responsiveFontSize(7)}
-            color="#004f9e"
+            color="#1F75FE"
             style={styles.menuIcon}
           />
           <Text style={styles.menuItemText}>Log Out</Text>
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     padding: responsiveWidth(5),
-    backgroundColor: "#004f9e",
+    backgroundColor: "#1F75FE",
     height: responsiveHeight(25),
   },
   profileContainer: {

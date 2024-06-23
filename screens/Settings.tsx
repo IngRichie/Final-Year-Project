@@ -20,23 +20,23 @@ const Settings = () => {
       <StatusBar screenName="Settings" />
       <View style={styles.buttonContainer}>
         <Pressable style={styles.button} onPress={() => handlePress("Profile")}>
-          <FontAwesome name="user" size={24} color="#01509f" style={styles.buttonIcon} />
+          <FontAwesome name="user" size={24} color="#1F75FE" style={styles.buttonIcon} />
           <Text style={styles.buttonText}>Profile</Text>
         </Pressable>
         <Pressable style={styles.button} onPress={() => handlePress("Privacy & Security")}>
-          <FontAwesome name="lock" size={24} color="#01509f" style={styles.buttonIcon} />
+          <FontAwesome name="lock" size={24} color="#1F75FE" style={styles.buttonIcon} />
           <Text style={styles.buttonText}>Privacy & Security</Text>
         </Pressable>
         <Pressable style={styles.button} onPress={() => handlePress("Notification")}>
-          <FontAwesome name="bell" size={24} color="#01509f" style={styles.buttonIcon} />
+          <FontAwesome name="bell" size={24} color="#1F75FE" style={styles.buttonIcon} />
           <Text style={styles.buttonText}>Notification</Text>
         </Pressable>
         <Pressable style={styles.button} onPress={() => handlePress("Accessibility")}>
-          <FontAwesome name="universal-access" size={24} color="#01509f" style={styles.buttonIcon} />
+          <FontAwesome name="universal-access" size={24} color="#1F75FE" style={styles.buttonIcon} />
           <Text style={styles.buttonText}>Accessibility</Text>
         </Pressable>
         <Pressable style={styles.button} onPress={() => handlePress("Preferences")}>
-          <FontAwesome name="sliders" size={24} color="#01509f" style={styles.buttonIcon} />
+          <FontAwesome name="sliders" size={24} color="#1F75FE" style={styles.buttonIcon} />
           <Text style={styles.buttonText}>Preferences</Text>
         </Pressable>
       </View>

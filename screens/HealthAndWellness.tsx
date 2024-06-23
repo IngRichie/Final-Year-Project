@@ -38,19 +38,19 @@ const HealthAndWellness = () => {
         <View style={styles.BtnSection}>
           <Text style={styles.sectionTitle}>Explore</Text>
           <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Mental Health")}>
-            <FontAwesome5 name="brain" size={24} color="#01509f" style={styles.buttonIcon} />
+            <FontAwesome5 name="brain" size={24} color="#1F75FE" style={styles.buttonIcon} />
             <Text style={styles.buttonText}>Mental Health</Text>
           </Pressable>
           <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Exercise")}>
-            <FontAwesome5 name="dumbbell" size={24} color="#01509f" style={styles.buttonIcon} />
+            <FontAwesome5 name="dumbbell" size={24} color="#1F75FE" style={styles.buttonIcon} />
             <Text style={styles.buttonText}>Exercise</Text>
           </Pressable>
           <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Healthy Relationships")}>
-            <MaterialCommunityIcons name="human-handsup" size={24} color="#01509f" style={styles.buttonIcon} />
+            <MaterialCommunityIcons name="human-handsup" size={24} color="#1F75FE" style={styles.buttonIcon} />
             <Text style={styles.buttonText}>Healthy Relationships</Text>
           </Pressable>
           <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Substance Abuse")}>
-            <Entypo name="warning" size={24} color="#01509f" style={styles.buttonIcon} />
+            <Entypo name="warning" size={24} color="#1F75FE" style={styles.buttonIcon} />
             <Text style={styles.buttonText}>Substance Abuse</Text>
           </Pressable>
         </View>
@@ -62,13 +62,13 @@ const HealthAndWellness = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "blue",
+    backgroundColor: "#1F75FE",
   },
   scrollContainer: {
     flexGrow: 1,
   },
   section: {
-    backgroundColor: "#01509f",
+    backgroundColor: "#1F75FE",
     height: responsiveHeight(30),
     justifyContent: "center",
     paddingHorizontal: responsiveWidth(5),

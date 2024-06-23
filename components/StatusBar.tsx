@@ -17,7 +17,7 @@ const CustomStatusBar = ({ screenName }: { screenName: string }) => {
     <LinearGradient
       style={styles.statusBar}
       locations={[0, 1]}
-      colors={["#066ed4", "#01509f"]}
+      colors={["#318CE7", "#1F75FE"]}
     >
       <View style={styles.statusBarInner}>
         <Pressable style={styles.leftArrowParent} onPress={() => navigation.goBack()}>

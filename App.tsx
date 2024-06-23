@@ -7,6 +7,7 @@ import { createDrawerNavigator } from "@react-navigation/drawer";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 
+
 // Import your screens here
 import LoginScreen from "./screens/LoginScreen";
 import Homepage from "./screens/Homepage";
@@ -27,7 +28,7 @@ const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 const Tab = createBottomTabNavigator();
 
-function DrawerRoot({ navigation }: any) {
+function DrawerRoot({ navigation }:{navigation:string}) {
   return (
     <Drawer.Navigator
       screenOptions={{ headerShown: false, drawerStyle: { width: Dimensions.get("window").width * 0.75 } }}
@@ -39,13 +40,14 @@ function DrawerRoot({ navigation }: any) {
       <Drawer.Screen name="CounselorSession" component={CounselorSession} options={{ headerShown: false }} />
       <Drawer.Screen name="Settings" component={Settings} options={{ headerShown: false }} />
       <Drawer.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
+      <Drawer.Screen name="EmergencyProcedures" component={EmergencyProcedures} options={{ headerShown: false }} />
     </Drawer.Navigator>
   );
 }
 
 function BottomTabsRoot() {
   const renderTabIcon = (name: string, focused: boolean) => {
-    let iconName: string;
+    let iconName;
 
     switch (name) {
       case "Homepage1":
@@ -103,9 +105,9 @@ function BottomTabsRoot() {
           shadowRadius: Dimensions.get("window").height * 0.02,
         },
       }}
-      tabBar={({ state, navigation }: any) => (
+      tabBar={({ state, navigation }) => (
         <View style={styles.tabBar}>
-          {state.routes.map((route: any, index: number) => (
+          {state.routes.map((route, index) => (
             <TouchableOpacity
               key={route.key}
               onPress={() => navigation.navigate(route.name)}
@@ -154,6 +156,7 @@ const App = () => {
           <Stack.Screen name="DrawerRoot" component={DrawerRoot} />
           <Stack.Screen name="Homepage" component={Homepage} />
           <Stack.Screen name="HealthAndWellness" component={HealthAndWellness} />
+          <Stack.Screen name="EmergencyProcedures" component={EmergencyProcedures} />
         </Stack.Navigator>
       ) : null}
     </NavigationContainer>
