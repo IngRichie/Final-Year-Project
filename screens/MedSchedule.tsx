@@ -80,7 +80,7 @@ const MedSchedule = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "blue",
+    backgroundColor: "#1F75FE",
   },
   scrollContainer: {
     flexGrow: 1,
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
   sectionText: {
     fontSize: responsiveFontSize(4.7),
     color: "#fff",
-    backgroundColor: "blue",
+    backgroundColor: "#1F75FE",
     height: "100%",
     lineHeight: responsiveHeight(5),
   },

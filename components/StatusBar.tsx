@@ -35,10 +35,11 @@ const styles = StyleSheet.create({
   },
   statusBarInner: {
     paddingHorizontal: responsiveWidth(2.5),
-    paddingVertical: responsiveHeight(3.75),
+    paddingVertical: responsiveHeight(1.75),
     justifyContent: "flex-start",
     flexDirection: "row",
     alignItems: "center",
+    marginTop: responsiveWidth(10),
   },
   leftArrowParent: {
     flexDirection: "row",

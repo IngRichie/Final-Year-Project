@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 25,
     fontWeight: "bold",
-    color: "#004d9a",
+    color: "#1F75FE",
     marginBottom: 12,
   },
   contactItem: {
