@@ -1,9 +1,8 @@
 import * as React from "react";
 import { ScrollView, StyleSheet, Text, Dimensions, Pressable, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
 import StatusBar from "../components/StatusBar";
-import { FontAwesome5, MaterialCommunityIcons, Entypo } from "@expo/vector-icons";
+import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get("window");
 
@@ -11,39 +10,38 @@ const responsiveWidth = (percent: number) => (width * percent) / 100;
 const responsiveHeight = (percent: number) => (height * percent) / 100;
 const responsiveFontSize = (percent: number) => (width * percent) / 100;
 
-const EmergencyProcedures = () => {
-  const navigation = useNavigation();
-
-  const handlePress = (screenName: string) => {
-    navigation.navigate(screenName);
+const GroceryLists = () => {
+  const handlePress = (buttonText: string) => {
+    // Replace with your navigation logic
+    console.log(`Navigating to: ${buttonText}`);
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar screenName="Emergency Procedures" />
+      <StatusBar screenName="Grocery Lists" />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.section}>
           <Text style={styles.sectionText}>
-            Emergency procedures are predefined steps for handling crises like fires, medical incidents, and safety concerns. They provide clear instructions to ensure safety and minimize harm during emergencies.
+            Grocery lists help organize your shopping needs. Choose from pre-made lists, create custom ones, explore categorized items, and discover shopping tips to enhance your grocery shopping experience.
           </Text>
         </View>
         <View style={styles.BtnSection}>
-          <Text style={styles.sectionTitle}>Emergency Procedures</Text>
-          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("MedicalEmergency")}>
-            <FontAwesome5 name="medkit" size={24} color="#1F75FE" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Medical Emergency</Text>
+          <Text style={styles.sectionTitle}>Grocery Lists</Text>
+          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Pre-made Grocery Lists")}>
+            <FontAwesome5 name="clipboard-list" size={24} color="#1F75FE" style={styles.buttonIcon} />
+            <Text style={styles.buttonText}>Pre-made Grocery Lists</Text>
           </Pressable>
-          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("FireEmergency")}>
-            <MaterialCommunityIcons name="fire" size={24} color="#1F75FE" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Fire Emergency</Text>
+          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Custom Grocery Lists")}>
+            <MaterialCommunityIcons name="playlist-edit" size={24} color="#1F75FE" style={styles.buttonIcon} />
+            <Text style={styles.buttonText}>Custom Grocery Lists</Text>
           </Pressable>
-          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("PersonalSafety")}>
-            <FontAwesome5 name="shield-alt" size={24} color="#1F75FE" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Personal Safety</Text>
+          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Categorized Items")}>
+            <MaterialCommunityIcons name="format-list-checkbox" size={24} color="#1F75FE" style={styles.buttonIcon} />
+            <Text style={styles.buttonText}>Categorized Items</Text>
           </Pressable>
-          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("DomesticAccident")}>
-            <MaterialCommunityIcons name="home-alert" size={24} color="#1F75FE" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Domestic Accident</Text>
+          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Shopping Tips")}>
+            <FontAwesome5 name="shopping-cart" size={24} color="#1F75FE" style={styles.buttonIcon} />
+            <Text style={styles.buttonText}>Shopping Tips</Text>
           </Pressable>
         </View>
       </ScrollView>
@@ -111,4 +109,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EmergencyProcedures;
+export default GroceryLists;

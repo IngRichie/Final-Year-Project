@@ -1,15 +1,8 @@
 import * as React from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  Dimensions,
-  Pressable,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, Text, Dimensions, Pressable, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import StatusBar from "../components/StatusBar";
-import { FontAwesome5, MaterialCommunityIcons, Entypo } from "@expo/vector-icons";
+import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get("window");
 
@@ -17,7 +10,7 @@ const responsiveWidth = (percent: number) => (width * percent) / 100;
 const responsiveHeight = (percent: number) => (height * percent) / 100;
 const responsiveFontSize = (percent: number) => (width * percent) / 100;
 
-const MentalHealth = () => {
+const MedicalEmergency = () => {
   const handlePress = (buttonText: string) => {
     // Replace with your navigation logic
     console.log(`Navigating to: ${buttonText}`);
@@ -25,38 +18,34 @@ const MentalHealth = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar screenName="Mental Health" />
+      <StatusBar screenName="Medical Emergency" />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.section}>
           <Text style={styles.sectionText}>
-            Mental health involves emotional, psychological, and social well-being, influencing thoughts, feelings, and actions. It determines how we handle stress, relate to others, and make choices.
+            During a medical emergency, knowing immediate actions, recognizing emergencies, understanding first aid basics, having emergency contacts, and accessing location information are crucial for timely and effective responses.
           </Text>
         </View>
         <View style={styles.BtnSection}>
-          <Text style={styles.sectionTitle}>Mental Health Resources</Text>
-          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Mental Health Tips")}>
-            <FontAwesome5 name="brain" size={24} color="#1F75FE" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Mental Health Tips</Text>
+          <Text style={styles.sectionTitle}>Medical Emergency</Text>
+          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Immediate Actions")}>
+            <FontAwesome5 name="exclamation-triangle" size={24} color="#1F75FE" style={styles.buttonIcon} />
+            <Text style={styles.buttonText}>Immediate Actions</Text>
           </Pressable>
-          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Mindfulness Practices")}>
-            <MaterialCommunityIcons name="meditation" size={24} color="#1F75FE" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Mindfulness Practices</Text>
+          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Recognizing Emergencies")}>
+            <FontAwesome5 name="heartbeat" size={24} color="#1F75FE" style={styles.buttonIcon} />
+            <Text style={styles.buttonText}>Recognizing Emergencies</Text>
           </Pressable>
-          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Self-care Suggestions")}>
-            <FontAwesome5 name="spa" size={24} color="#1F75FE" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Self-care Suggestions</Text>
+          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("First Aid Basics")}>
+          <FontAwesome5 name="first-aid" size={24} color="#1F75FE" style={styles.buttonIcon} />
+            <Text style={styles.buttonText}>First Aid Basics</Text>
           </Pressable>
-          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Inspirational Quotes and Affirmations")}>
-            <Entypo name="quote" size={24} color="#1F75FE" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Inspirational Quotes and Affirmations</Text>
+          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Emergency Contacts")}>
+            <FontAwesome5 name="address-book" size={24} color="#1F75FE" style={styles.buttonIcon} />
+            <Text style={styles.buttonText}>Emergency Contacts</Text>
           </Pressable>
-          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Educational Articles")}>
-            <MaterialCommunityIcons name="book-open-page-variant" size={24} color="#1F75FE" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Educational Articles</Text>
-          </Pressable>
-          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Progress Tracking")}>
-            <FontAwesome5 name="chart-line" size={24} color="#1F75FE" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Progress Tracking</Text>
+          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Location Information")}>
+            <MaterialCommunityIcons name="map-marker" size={24} color="#1F75FE" style={styles.buttonIcon} />
+            <Text style={styles.buttonText}>Location Information</Text>
           </Pressable>
         </View>
       </ScrollView>
@@ -124,4 +113,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MentalHealth;
+export default MedicalEmergency;

@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import StatusBar from "../components/StatusBar";
-import { FontAwesome5, MaterialCommunityIcons, Entypo } from "@expo/vector-icons";
+import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get("window");
 
@@ -17,7 +17,7 @@ const responsiveWidth = (percent: number) => (width * percent) / 100;
 const responsiveHeight = (percent: number) => (height * percent) / 100;
 const responsiveFontSize = (percent: number) => (width * percent) / 100;
 
-const MentalHealth = () => {
+const MealPlans = () => {
   const handlePress = (buttonText: string) => {
     // Replace with your navigation logic
     console.log(`Navigating to: ${buttonText}`);
@@ -25,38 +25,30 @@ const MentalHealth = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar screenName="Mental Health" />
+      <StatusBar screenName="Meal Plans" />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.section}>
           <Text style={styles.sectionText}>
-            Mental health involves emotional, psychological, and social well-being, influencing thoughts, feelings, and actions. It determines how we handle stress, relate to others, and make choices.
+            Meal planning is essential for a balanced diet, ensuring you receive the right nutrients and maintain a healthy lifestyle. Here you'll find various resources to help you create effective meal plans.
           </Text>
         </View>
         <View style={styles.BtnSection}>
-          <Text style={styles.sectionTitle}>Mental Health Resources</Text>
-          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Mental Health Tips")}>
-            <FontAwesome5 name="brain" size={24} color="#1F75FE" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Mental Health Tips</Text>
+          <Text style={styles.sectionTitle}>Meal Plans Resources</Text>
+          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Daily Meal Plan")}>
+            <FontAwesome5 name="calendar-alt" size={24} color="#1F75FE" style={styles.buttonIcon} />
+            <Text style={styles.buttonText}>Daily Meal Plan</Text>
           </Pressable>
-          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Mindfulness Practices")}>
-            <MaterialCommunityIcons name="meditation" size={24} color="#1F75FE" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Mindfulness Practices</Text>
+          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Recipe Library")}>
+            <MaterialCommunityIcons name="book-open" size={24} color="#1F75FE" style={styles.buttonIcon} />
+            <Text style={styles.buttonText}>Recipe Library</Text>
           </Pressable>
-          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Self-care Suggestions")}>
-            <FontAwesome5 name="spa" size={24} color="#1F75FE" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Self-care Suggestions</Text>
+          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Custom Meal Plans")}>
+            <MaterialCommunityIcons name="format-list-bulleted" size={24} color="#1F75FE" style={styles.buttonIcon} />
+            <Text style={styles.buttonText}>Custom Meal Plans</Text>
           </Pressable>
-          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Inspirational Quotes and Affirmations")}>
-            <Entypo name="quote" size={24} color="#1F75FE" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Inspirational Quotes and Affirmations</Text>
-          </Pressable>
-          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Educational Articles")}>
-            <MaterialCommunityIcons name="book-open-page-variant" size={24} color="#1F75FE" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Educational Articles</Text>
-          </Pressable>
-          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Progress Tracking")}>
-            <FontAwesome5 name="chart-line" size={24} color="#1F75FE" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Progress Tracking</Text>
+          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Nutritional Information")}>
+            <FontAwesome5 name="info-circle" size={24} color="#1F75FE" style={styles.buttonIcon} />
+            <Text style={styles.buttonText}>Nutritional Information</Text>
           </Pressable>
         </View>
       </ScrollView>
@@ -124,4 +116,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MentalHealth;
+export default MealPlans;

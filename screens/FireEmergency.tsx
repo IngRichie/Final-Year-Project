@@ -1,9 +1,8 @@
 import * as React from "react";
 import { ScrollView, StyleSheet, Text, Dimensions, Pressable, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
 import StatusBar from "../components/StatusBar";
-import { FontAwesome5, MaterialCommunityIcons, Entypo } from "@expo/vector-icons";
+import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get("window");
 
@@ -11,39 +10,38 @@ const responsiveWidth = (percent: number) => (width * percent) / 100;
 const responsiveHeight = (percent: number) => (height * percent) / 100;
 const responsiveFontSize = (percent: number) => (width * percent) / 100;
 
-const EmergencyProcedures = () => {
-  const navigation = useNavigation();
-
-  const handlePress = (screenName: string) => {
-    navigation.navigate(screenName);
+const FireEmergency = () => {
+  const handlePress = (buttonText: string) => {
+    // Replace with your navigation logic
+    console.log(`Navigating to: ${buttonText}`);
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar screenName="Emergency Procedures" />
+      <StatusBar screenName="Fire Emergency" />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.section}>
           <Text style={styles.sectionText}>
-            Emergency procedures are predefined steps for handling crises like fires, medical incidents, and safety concerns. They provide clear instructions to ensure safety and minimize harm during emergencies.
+            During a fire emergency, taking immediate actions, knowing how to use fire extinguishers, having emergency contacts, and following an evacuation plan are critical for safety and minimizing damage.
           </Text>
         </View>
         <View style={styles.BtnSection}>
-          <Text style={styles.sectionTitle}>Emergency Procedures</Text>
-          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("MedicalEmergency")}>
-            <FontAwesome5 name="medkit" size={24} color="#1F75FE" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Medical Emergency</Text>
+          <Text style={styles.sectionTitle}>Fire Emergency</Text>
+          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Immediate Actions")}>
+            <FontAwesome5 name="exclamation-triangle" size={24} color="#1F75FE" style={styles.buttonIcon} />
+            <Text style={styles.buttonText}>Immediate Actions</Text>
           </Pressable>
-          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("FireEmergency")}>
-            <MaterialCommunityIcons name="fire" size={24} color="#1F75FE" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Fire Emergency</Text>
+          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Using Fire Extinguishers")}>
+            <MaterialCommunityIcons name="fire-extinguisher" size={24} color="#1F75FE" style={styles.buttonIcon} />
+            <Text style={styles.buttonText}>Using Fire Extinguishers</Text>
           </Pressable>
-          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("PersonalSafety")}>
-            <FontAwesome5 name="shield-alt" size={24} color="#1F75FE" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Personal Safety</Text>
+          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Emergency Contacts")}>
+            <FontAwesome5 name="address-book" size={24} color="#1F75FE" style={styles.buttonIcon} />
+            <Text style={styles.buttonText}>Emergency Contacts</Text>
           </Pressable>
-          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("DomesticAccident")}>
-            <MaterialCommunityIcons name="home-alert" size={24} color="#1F75FE" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Domestic Accident</Text>
+          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Evacuation Plan")}>
+            <MaterialCommunityIcons name="exit-run" size={24} color="#1F75FE" style={styles.buttonIcon} />
+            <Text style={styles.buttonText}>Evacuation Plan</Text>
           </Pressable>
         </View>
       </ScrollView>
@@ -111,4 +109,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EmergencyProcedures;
+export default FireEmergency;

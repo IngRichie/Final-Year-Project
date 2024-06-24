@@ -17,7 +17,7 @@ const responsiveWidth = (percent: number) => (width * percent) / 100;
 const responsiveHeight = (percent: number) => (height * percent) / 100;
 const responsiveFontSize = (percent: number) => (width * percent) / 100;
 
-const MentalHealth = () => {
+const Exercise = () => {
   const handlePress = (buttonText: string) => {
     // Replace with your navigation logic
     console.log(`Navigating to: ${buttonText}`);
@@ -25,38 +25,30 @@ const MentalHealth = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar screenName="Mental Health" />
+      <StatusBar screenName="Exercise" />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.section}>
           <Text style={styles.sectionText}>
-            Mental health involves emotional, psychological, and social well-being, influencing thoughts, feelings, and actions. It determines how we handle stress, relate to others, and make choices.
+            Regular exercise is crucial for maintaining physical health, mental well-being, and overall quality of life. It includes activities that enhance cardiovascular fitness, strength, and flexibility.
           </Text>
         </View>
         <View style={styles.BtnSection}>
-          <Text style={styles.sectionTitle}>Mental Health Resources</Text>
-          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Mental Health Tips")}>
-            <FontAwesome5 name="brain" size={24} color="#1F75FE" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Mental Health Tips</Text>
+          <Text style={styles.sectionTitle}>Exercise Resources</Text>
+          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Daily Workout Plan")}>
+            <FontAwesome5 name="calendar-alt" size={24} color="#1F75FE" style={styles.buttonIcon} />
+            <Text style={styles.buttonText}>Daily Workout Plan</Text>
           </Pressable>
-          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Mindfulness Practices")}>
-            <MaterialCommunityIcons name="meditation" size={24} color="#1F75FE" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Mindfulness Practices</Text>
+          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Exercise Library")}>
+            <MaterialCommunityIcons name="dumbbell" size={24} color="#1F75FE" style={styles.buttonIcon} />
+            <Text style={styles.buttonText}>Exercise Library</Text>
           </Pressable>
-          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Self-care Suggestions")}>
-            <FontAwesome5 name="spa" size={24} color="#1F75FE" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Self-care Suggestions</Text>
-          </Pressable>
-          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Inspirational Quotes and Affirmations")}>
-            <Entypo name="quote" size={24} color="#1F75FE" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Inspirational Quotes and Affirmations</Text>
-          </Pressable>
-          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Educational Articles")}>
-            <MaterialCommunityIcons name="book-open-page-variant" size={24} color="#1F75FE" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Educational Articles</Text>
-          </Pressable>
-          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Progress Tracking")}>
+          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Progress Tracker")}>
             <FontAwesome5 name="chart-line" size={24} color="#1F75FE" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Progress Tracking</Text>
+            <Text style={styles.buttonText}>Progress Tracker</Text>
+          </Pressable>
+          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Quick Workouts")}>
+            <MaterialCommunityIcons name="clock-fast" size={24} color="#1F75FE" style={styles.buttonIcon} />
+            <Text style={styles.buttonText}>Quick Workouts</Text>
           </Pressable>
         </View>
       </ScrollView>
@@ -124,4 +116,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MentalHealth;
+export default Exercise;

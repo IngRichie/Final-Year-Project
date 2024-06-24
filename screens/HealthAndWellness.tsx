@@ -1,31 +1,26 @@
-import * as React from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  Dimensions,
-  Pressable,
-  View,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import StatusBar from "../components/StatusBar";
-import { FontAwesome5, MaterialCommunityIcons, Entypo } from "@expo/vector-icons";
+import * as React from 'react';
+import { View, Text, Pressable, StyleSheet, Dimensions, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import { FontAwesome5, MaterialCommunityIcons, Entypo } from '@expo/vector-icons';
+import StatusBar from '../components/StatusBar';
 
-const { width, height } = Dimensions.get("window");
+const { width, height } = Dimensions.get('window');
 
 const responsiveWidth = (percent: number) => (width * percent) / 100;
 const responsiveHeight = (percent: number) => (height * percent) / 100;
 const responsiveFontSize = (percent: number) => (width * percent) / 100;
 
 const HealthAndWellness = () => {
-  const handlePress = (buttonText: string) => {
-    // Replace with your navigation logic
-    console.log(`Navigating to: ${buttonText}`);
+  const navigation = useNavigation();
+
+  const handlePress = (screenName: string) => {
+    navigation.navigate(screenName);
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar screenName="Health & Wellness" />
+        <StatusBar screenName="Health and Wellness" />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.section}>
           <Text style={styles.sectionText}>
@@ -37,19 +32,19 @@ const HealthAndWellness = () => {
         </View>
         <View style={styles.BtnSection}>
           <Text style={styles.sectionTitle}>Explore</Text>
-          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Mental Health")}>
+          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress('MentalHealth')}>
             <FontAwesome5 name="brain" size={24} color="#1F75FE" style={styles.buttonIcon} />
             <Text style={styles.buttonText}>Mental Health</Text>
           </Pressable>
-          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Exercise")}>
+          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress('Exercise')}>
             <FontAwesome5 name="dumbbell" size={24} color="#1F75FE" style={styles.buttonIcon} />
             <Text style={styles.buttonText}>Exercise</Text>
           </Pressable>
-          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Healthy Relationships")}>
+          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress('HealthyRelationships')}>
             <MaterialCommunityIcons name="human-handsup" size={24} color="#1F75FE" style={styles.buttonIcon} />
             <Text style={styles.buttonText}>Healthy Relationships</Text>
           </Pressable>
-          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("Substance Abuse")}>
+          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress('SubstanceAbuse')}>
             <Entypo name="warning" size={24} color="#1F75FE" style={styles.buttonIcon} />
             <Text style={styles.buttonText}>Substance Abuse</Text>
           </Pressable>
@@ -62,19 +57,19 @@ const HealthAndWellness = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1F75FE",
+    backgroundColor: '#1F75FE',
   },
   scrollContainer: {
     flexGrow: 1,
   },
   section: {
-    backgroundColor: "#1F75FE",
+    backgroundColor: '#1F75FE',
     height: responsiveHeight(30),
-    justifyContent: "center",
+    justifyContent: 'center',
     paddingHorizontal: responsiveWidth(5),
   },
   BtnSection: {
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
     paddingVertical: responsiveHeight(5),
@@ -84,26 +79,26 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: responsiveFontSize(5),
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginBottom: responsiveHeight(2),
-    color: "#3a3a3a",
+    color: '#3a3a3a',
   },
   sectionText: {
     fontSize: responsiveFontSize(4),
-    color: "#fff",
+    color: '#fff',
     lineHeight: responsiveHeight(5),
   },
   button: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     height: responsiveHeight(7),
-    backgroundColor: "#fbfaf3",
-    justifyContent: "flex-start",
+    backgroundColor: '#fbfaf3',
+    justifyContent: 'flex-start',
     paddingLeft: responsiveWidth(5),
     marginBottom: responsiveHeight(2),
     borderRadius: 8,
-    borderColor: "#ccc",
-    shadowColor: "#000",
+    borderColor: '#ccc',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 2,
@@ -112,7 +107,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: responsiveFontSize(4),
     marginLeft: responsiveWidth(2),
-    color: "#3a3a3a",
+    color: '#3a3a3a',
   },
   buttonIcon: {
     marginRight: responsiveWidth(2),
