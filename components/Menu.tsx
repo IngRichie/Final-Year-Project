@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  StyleSheet,
-  View,
-  Text,
-  Linking,
-  Dimensions,
-  Pressable,
-} from "react-native";
+import { StyleSheet, View, Text, Linking, Dimensions, Pressable } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -14,6 +7,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 
 // Define a RootStackParamList for navigation typings
 type RootStackParamList = {
+  WelcomeScreen: undefined;
   SymptomAssessment: undefined;
   MedSchedule: undefined;
   CounselorSession: undefined;
@@ -35,7 +29,7 @@ const responsiveFontSize = (percent: number) => (width * percent) / 100;
 
 const Menu: React.FC<MenuProps> = ({ navigation }) => {
   const handleLogOut = () => {
-    navigation.navigate("LoginScreen");
+    navigation.navigate("WelcomeScreen");
   };
 
   return (
@@ -194,22 +188,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     alignSelf: "flex-start",
     justifyContent: 'center',
-    // height: '80%',
-    // backgroundColor: 'red'
   },
   profileIcon: {
     marginRight: responsiveWidth(2.5),
-    fontSize: responsiveFontSize(35),
-    color: 'white',
-
   },
   username: {
+    fontFamily: "Poppins-SemiBold",
     fontSize: responsiveFontSize(4.5),
     color: "#fff",
   },
   nightModeIcon: {
     alignSelf: "flex-start",
-    fontSize: responsiveFontSize(5.5),
   },
   menuItems: {
     marginTop: responsiveHeight(2.5),
@@ -224,6 +213,7 @@ const styles = StyleSheet.create({
     marginRight: responsiveWidth(3.75),
   },
   menuItemText: {
+    fontFamily: "Poppins-Regular",
     fontSize: responsiveFontSize(4.5),
     color: "#333",
   },

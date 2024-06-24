@@ -1,17 +1,16 @@
 import * as React from "react";
 import { NavigationContainer } from "@react-navigation/native";
-import { useFonts } from "expo-font";
+import { useFonts, Poppins_400Regular, Poppins_600SemiBold, Poppins_700Bold } from "@expo-google-fonts/poppins";
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 
-
 // Import your screens here
 import LoginScreen from "./screens/LoginScreen";
 import Homepage from "./screens/Homepage";
-import HealthAndWellness from "./screens/HealthAndWellness"; // Ensure this import is correct
+import HealthAndWellness from "./screens/HealthAndWellness";
 import CounselorSession from "./screens/CounselorSession";
 import EmergencyContacts from "./screens/EmergencyContacts";
 import MentalHealth from "./screens/MentalHealth";
@@ -23,12 +22,13 @@ import FitnessNutrition from "./screens/FitnessNutrition";
 import Homepage1 from "./screens/Homepage1";
 import MedSchedule from "./screens/MedSchedule";
 import Menu from "./components/Menu";
+import WelcomeScreen from "./screens/WelcomeScreen";
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 const Tab = createBottomTabNavigator();
 
-function DrawerRoot({ navigation }:{navigation:string}) {
+function DrawerRoot({ navigation }: { navigation: string }) {
   return (
     <Drawer.Navigator
       screenOptions={{ headerShown: false, drawerStyle: { width: Dimensions.get("window").width * 0.75 } }}
@@ -133,17 +133,13 @@ function BottomTabsRoot() {
 const App = () => {
   const [hideSplashScreen, setHideSplashScreen] = React.useState(true);
 
-  const [fontsLoaded, error] = useFonts({
-    "Lato-Regular": require("./assets/fonts/Lato-Regular.ttf"),
-    "Lato-Black": require("./assets/fonts/Lato-Black.ttf"),
-    "Inter-Light": require("./assets/fonts/Inter-Light.ttf"),
-    "Inter-Regular": require("./assets/fonts/Inter-Regular.ttf"),
-    "Inter-Medium": require("./assets/fonts/Inter-Medium.ttf"),
-    "Inter-SemiBold": require("./assets/fonts/Inter-SemiBold.ttf"),
-    "Inter-Bold": require("./assets/fonts/Inter-Bold.ttf"),
+  const [fontsLoaded] = useFonts({
+    Poppins_400Regular,
+    Poppins_600SemiBold,
+    Poppins_700Bold,
   });
 
-  if (!fontsLoaded && !error) {
+  if (!fontsLoaded) {
     return null;
   }
 
@@ -151,6 +147,7 @@ const App = () => {
     <NavigationContainer>
       {hideSplashScreen ? (
         <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} />
           <Stack.Screen name="LoginScreen" component={LoginScreen} />
           <Stack.Screen name="SignUpScreen" component={SignUpScreen} />
           <Stack.Screen name="DrawerRoot" component={DrawerRoot} />

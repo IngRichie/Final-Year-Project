@@ -80,7 +80,7 @@ const LoginScreen = () => {
               activeOutlineColor="#085ea9"
               keyboardType="email-address"
               theme={{
-                fonts: { regular: { fontWeight: '300' } },
+                fonts: { regular: { fontFamily: 'Poppins-Regular', fontWeight: '300' } },
                 colors: { text: '#818181' },
               }}
             />
@@ -96,7 +96,7 @@ const LoginScreen = () => {
               outlineColor="#156190"
               activeOutlineColor="#133e85"
               theme={{
-                fonts: { regular: { fontFamily: 'Inter', fontWeight: '300' } },
+                fonts: { regular: { fontFamily: 'Poppins-Regular', fontWeight: '300' } },
                 colors: { text: '#878787' },
               }}
             />
@@ -172,10 +172,12 @@ const styles = StyleSheet.create({
   loginText: {
     color: '#fff',
     fontSize: responsiveFontSize(5),
+    fontFamily: 'Poppins-Bold',
   },
   orLoginWith: {
     marginVertical: responsiveHeight(2),
     fontSize: responsiveFontSize(4.0),
+    fontFamily: 'Poppins-Regular',
   },
   socialMediaLogin: {
     flexDirection: 'row',
@@ -194,6 +196,7 @@ const styles = StyleSheet.create({
   },
   dontHaveAn: {
     fontSize: responsiveFontSize(4.0),
+    fontFamily: 'Poppins-Regular',
   },
   signUp: {
     marginLeft: responsiveWidth(1),
@@ -202,11 +205,13 @@ const styles = StyleSheet.create({
     color: "#1F75FE",
     fontWeight: 'bold',
     fontSize: responsiveFontSize(4.0),
+    fontFamily: 'Poppins-SemiBold',
   },
   errorText: {
     color: 'red',
     marginBottom: responsiveHeight(2),
     fontSize: responsiveFontSize(4),
+    fontFamily: 'Poppins-Regular',
   },
 });
 

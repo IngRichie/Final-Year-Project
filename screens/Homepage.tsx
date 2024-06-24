@@ -24,10 +24,10 @@ const Homepage = () => {
             colors={["#318CE7", "#1F75FE"]}
           />
           <View style={styles.topIcons}>
-            <Pressable onPress={() => navigation.dispatch(DrawerActions.openDrawer())}>
+            <Pressable onPress={() => navigation.dispatch(DrawerActions.openDrawer())} style={styles.iconContainer} >
               <Entypo name="dots-three-vertical" style={styles.icon} />
             </Pressable>
-            <Pressable onPress={() => console.log("Bell pressed")}>
+            <Pressable onPress={() => console.log("Bell pressed")} style={styles.iconContainer} >
               <Entypo name="bell" style={styles.icon} />
             </Pressable>
           </View>
@@ -108,12 +108,27 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     marginBottom: responsiveFontSize(4.5),
   },
-  icon: {
-    width: responsiveWidth(6),
-    height: responsiveHeight(3),
+  iconContainer:{
+    width: responsiveHeight(5),
+    height: responsiveHeight(5),
     fontSize: responsiveFontSize(6),
     fontWeight: "bold",
     color: "white",
+    borderRadius: responsiveHeight(4),
+    backgroundColor: "#1F75FE",
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  icon: {
+    
+    fontSize: responsiveFontSize(6),
+    fontWeight: "bold",
+    color: "white",
+    
+  
+    // elevation: 5,
+
   },
   greetingContainer: {
     width: "90%",
@@ -163,14 +178,16 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
   dailyTip: {
-    fontSize: responsiveFontSize(4),
+    fontSize: responsiveFontSize(3),
     color: "#fff",
     marginTop: responsiveHeight(2),
     textAlign: "center",
+    fontFamily: 'Poppins-Regular',
   },
   greeting: {
     fontSize: responsiveFontSize(5),
     color: "#fff",
+    marginLeft: 4
   },
   welcome: {
     fontSize: responsiveFontSize(6.5),
@@ -213,6 +230,7 @@ const styles = StyleSheet.create({
     color: "#333",
     display: "flex",
     alignItems: "center",
+    fontFamily: 'Poppins-Regular',
   },
   buttonIcon: {
     marginRight: responsiveWidth(2),
