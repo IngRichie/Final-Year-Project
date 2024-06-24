@@ -76,7 +76,7 @@ const LoginScreen = () => {
               value={email}
               onChangeText={setEmail}
               placeholderTextColor="#717171"
-              outlineColor="#14779b"
+              outlineColor="#1F75FE"
               activeOutlineColor="#085ea9"
               keyboardType="email-address"
               theme={{
@@ -93,7 +93,7 @@ const LoginScreen = () => {
               onChangeText={setPassword}
               secureTextEntry
               placeholderTextColor="#717171"
-              outlineColor="#156190"
+              outlineColor="#1F75FE"
               activeOutlineColor="#133e85"
               theme={{
                 fonts: { regular: { fontFamily: 'Poppins-Regular', fontWeight: '300' } },
