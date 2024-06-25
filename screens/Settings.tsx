@@ -1,8 +1,9 @@
 import * as React from "react";
 import { StyleSheet, Text, View, Pressable, Dimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import StatusBar from "../components/StatusBar"; // Adjust the path based on your project structure
+import { useNavigation, NavigationProp, ParamListBase } from "@react-navigation/native";
 import { FontAwesome } from "@expo/vector-icons";
+import StatusBar from "../components/StatusBar"; // Adjust the path based on your project structure
 
 const { width, height } = Dimensions.get("window");
 
@@ -11,8 +12,20 @@ const responsiveHeight = (percent: number) => (height * percent) / 100;
 const responsiveFontSize = (percent: number) => (width * percent) / 100;
 
 const Settings = () => {
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
+
   const handlePress = (buttonText: string) => {
-    console.log(`Navigating to: ${buttonText}`);
+    // Map button text to screen component
+    const screenComponents: { [key: string]: React.ComponentType } = {
+      Profile: require("./ProfileScreen").default, // Adjust path as needed
+      Privacy: require("./PrivacyScreen").default, // Adjust path as needed
+      Notification: require("./NotificationScreen").default, // Adjust path as needed
+      Accessibility: require("./AccessibilityScreen").default, // Adjust path as needed
+      Preferences: require("./PreferencesScreen").default, // Adjust path as needed
+    };
+
+    // Navigate using the mapped screen component
+    navigation.navigate(buttonText, {});
   };
 
   return (
@@ -23,9 +36,9 @@ const Settings = () => {
           <FontAwesome name="user" size={24} color="#1F75FE" style={styles.buttonIcon} />
           <Text style={styles.buttonText}>Profile</Text>
         </Pressable>
-        <Pressable style={styles.button} onPress={() => handlePress("Privacy & Security")}>
+        <Pressable style={styles.button} onPress={() => handlePress("Privacy")}>
           <FontAwesome name="lock" size={24} color="#1F75FE" style={styles.buttonIcon} />
-          <Text style={styles.buttonText}>Privacy & Security</Text>
+          <Text style={styles.buttonText}>Privacy</Text>
         </Pressable>
         <Pressable style={styles.button} onPress={() => handlePress("Notification")}>
           <FontAwesome name="bell" size={24} color="#1F75FE" style={styles.buttonIcon} />
@@ -48,23 +61,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-  },
-  statusBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#004d9b",
-    paddingHorizontal: responsiveWidth(5),
-    paddingVertical: responsiveHeight(2),
-  },
-  leftArrowIcon: {
-    width: 30,
-    height: 30,
-  },
-  screenName: {
-    marginLeft: 15,
-    fontSize: responsiveFontSize(6),
-    color: "#fff",
-    fontWeight: "600",
   },
   buttonContainer: {
     marginTop: responsiveHeight(5),

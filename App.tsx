@@ -34,6 +34,11 @@ import WorkoutPlans from './screens/WorkoutPlans';
 import MealPlans from './screens/MealPlans';
 import HealthyTips from './screens/HealthyTips';
 import GroceryList from './screens/GroceryList';
+import Profile from './screens/ProfileScreen';
+import Privacy from './screens/PrivacyScreen';
+import Preferences from './screens/PreferencesScreen';
+import Notification from './screens/NotificationScreen';
+import Accessibility from './screens/AccessibilityScreen';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -188,6 +193,14 @@ const App = () => {
 
           {/* Add the CounselorDetails screen */}
           <Stack.Screen name="CounselorDetails" component={CounselorDetails} />
+          <Stack.Screen name="Profile" component={Profile} />
+          <Stack.Screen name="Privacy" component={Privacy} />
+          <Stack.Screen name="Preferences" component={Preferences} />
+          <Stack.Screen name="Notification" component={Notification} />
+          <Stack.Screen name="Accessibility" component={Accessibility} />
+
+
+
 
           {/* Add more screens as needed */}
         </Stack.Navigator>
