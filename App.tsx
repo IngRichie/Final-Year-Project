@@ -6,7 +6,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 
-// Import screens and components
+// Import screens
 import LoginScreen from './screens/LoginScreen';
 import Homepage from './screens/Homepage';
 import HealthAndWellness from './screens/HealthAndWellness';
@@ -23,6 +23,17 @@ import Homepage1 from './screens/Homepage1';
 import MedSchedule from './screens/MedSchedule';
 import Menu from './components/Menu';
 import WelcomeScreen from './screens/WelcomeScreen';
+import MedicalEmergency from './screens/MedicalEmergency';
+import FireEmergency from './screens/FireEmergency';
+import PersonalSafety from './screens/PersonalSafety'; 
+import DomesticAccident from './screens/DomesticAccident';
+import CounselorDetails from './screens/CounselorDetails'; // Import CounselorDetails screen
+
+// Import additional screens you want to navigate to
+import WorkoutPlans from './screens/WorkoutPlans';
+import MealPlans from './screens/MealPlans';
+import HealthyTips from './screens/HealthyTips';
+import GroceryList from './screens/GroceryList';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -41,7 +52,6 @@ function DrawerRoot() {
       <Drawer.Screen name="Settings" component={Settings} options={{ headerShown: false }} />
       <Drawer.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
       <Drawer.Screen name="EmergencyProcedures" component={EmergencyProcedures} options={{ headerShown: false }} />
-      {/* Add more screens as needed */}
       <Drawer.Screen name="MentalHealth" component={MentalHealth} options={{ headerShown: false }} />
       <Drawer.Screen name="Exercise" component={Exercise} options={{ headerShown: false }} />
     </Drawer.Navigator>
@@ -154,7 +164,7 @@ const App = () => {
   return (
     <NavigationContainer>
       {hideSplashScreen ? null : (
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Navigator initialRouteName="WelcomeScreen" screenOptions={{ headerShown: false }}>
           <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} />
           <Stack.Screen name="LoginScreen" component={LoginScreen} />
           <Stack.Screen name="SignUpScreen" component={SignUpScreen} />
@@ -163,6 +173,22 @@ const App = () => {
           <Stack.Screen name="HealthAndWellness" component={HealthAndWellness} />
           <Stack.Screen name="SymptomAssessment" component={SymptomAssessment} />
           <Stack.Screen name="EmergencyProcedures" component={EmergencyProcedures} />
+          
+          {/* Define the screens for emergency procedures */}
+          <Stack.Screen name="MedicalEmergency" component={MedicalEmergency} />
+          <Stack.Screen name="FireEmergency" component={FireEmergency} />
+          <Stack.Screen name="PersonalSafety" component={PersonalSafety} />
+          <Stack.Screen name="DomesticAccident" component={DomesticAccident} />
+
+          {/* Add additional screens here */}
+          <Stack.Screen name="WorkoutPlans" component={WorkoutPlans} />
+          <Stack.Screen name="MealPlans" component={MealPlans} />
+          <Stack.Screen name="HealthyTips" component={HealthyTips} />
+          <Stack.Screen name="GroceryList" component={GroceryList} />
+
+          {/* Add the CounselorDetails screen */}
+          <Stack.Screen name="CounselorDetails" component={CounselorDetails} />
+
           {/* Add more screens as needed */}
         </Stack.Navigator>
       )}

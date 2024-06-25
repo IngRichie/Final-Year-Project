@@ -1,18 +1,18 @@
-import * as React from "react";
-import { ScrollView, StyleSheet, Text, Dimensions, Pressable, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
-import StatusBar from "../components/StatusBar";
-import { FontAwesome5, MaterialCommunityIcons, Entypo } from "@expo/vector-icons";
+import React from 'react';
+import { ScrollView, StyleSheet, Text, Dimensions, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import StatusBar from '../components/StatusBar';
+import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 
-const { width, height } = Dimensions.get("window");
+const { width, height } = Dimensions.get('window');
 
 const responsiveWidth = (percent: number) => (width * percent) / 100;
 const responsiveHeight = (percent: number) => (height * percent) / 100;
 const responsiveFontSize = (percent: number) => (width * percent) / 100;
 
 const EmergencyProcedures = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
 
   const handlePress = (screenName: string) => {
     navigation.navigate(screenName);
@@ -29,22 +29,22 @@ const EmergencyProcedures = () => {
         </View>
         <View style={styles.BtnSection}>
           <Text style={styles.sectionTitle}>Emergency Procedures</Text>
-          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("MedicalEmergency")}>
+          <TouchableOpacity style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("MedicalEmergency")}>
             <FontAwesome5 name="medkit" size={24} color="#1F75FE" style={styles.buttonIcon} />
             <Text style={styles.buttonText}>Medical Emergency</Text>
-          </Pressable>
-          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("FireEmergency")}>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("FireEmergency")}>
             <MaterialCommunityIcons name="fire" size={24} color="#1F75FE" style={styles.buttonIcon} />
             <Text style={styles.buttonText}>Fire Emergency</Text>
-          </Pressable>
-          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("PersonalSafety")}>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("PersonalSafety")}>
             <FontAwesome5 name="shield-alt" size={24} color="#1F75FE" style={styles.buttonIcon} />
             <Text style={styles.buttonText}>Personal Safety</Text>
-          </Pressable>
-          <Pressable style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("DomesticAccident")}>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.button, { width: responsiveWidth(90) }]} onPress={() => handlePress("DomesticAccident")}>
             <MaterialCommunityIcons name="home-alert" size={24} color="#1F75FE" style={styles.buttonIcon} />
             <Text style={styles.buttonText}>Domestic Accident</Text>
-          </Pressable>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -54,19 +54,19 @@ const EmergencyProcedures = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1F75FE",
+    backgroundColor: '#1F75FE',
   },
   scrollContainer: {
     flexGrow: 1,
   },
   section: {
-    backgroundColor: "#1F75FE",
+    backgroundColor: '#1F75FE',
     height: responsiveHeight(30),
-    justifyContent: "center",
+    justifyContent: 'center',
     paddingHorizontal: responsiveWidth(5),
   },
   BtnSection: {
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
     paddingVertical: responsiveHeight(5),
@@ -76,26 +76,26 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: responsiveFontSize(5),
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginBottom: responsiveHeight(2),
-    color: "#3a3a3a",
+    color: '#3a3a3a',
   },
   sectionText: {
     fontSize: responsiveFontSize(4),
-    color: "#fff",
+    color: '#fff',
     lineHeight: responsiveHeight(5),
   },
   button: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     height: responsiveHeight(7),
-    backgroundColor: "#fbfaf3",
-    justifyContent: "flex-start",
+    backgroundColor: '#fbfaf3',
+    justifyContent: 'flex-start',
     paddingLeft: responsiveWidth(5),
     marginBottom: responsiveHeight(2),
     borderRadius: 8,
-    borderColor: "#ccc",
-    shadowColor: "#000",
+    borderColor: '#ccc',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 2,
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: responsiveFontSize(4),
     marginLeft: responsiveWidth(2),
-    color: "#3a3a3a",
+    color: '#3a3a3a',
   },
   buttonIcon: {
     marginRight: responsiveWidth(2),

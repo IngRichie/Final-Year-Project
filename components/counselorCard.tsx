@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Image, StyleSheet, Text, View, Pressable, Dimensions } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { NavigationProp, ParamListBase, useNavigation } from "@react-navigation/native";
 
 const { width, height } = Dimensions.get("window");
 
@@ -20,7 +20,7 @@ const responsiveHeight = (percent: number) => (height * percent) / 100;
 const responsiveFontSize = (percent: number) => (width * percent) / 100;
 
 const CounselorCard: React.FC<CounselorCardProps> = ({ counselor }) => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
 
   const handlePress = () => {
     navigation.navigate("CounselorDetails", { counselor });
@@ -50,7 +50,7 @@ const CounselorCard: React.FC<CounselorCardProps> = ({ counselor }) => {
 const styles = StyleSheet.create({
   counselorCard: {
     flexDirection: "row",
-    padding: responsiveWidth(3), // Decreased padding
+    padding: responsiveWidth(2.5), // Decreased padding
     marginVertical: responsiveHeight(1), // Decreased vertical margin
     height: responsiveHeight(17),
     backgroundColor: "#fbfaf3",
@@ -62,9 +62,10 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   counselorImage: {
-    width: responsiveWidth(25), // Decreased image width
-    height: responsiveWidth(28), // Decreased image height
-    // borderRadius: responsiveWidth(10), // Decreased image border radius
+    width: responsiveWidth(26), // Decreased image width
+    height: responsiveWidth(32), // Decreased image height
+    borderTopLeftRadius: responsiveWidth(2.8),
+    borderBottomLeftRadius: responsiveWidth(2.8)
   },
   counselorInfo: {
     marginLeft: responsiveWidth(4), // Decreased marginLeft

@@ -1,27 +1,27 @@
 import * as React from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from "react-native";
+import { View, Text, Pressable, StyleSheet, Dimensions } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 
 const WelcomeScreen = ({ navigation }: { navigation: any }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.welcomeText}>Welcome to CampCare!</Text>
-      <TouchableOpacity
+      <Pressable
         style={styles.buttonContainer}
         onPress={() => navigation.navigate("LoginScreen")}
       >
         <LinearGradient colors={["#318CE7", "#1F75FE"]} style={styles.button}>
           <Text style={styles.buttonText}>Login</Text>
         </LinearGradient>
-      </TouchableOpacity>
-      <TouchableOpacity
+      </Pressable>
+      <Pressable
         style={styles.buttonContainer}
         onPress={() => navigation.navigate("SignUpScreen")}
       >
         <LinearGradient colors={["#318CE7", "#1F75FE"]} style={styles.button}>
           <Text style={styles.buttonText}>Sign Up</Text>
         </LinearGradient>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 };

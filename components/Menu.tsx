@@ -188,9 +188,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     alignSelf: "flex-start",
     justifyContent: 'center',
+    
   },
   profileIcon: {
     marginRight: responsiveWidth(2.5),
+    fontSize: responsiveFontSize(30),
+    color: 'white'
   },
   username: {
     fontFamily: "Poppins-SemiBold",
@@ -199,10 +202,12 @@ const styles = StyleSheet.create({
   },
   nightModeIcon: {
     alignSelf: "flex-start",
+    fontSize: responsiveFontSize(6),
   },
   menuItems: {
     marginTop: responsiveHeight(2.5),
     paddingHorizontal: responsiveWidth(5),
+    width: '100%'
   },
   menuItem: {
     flexDirection: "row",
