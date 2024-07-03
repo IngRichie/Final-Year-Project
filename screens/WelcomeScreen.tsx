@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   welcomeText: {
-    fontFamily: "Poppins_700Bold",
+    fontFamily: "Poppins-SemiBold",
     fontSize: width * 0.063, // Responsive font size
     marginBottom: height * 0.05, // Responsive margin
     textAlign: "center",

@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     flexDirection: "row",
     alignItems: "center",
-    marginTop: responsiveWidth(10),
+    marginTop: responsiveWidth(5),
   },
   leftArrowParent: {
     flexDirection: "row",

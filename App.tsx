@@ -1,10 +1,13 @@
-import * as React from 'react';
+// Import necessary dependencies
+import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import * as Font from "expo-font";
+import AppLoading from "expo-app-loading";
 
 // Import screens
 import LoginScreen from './screens/LoginScreen';
@@ -27,9 +30,7 @@ import MedicalEmergency from './screens/MedicalEmergency';
 import FireEmergency from './screens/FireEmergency';
 import PersonalSafety from './screens/PersonalSafety'; 
 import DomesticAccident from './screens/DomesticAccident';
-import CounselorDetails from './screens/CounselorDetails'; // Import CounselorDetails screen
-
-// Import additional screens you want to navigate to
+import CounselorDetails from './screens/CounselorDetails';
 import WorkoutPlans from './screens/WorkoutPlans';
 import MealPlans from './screens/MealPlans';
 import HealthyTips from './screens/HealthyTips';
@@ -40,9 +41,24 @@ import Preferences from './screens/PreferencesScreen';
 import Notification from './screens/NotificationScreen';
 import Accessibility from './screens/AccessibilityScreen';
 
+// Import ForgotPasswordScreen
+import ForgotPasswordScreen from './screens/ForgetPassword'; // Adjust the path as per your file structure
+
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 const Tab = createBottomTabNavigator();
+
+const loadFonts = () => {
+  return Font.loadAsync({
+    "Poppins-Regular": require("./assets/fonts/Poppins-Regular.ttf"),
+    "Poppins-Bold": require("./assets/fonts/Poppins-Bold.ttf"),
+    "Poppins-Italic": require("./assets/fonts/Poppins-Italic.ttf"),
+    "Poppins-Light": require("./assets/fonts/Poppins-Light.ttf"),
+    "Poppins-Medium": require("./assets/fonts/Poppins-Medium.ttf"),
+    "Poppins-SemiBold": require("./assets/fonts/Poppins-SemiBold.ttf"),
+    "Poppins-Thin": require("./assets/fonts/Poppins-Thin.ttf")
+  });
+};
 
 function DrawerRoot() {
   return (
@@ -56,6 +72,7 @@ function DrawerRoot() {
       <Drawer.Screen name="CounselorSession" component={CounselorSession} options={{ headerShown: false }} />
       <Drawer.Screen name="Settings" component={Settings} options={{ headerShown: false }} />
       <Drawer.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
+      <Drawer.Screen name="ForgotPasswordScreen" component={ForgotPasswordScreen} options={{ headerShown: false }} /> {/* Add ForgotPasswordScreen to Drawer */}
       <Drawer.Screen name="EmergencyProcedures" component={EmergencyProcedures} options={{ headerShown: false }} />
       <Drawer.Screen name="MentalHealth" component={MentalHealth} options={{ headerShown: false }} />
       <Drawer.Screen name="Exercise" component={Exercise} options={{ headerShown: false }} />
@@ -166,6 +183,17 @@ const App = () => {
     }, 2000); // Adjust the time as needed
   }, []);
 
+  const [fontsLoaded, setFontsLoaded] = useState(false);
+
+  if (!fontsLoaded) {
+    return (
+      <AppLoading
+        startAsync={loadFonts}
+        onFinish={() => setFontsLoaded(true)}
+        onError={(err: any) => console.log(err)}
+      />
+    );
+  }
   return (
     <NavigationContainer>
       {hideSplashScreen ? null : (
@@ -199,10 +227,8 @@ const App = () => {
           <Stack.Screen name="Notification" component={Notification} />
           <Stack.Screen name="Accessibility" component={Accessibility} />
 
-
-
-
-          {/* Add more screens as needed */}
+          {/* Add ForgotPasswordScreen */}
+          <Stack.Screen name="ForgotPasswordScreen" component={ForgotPasswordScreen} options={{ headerShown: false }} />
         </Stack.Navigator>
       )}
     </NavigationContainer>

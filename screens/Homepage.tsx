@@ -1,6 +1,19 @@
 import * as React from "react";
-import { View, Text, Pressable, Image, StyleSheet, Dimensions, ScrollView } from "react-native";
-import { useNavigation, NavigationProp, ParamListBase, DrawerActions } from "@react-navigation/native";
+import {
+  View,
+  Text,
+  Pressable,
+  Image,
+  StyleSheet,
+  Dimensions,
+  ScrollView,
+} from "react-native";
+import {
+  useNavigation,
+  NavigationProp,
+  ParamListBase,
+  DrawerActions,
+} from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Entypo } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -23,18 +36,28 @@ const Homepage = () => {
             locations={[0, 1]}
             colors={["#318CE7", "#1F75FE"]}
           />
+          <View>
+            <Text style={styles.campcare}>CampCare</Text>
+          </View>
           <View style={styles.topIcons}>
-            <Pressable onPress={() => navigation.dispatch(DrawerActions.openDrawer())} style={styles.iconContainer} >
+            <Pressable
+              onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+              style={styles.iconContainer}
+            >
               <Entypo name="dots-three-vertical" style={styles.icon} />
             </Pressable>
-            <Pressable onPress={() => console.log("Bell pressed")} style={styles.iconContainer} >
+            <View style={styles.greetingContainer}>
+              <Text style={styles.welcome}>Welcome!</Text>
+              <Text style={styles.greeting}>Hi, Richie</Text>
+            </View>
+            <Pressable
+              onPress={() => console.log("Bell pressed")}
+              style={styles.iconContainer}
+            >
               <Entypo name="bell" style={styles.icon} />
             </Pressable>
           </View>
-          <View style={styles.greetingContainer}>
-            <Text style={styles.greeting}>Hi, Richie</Text>
-            <Text style={styles.welcome}></Text>
-          </View>
+
           <View style={styles.dailyTipContainer}>
             <Text style={styles.title}>Daily health tips</Text>
             <View style={styles.imageContainer}>
@@ -45,10 +68,10 @@ const Homepage = () => {
                 resizeMode="cover"
               />
               <Text style={styles.dailyTip}>
-                Eating a variety of fresh, whole fruits daily boosts your health by
-                providing essential vitamins, minerals, and fiber. Opt for seasonal
-                fruits and choose whole fruits over juices to maximize nutrient
-                intake and aid digestion.
+                Eating a variety of fresh, whole fruits daily boosts your health
+                by providing essential vitamins, minerals, and fiber. Opt for
+                seasonal fruits and choose whole fruits over juices to maximize
+                nutrient intake and aid digestion.
               </Text>
             </View>
           </View>
@@ -59,14 +82,24 @@ const Homepage = () => {
               style={styles.button}
               onPress={() => navigation.navigate("HealthAndWellness")}
             >
-              <Entypo name="heart" size={24} color="#1F75FE" style={styles.buttonIcon} />
+              <Entypo
+                name="heart"
+                size={24}
+                color="#1F75FE"
+                style={styles.buttonIcon}
+              />
               <Text style={styles.buttonText}>Health and Wellness</Text>
             </Pressable>
             <Pressable
               style={styles.button}
               onPress={() => navigation.navigate("EmergencyProcedures")}
             >
-              <Entypo name="warning" size={24} color="#1F75FE" style={styles.buttonIcon} />
+              <Entypo
+                name="warning"
+                size={24}
+                color="#1F75FE"
+                style={styles.buttonIcon}
+              />
               <Text style={styles.buttonText}>Emergency Procedures</Text>
             </Pressable>
           </View>
@@ -75,14 +108,24 @@ const Homepage = () => {
               style={styles.button}
               onPress={() => navigation.navigate("EmergencyContacts")}
             >
-              <Entypo name="phone" size={24} color="#1F75FE" style={styles.buttonIcon} />
+              <Entypo
+                name="phone"
+                size={24}
+                color="#1F75FE"
+                style={styles.buttonIcon}
+              />
               <Text style={styles.buttonText}>Emergency Contacts</Text>
             </Pressable>
             <Pressable
               style={styles.button}
               onPress={() => navigation.navigate("CounselorSession")}
             >
-              <Entypo name="users" size={24} color="#1F75FE" style={styles.buttonIcon} />
+              <Entypo
+                name="users"
+                size={24}
+                color="#1F75FE"
+                style={styles.buttonIcon}
+              />
               <Text style={styles.buttonText}>Counselor Session</Text>
             </Pressable>
           </View>
@@ -101,43 +144,49 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
   },
+
+  campcare: {
+    fontSize: responsiveFontSize(7.5),
+    color: "white",
+    fontWeight: "bold",
+    marginVertical: responsiveHeight(0.5),
+    marginLeft: responsiveFontSize(3),
+  },
   header: {
     width: "100%",
-    height: responsiveHeight(65),
+    height: responsiveHeight(66),
     display: "flex",
     flexDirection: "column",
     marginBottom: responsiveFontSize(4.5),
   },
-  iconContainer:{
+  iconContainer: {
     width: responsiveHeight(5),
     height: responsiveHeight(5),
     fontSize: responsiveFontSize(6),
     fontWeight: "bold",
     color: "white",
     borderRadius: responsiveHeight(4),
-    backgroundColor: "#1F75FE",
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center'
+    backgroundColor: "#333333",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
   icon: {
-    
     fontSize: responsiveFontSize(6),
     fontWeight: "bold",
     color: "white",
-    
-  
-    // elevation: 5,
 
+    // elevation: 5,
   },
   greetingContainer: {
-    width: "90%",
+    width: "78%",
     display: "flex",
     flexDirection: "column",
     alignItems: "flex-start",
     justifyContent: "space-between",
-    marginLeft: responsiveFontSize(4.5),
+    marginLeft: responsiveFontSize(10.5),
     marginBottom: responsiveFontSize(4.5),
+    // backgroundColor:"green"
   },
   gradient: {
     position: "absolute",
@@ -148,19 +197,21 @@ const styles = StyleSheet.create({
   },
   topIcons: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
     paddingHorizontal: responsiveWidth(2.5),
-    width: "95%",
+    width: "96%",
     marginTop: responsiveHeight(2.5),
-    marginBottom: responsiveHeight(3),
+    // marginBottom: responsiveHeight(3),
     alignSelf: "center",
+    // backgroundColor: 'red'
   },
   dailyTipContainer: {
     paddingHorizontal: responsiveWidth(5),
     width: "100%",
     height: "60%",
-    borderTopWidth: 1,
-    borderColor: "white",
+    // borderTopWidth: 1,
+    // borderColor: "white",
+    position: "relative",
   },
   imageContainer: {
     marginTop: responsiveHeight(2),
@@ -168,31 +219,41 @@ const styles = StyleSheet.create({
   },
   image: {
     width: responsiveWidth(95),
-    height: responsiveHeight(20),
-    borderRadius: 5,
-    elevation: 12
+    height: responsiveHeight(25),
+    borderRadius: 15,
+    // elevation: 12,
+    backgroundColor: "black",
   },
   title: {
     fontSize: responsiveFontSize(5),
     fontWeight: "bold",
     color: "#fff",
+    position: "absolute",
+    left: responsiveFontSize(4.5),
+    bottom: responsiveHeight(30),
   },
   dailyTip: {
-    fontSize: responsiveFontSize(3),
+    width: responsiveWidth(95),
+    height: responsiveHeight(17),
+    backgroundColor: "#318CE7",
+    padding: responsiveFontSize(3),
+    fontSize: responsiveFontSize(3.8),
     color: "#fff",
-    marginTop: responsiveHeight(2),
-    textAlign: "center",
-    fontFamily: 'Poppins-Regular',
+    marginTop: responsiveHeight(1),
+    // textAlign: "center",
+
+    fontFamily: "Poppins-Regular",
+    borderRadius: 15,
   },
   greeting: {
-    fontSize: responsiveFontSize(5),
+    fontSize: responsiveFontSize(4),
     color: "#fff",
-    marginLeft: 4
+    marginLeft: 4,
   },
   welcome: {
-    fontSize: responsiveFontSize(6.5),
+    fontSize: responsiveFontSize(5),
     fontWeight: "bold",
-    marginBottom: responsiveFontSize(6.5),
+    // marginBottom: responsiveFontSize(6.5),
     color: "#fff",
   },
   mainContainer: {
@@ -230,7 +291,7 @@ const styles = StyleSheet.create({
     color: "#333",
     display: "flex",
     alignItems: "center",
-    fontFamily: 'Poppins-Regular',
+    fontFamily: "Poppins-Regular",
   },
   buttonIcon: {
     marginRight: responsiveWidth(2),

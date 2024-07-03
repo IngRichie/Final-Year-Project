@@ -1,21 +1,13 @@
-import * as React from "react";
-import { useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  Pressable,
-  View,
-  ScrollView,
-  Dimensions,
-  Image,
-} from "react-native";
+import React, { useState } from "react";
+import { StyleSheet, Text, Pressable, View, ScrollView, Dimensions, Image } from "react-native";
 import { TextInput as RNPTextInput } from "react-native-paper";
 import { LinearGradient } from "expo-linear-gradient";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { useNavigation, ParamListBase } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { handleSignUp } from "../utils/auth";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { auth, db } from "../firebaseConfig";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { setDoc, doc, serverTimestamp, getDocs, collection } from "firebase/firestore";
 
 const { width, height } = Dimensions.get("window");
 
@@ -23,21 +15,73 @@ const responsiveWidth = (percent: number) => (width * percent) / 100;
 const responsiveHeight = (percent: number) => (height * percent) / 100;
 const responsiveFontSize = (percent: number) => (width * percent) / 100;
 
-const SignUpScreen = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+const SignUpScreen: React.FC = () => {
+  const [username, setUsername] = useState<string>("");
+  const [firstname, setFirstname] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
 
-  const onSignUpPress = () => {
-    const errorMsg = handleSignUp(email, password, confirmPassword);
-    if (errorMsg) {
-      setError(errorMsg);
-    } else {
-      setError(null);
-      navigation.navigate("DrawerRoot", { screen: "LoginScreen" });
+  const onSignUpPress = async () => {
+    setError(null); // Reset error message before attempting to sign up
+    try {
+      if (password !== confirmPassword) {
+        setError("Passwords do not match");
+        return;
+      }
+
+      // Check if username is unique
+      const usernamesSnapshot = await getDocs(collection(db, "users"));
+      const usernames = usernamesSnapshot.docs.map(doc => doc.id);
+      if (usernames.includes(username)) {
+        setError("Username is already taken. Please choose another one.");
+        return;
+      }
+
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userId = userCredential.user.uid;
+
+      // Write user data to Firestore
+      await setDoc(doc(db, "users", username), {
+        userId: userId,
+        email: email,
+        firstname: firstname,
+        createdAt: serverTimestamp()
+      });
+
+      navigation.navigate("DrawerRoot", { screen: "Homepage" });
+    } catch (error: any) {
+      handleError(error);
     }
+  };
+
+  const handleError = (error: any) => {
+    let message;
+    switch (error.code) {
+      case "auth/email-already-in-use":
+        message = "The email address is already in use by another account.";
+        break;
+      case "auth/invalid-email":
+        message = "The email address is not valid.";
+        break;
+      case "auth/weak-password":
+        message = "The password is too weak. It should be at least 6 characters long.";
+        break;
+      case "auth/operation-not-allowed":
+        message = "Email/password accounts are not enabled. Please contact support.";
+        break;
+      case "auth/invalid-argument":
+        message = "An invalid argument was provided. Please check your input.";
+        break;
+      case "auth/invalid-user-import":
+        message = "The user record to import is invalid.";
+        break;
+      default:
+        message = "An unexpected error occurred. Please try again.";
+    }
+    setError(message);
   };
 
   return (
@@ -51,6 +95,30 @@ const SignUpScreen = () => {
           />
           <View style={styles.formContainer}>
             {error && <Text style={styles.errorText}>{error}</Text>}
+            <RNPTextInput
+              style={styles.input}
+              label="Username"
+              placeholder="Username"
+              mode="outlined"
+              value={username}
+              onChangeText={setUsername}
+              placeholderTextColor="#545454"
+              outlineColor="#0b6fab"
+              activeOutlineColor="#175689"
+              theme={{ colors: { text: "#626262" } }}
+            />
+            <RNPTextInput
+              style={styles.input}
+              label="Firstname"
+              placeholder="Firstname"
+              mode="outlined"
+              value={firstname}
+              onChangeText={setFirstname}
+              placeholderTextColor="#545454"
+              outlineColor="#0b6fab"
+              activeOutlineColor="#175689"
+              theme={{ colors: { text: "#626262" } }}
+            />
             <RNPTextInput
               style={styles.input}
               label="Email"
@@ -102,17 +170,6 @@ const SignUpScreen = () => {
 
           <View style={styles.socialMediaSignupContainer}>
             <Text style={styles.orSignUp}>Or Sign Up with</Text>
-            <View style={styles.socialMediaSignup}>
-              <Pressable onPress={() => {}}>
-                <FontAwesome name="google" size={responsiveFontSize(7)} color="#DB4437" />
-              </Pressable>
-              <Pressable onPress={() => {}}>
-                <FontAwesome name="facebook" size={responsiveFontSize(7)} color="#3b5998" />
-              </Pressable>
-              <Pressable onPress={() => {}}>
-                <FontAwesome name="twitter" size={responsiveFontSize(7)} color="#1DA1F2" />
-              </Pressable>
-            </View>
           </View>
           <View style={styles.haveAnAccount}>
             <Text style={styles.haveAnAccountText}>Have an account? </Text>

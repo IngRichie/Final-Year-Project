@@ -1,13 +1,14 @@
-import * as React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, Pressable, View, ScrollView, Dimensions, Image } from 'react-native';
 import { TextInput as RNPTextInput } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation, ParamListBase } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { handleLogin } from '../utils/auth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+// import { db, auth } from '../firebaseConfig';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 
 const { width, height } = Dimensions.get('window');
 
@@ -21,23 +22,34 @@ const isValidEmail = (email: string) => {
 };
 
 const LoginScreen = () => {
-  const [email, setEmail] = useState('');
+  const [emailOrUsername, setEmailOrUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
 
-  const onLoginPress = () => {
-    if (!isValidEmail(email)) {
-      setError('Please enter a valid email address.');
-      return;
-    }
+  const onLoginPress = async () => {
+    try {
+      let email = emailOrUsername;
 
-    const errorMsg = handleLogin(email, password);
-    if (errorMsg) {
-      setError(errorMsg);
-    } else {
-      setError(null);
+      if (!isValidEmail(emailOrUsername)) {
+        const userQuery = query(collection(db, 'users'), where('username', '==', emailOrUsername));
+        const userSnapshot = await getDocs(userQuery);
+        if (!userSnapshot.empty) {
+          const userData = userSnapshot.docs[0].data();
+          email = userData.email;
+        } else {
+          throw new Error('User not found');
+        }
+      }
+
+      await signInWithEmailAndPassword(auth, email, password);
       navigation.navigate('DrawerRoot');
+    } catch (error: any) {
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+        setError('Invalid email or password');
+      } else {
+        setError(error.message);
+      }
     }
   };
 
@@ -57,6 +69,10 @@ const LoginScreen = () => {
     navigation.navigate('SignUpScreen');
   };
 
+  const onForgotPasswordPress = () => {
+    navigation.navigate('ForgotPasswordScreen');
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.scrollView}>
@@ -70,15 +86,15 @@ const LoginScreen = () => {
             {error && <Text style={styles.errorText}>{error}</Text>}
             <RNPTextInput
               style={styles.input}
-              label="Email"
-              placeholder="Email"
+              label="Email or Username"
+              placeholder="Email or Username"
               mode="outlined"
-              value={email}
-              onChangeText={setEmail}
+              value={emailOrUsername}
+              onChangeText={setEmailOrUsername}
               placeholderTextColor="#717171"
               outlineColor="#1F75FE"
               activeOutlineColor="#085ea9"
-              keyboardType="email-address"
+              keyboardType="default"
               theme={{
                 fonts: { regular: { fontFamily: 'Poppins-Regular', fontWeight: '300' } },
                 colors: { text: '#818181' },
@@ -100,6 +116,9 @@ const LoginScreen = () => {
                 colors: { text: '#878787' },
               }}
             />
+            <Pressable onPress={onForgotPasswordPress}>
+              <Text style={styles.forgotPassword}>Forgot Password?</Text>
+            </Pressable>
             <LinearGradient
               colors={["#318CE7", "#1F75FE"]}
               style={styles.loginButton}
@@ -158,6 +177,13 @@ const styles = StyleSheet.create({
   },
   input: {
     marginBottom: responsiveHeight(2),
+  },
+  forgotPassword: {
+    color: '#1F75FE',
+    marginBottom: responsiveHeight(2),
+    fontSize: responsiveFontSize(3.5),
+    fontFamily: 'Poppins-Regular',
+    textAlign: 'right',
   },
   loginButton: {
     width: '100%',
