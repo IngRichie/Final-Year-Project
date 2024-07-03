@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import { StyleSheet, Text, Pressable, View, ScrollView, Dimensions, Image } from "react-native";
+import { StyleSheet, Text, Pressable, View, ScrollView, Dimensions, Image, Alert } from "react-native";
 import { TextInput as RNPTextInput } from "react-native-paper";
 import { LinearGradient } from "expo-linear-gradient";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { useNavigation, ParamListBase } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { auth, db } from "../firebaseConfig";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { setDoc, doc, serverTimestamp, getDocs, collection } from "firebase/firestore";
+import { auth, db } from "../firebaseConfig"; // Ensure you import auth from your Firebase config correctly
 
 const { width, height } = Dimensions.get("window");
 
@@ -24,8 +24,10 @@ const SignUpScreen: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
 
+  const auth = getAuth(); // Initialize Firebase auth
+
   const onSignUpPress = async () => {
-    setError(null); // Reset error message before attempting to sign up
+    setError(null);
     try {
       if (password !== confirmPassword) {
         setError("Passwords do not match");
@@ -40,20 +42,45 @@ const SignUpScreen: React.FC = () => {
         return;
       }
 
+      // Create user with email and password
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const userId = userCredential.user.uid;
+      const user = userCredential.user;
 
-      // Write user data to Firestore
-      await setDoc(doc(db, "users", username), {
-        userId: userId,
-        email: email,
-        firstname: firstname,
-        createdAt: serverTimestamp()
-      });
+      // Send verification email
+      await sendVerificationEmail(user);
 
-      navigation.navigate("DrawerRoot", { screen: "Homepage" });
+      // Show verification note
+      Alert.alert(
+        "Verification Required",
+        "A verification email has been sent to your email address. Please verify your email before proceeding.",
+        [{ text: "OK", onPress: () => console.log("Verification email sent") }]
+      );
+
+      // Clear input fields
+      setUsername("");
+      setFirstname("");
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
+
+      // Optionally: Navigate to a verification pending screen
+      // navigation.navigate("VerificationPendingScreen");
+
     } catch (error: any) {
       handleError(error);
+    }
+  };
+
+  const sendVerificationEmail = async (user: any) => { // Adjust the type as per your Firebase setup
+    if (user) {
+      try {
+        await sendEmailVerification(auth.currentUser); // Correctly call sendEmailVerification with auth.currentUser
+      } catch (error) {
+        console.error('Error sending verification email:', error);
+        // Handle error appropriately
+      }
+    } else {
+      console.error('User object is null or undefined');
     }
   };
 
@@ -168,11 +195,8 @@ const SignUpScreen: React.FC = () => {
             </LinearGradient>
           </View>
 
-          <View style={styles.socialMediaSignupContainer}>
-            <Text style={styles.orSignUp}>Or Sign Up with</Text>
-          </View>
           <View style={styles.haveAnAccount}>
-            <Text style={styles.haveAnAccountText}>Have an account? </Text>
+            <Text style={styles.haveAnAccountText}>Already have an account? </Text>
             <Pressable onPress={() => navigation.navigate("LoginScreen")}>
               <Text style={styles.loginBtn}>Login</Text>
             </Pressable>
@@ -202,10 +226,6 @@ const styles = StyleSheet.create({
     width: responsiveWidth(70),
     height: responsiveHeight(17),
     marginBottom: responsiveHeight(2),
-  },
-  orSignUp: {
-    marginBottom: responsiveHeight(2),
-    fontSize: responsiveFontSize(4),
   },
   formContainer: {
     width: responsiveWidth(80),
@@ -241,21 +261,6 @@ const styles = StyleSheet.create({
     fontSize: responsiveFontSize(4.0),
     fontWeight: "600",
     marginLeft: responsiveWidth(1),
-  },
-  socialMediaSignupContainer: {
-    marginBottom: responsiveHeight(8),
-    marginTop: responsiveHeight(2),
-    alignItems: "center",
-  },
-  socialMediaSignup: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    width: responsiveWidth(60),
-    marginBottom: responsiveHeight(2),
-  },
-  socialIcon: {
-    width: responsiveWidth(10),
-    height: responsiveWidth(10),
   },
   errorText: {
     color: "red",

@@ -6,7 +6,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation, ParamListBase } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-// import { db, auth } from '../firebaseConfig';
+import { db, auth } from '../firebaseConfig';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 
@@ -43,13 +43,29 @@ const LoginScreen = () => {
       }
 
       await signInWithEmailAndPassword(auth, email, password);
-      navigation.navigate('DrawerRoot');
+      navigation.navigate('Homepage');  // Make sure 'Homepage' is the correct route name
     } catch (error: any) {
-      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-        setError('Invalid email or password');
-      } else {
-        setError(error.message);
-      }
+      const errorMessage = getErrorMessage(error);
+      setError(errorMessage);
+    }
+  };
+
+  const getErrorMessage = (error: any) => {
+    console.log(error.code);
+    
+    switch (error.code) {
+      case 'auth/invalid-email':
+        return 'The email address is not valid.';
+      case 'auth/user-disabled':
+        return 'Your account has been disabled. Please contact support.';
+      case 'auth/user-not-found':
+        return 'Invalid email or password.';
+      case 'auth/wrong-password':
+        return 'Invalid email or password.';
+      case 'auth/invalid-credential':
+        return 'Incorrect email or password.';
+      default:
+        return 'An unexpected error occurred. Please try again.';
     }
   };
 
@@ -86,8 +102,8 @@ const LoginScreen = () => {
             {error && <Text style={styles.errorText}>{error}</Text>}
             <RNPTextInput
               style={styles.input}
-              label="Email or Username"
-              placeholder="Email or Username"
+              label="Email"
+              placeholder="Email"
               mode="outlined"
               value={emailOrUsername}
               onChangeText={setEmailOrUsername}
@@ -238,6 +254,7 @@ const styles = StyleSheet.create({
     marginBottom: responsiveHeight(2),
     fontSize: responsiveFontSize(4),
     fontFamily: 'Poppins-Regular',
+    textAlign: 'center',
   },
 });
 
