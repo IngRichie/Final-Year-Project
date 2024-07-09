@@ -10,37 +10,44 @@ const responsiveWidth = (percent: number) => (width * percent) / 100;
 const responsiveHeight = (percent: number) => (height * percent) / 100;
 const responsiveFontSize = (percent: number) => (width * percent) / 100;
 
-const AccessibilityScreen = ({ navigation }) => {
-  const [isVoiceOverEnabled, setIsVoiceOverEnabled] = React.useState(false);
-  const [isDarkModeEnabled, setIsDarkModeEnabled] = React.useState(false);
-
-  const toggleVoiceOverSwitch = () => setIsVoiceOverEnabled(previousState => !previousState);
-  const toggleDarkModeSwitch = () => setIsDarkModeEnabled(previousState => !previousState);
+const NotificationSettingsScreen = ({ navigation }) => {
+  const [emailNotifications, setEmailNotifications] = React.useState(false);
+  const [pushNotifications, setPushNotifications] = React.useState(false);
+  const [smsNotifications, setSmsNotifications] = React.useState(false);
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar screenName="Accessibility" />
-    
+      <StatusBar screenName="Notification Settings" />
+      
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.accessibilityItem}>
-          <Text style={styles.label}>Enable Voice Over</Text>
+        <View style={styles.settingItem}>
+          <Text style={styles.label}>Email Notifications</Text>
           <Switch
             trackColor={{ false: "#767577", true: "#1F75FE" }}
-            thumbColor={isVoiceOverEnabled ? "#fff" : "#f4f3f4"}
-            onValueChange={toggleVoiceOverSwitch}
-            value={isVoiceOverEnabled}
+            thumbColor={emailNotifications ? "#fff" : "#f4f3f4"}
+            onValueChange={() => setEmailNotifications(previousState => !previousState)}
+            value={emailNotifications}
           />
         </View>
-        <View style={styles.accessibilityItem}>
-          <Text style={styles.label}>Enable Dark Mode</Text>
+        <View style={styles.settingItem}>
+          <Text style={styles.label}>Push Notifications</Text>
           <Switch
             trackColor={{ false: "#767577", true: "#1F75FE" }}
-            thumbColor={isDarkModeEnabled ? "#fff" : "#f4f3f4"}
-            onValueChange={toggleDarkModeSwitch}
-            value={isDarkModeEnabled}
+            thumbColor={pushNotifications ? "#fff" : "#f4f3f4"}
+            onValueChange={() => setPushNotifications(previousState => !previousState)}
+            value={pushNotifications}
           />
         </View>
-        {/* Add more accessibility settings as needed */}
+        <View style={styles.settingItem}>
+          <Text style={styles.label}>SMS Notifications</Text>
+          <Switch
+            trackColor={{ false: "#767577", true: "#1F75FE" }}
+            thumbColor={smsNotifications ? "#fff" : "#f4f3f4"}
+            onValueChange={() => setSmsNotifications(previousState => !previousState)}
+            value={smsNotifications}
+          />
+        </View>
+        {/* Add more notification settings as needed */}
       </ScrollView>
     </SafeAreaView>
   );
@@ -70,7 +77,7 @@ const styles = StyleSheet.create({
   scrollContainer: {
     padding: responsiveWidth(5),
   },
-  accessibilityItem: {
+  settingItem: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -84,4 +91,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AccessibilityScreen;
+export default NotificationSettingsScreen;

@@ -28,8 +28,8 @@ const responsiveHeight = (percent: number) => (height * percent) / 100;
 const responsiveFontSize = (percent: number) => (width * percent) / 100;
 
 const Menu: React.FC<MenuProps> = ({ navigation }) => {
-  const handleLogOut = () => {
-    navigation.navigate("WelcomeScreen");
+  const handleLogOut = (screens: any) => {
+    navigation.navigate(screens);
   };
 
   return (
@@ -94,38 +94,6 @@ const Menu: React.FC<MenuProps> = ({ navigation }) => {
             styles.menuItem,
             { backgroundColor: pressed ? "#f0f0f0" : "transparent" },
           ]}
-          onPress={() => navigation.navigate("CounselorSession")}
-        >
-          <Ionicons
-            name="people-outline"
-            size={responsiveFontSize(7)}
-            color="#1F75FE"
-            style={styles.menuIcon}
-          />
-          <Text style={styles.menuItemText}>Counselor Session</Text>
-        </Pressable>
-
-        <Pressable
-          style={({ pressed }) => [
-            styles.menuItem,
-            { backgroundColor: pressed ? "#f0f0f0" : "transparent" },
-          ]}
-          onPress={() => navigation.navigate("FitnessNutrition")}
-        >
-          <Ionicons
-            name="fitness-outline"
-            size={responsiveFontSize(7)}
-            color="#1F75FE"
-            style={styles.menuIcon}
-          />
-          <Text style={styles.menuItemText}>Fitness & Nutrition</Text>
-        </Pressable>
-
-        <Pressable
-          style={({ pressed }) => [
-            styles.menuItem,
-            { backgroundColor: pressed ? "#f0f0f0" : "transparent" },
-          ]}
           onPress={() =>
             Linking.openURL("https://webapps.knust.edu.gh/uhs/appointments/")
           }
@@ -137,6 +105,37 @@ const Menu: React.FC<MenuProps> = ({ navigation }) => {
             style={styles.menuIcon}
           />
           <Text style={styles.menuItemText}>Clinic Appointment</Text>
+        </Pressable>
+        <Pressable
+          style={({ pressed }) => [
+            styles.menuItem,
+            { backgroundColor: pressed ? "#f0f0f0" : "transparent" },
+          ]}
+          onPress={() => navigation.navigate("NewsPage")}
+        >
+          <Ionicons
+            name="newspaper-outline"
+            size={responsiveFontSize(7)}
+            color="#1F75FE"
+            style={styles.menuIcon}
+          />
+          <Text style={styles.menuItemText}>News</Text>
+        </Pressable>
+
+        <Pressable
+          style={({ pressed }) => [
+            styles.menuItem,
+            { backgroundColor: pressed ? "#f0f0f0" : "transparent" },
+          ]}
+          onPress={() => navigation.navigate("NotificationScreen")}
+        >
+          <Ionicons
+            name="notifications-outline"
+            size={responsiveFontSize(7)}
+            color="#1F75FE"
+            style={styles.menuIcon}
+          />
+          <Text style={styles.menuItemText}>Notifications</Text>
         </Pressable>
         <Pressable
           style={({ pressed }) => [

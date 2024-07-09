@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Image, StyleSheet, Text, View, Pressable, Dimensions } from "react-native";
 import { NavigationProp, ParamListBase, useNavigation } from "@react-navigation/native";
+import MaterialIcons from "@expo/vector-icons/build/MaterialIcons";
 
 const { width, height } = Dimensions.get("window");
 
@@ -35,13 +36,10 @@ const CounselorCard: React.FC<CounselorCardProps> = ({ counselor }) => {
       <View style={styles.counselorInfo}>
         <Text style={styles.position}>{counselor.position}</Text>
         <Text style={styles.fullName}>{counselor.fullName}</Text>
-        <Text style={styles.description}>{counselor.description}</Text>
-        <Text style={styles.availability}>
-          Available:{" "}
-          <Text style={styles.availabilityStatus}>
-            {counselor.available ? "Yes" : "No"}
-          </Text>
-        </Text>
+        <View style={styles.ratingContainer}>
+          <Text style={styles.ratingText}>★★★★★</Text>
+          <MaterialIcons name="navigate-next" size={responsiveFontSize(6)} color="#0063ae" />
+        </View>
       </View>
     </Pressable>
   );
@@ -78,21 +76,15 @@ const styles = StyleSheet.create({
   },
   fullName: {
     fontSize: responsiveFontSize(4), // Increased font size
-    // fontWeight: "600",
     marginBottom: responsiveHeight(0.5), // Decreased marginBottom
   },
-  description: {
-    fontSize: responsiveFontSize(3.5), // Increased font size
-    color: "#666",
-    marginBottom: responsiveHeight(0.5), // Decreased marginBottom
+  ratingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
   },
-  availability: {
-    fontSize: responsiveFontSize(3.2), // Increased font size
-    color: "#333",
-  },
-  availabilityStatus: {
-    fontWeight: "bold",
-    // color: counselor.available ? "#0f0" : "#f00",
+  ratingText: {
+    fontSize: responsiveFontSize(4), // Increased font size
+    color: "#ffb400",
   },
 });
 

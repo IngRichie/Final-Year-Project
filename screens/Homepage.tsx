@@ -1,22 +1,21 @@
-import * as React from "react";
+import React, { useRef, useEffect, useState } from "react";
 import {
   View,
   Text,
-  Pressable,
   Image,
   StyleSheet,
   Dimensions,
+  SafeAreaView,
+  StatusBar,
   ScrollView,
+  Pressable,
 } from "react-native";
-import {
-  useNavigation,
-  NavigationProp,
-  ParamListBase,
-  DrawerActions,
-} from "@react-navigation/native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Entypo } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
+import { useNavigation, NavigationProp, DrawerActions } from "@react-navigation/native";
+import { FontAwesome5 } from "@expo/vector-icons";
+import { LinearGradient } from 'expo-linear-gradient';
+import dailyTips from "./DailyTips";
+import { db, auth } from "../firebaseConfig";
+import { doc, getDoc } from "firebase/firestore";
 
 const { width, height } = Dimensions.get("window");
 
@@ -24,111 +23,144 @@ const responsiveWidth = (percent: number) => (width * percent) / 100;
 const responsiveHeight = (percent: number) => (height * percent) / 100;
 const responsiveFontSize = (percent: number) => (width * percent) / 100;
 
-const Homepage = () => {
-  const navigation = useNavigation<NavigationProp<ParamListBase>>();
+type RootStackParamList = {
+  Home: undefined;
+  SymptomAssessment: undefined;
+  ClinicAppointment: undefined;
+  FitnessNutrition: undefined;
+  MentalHealth: undefined;
+  CounselorSession: undefined;
+  DailyTipDetailScreen: { tip: any };
+};
+
+const Homepage: React.FC = () => {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const [firstName, setFirstName] = useState<string>("");
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const user = auth.currentUser;
+        if (user) {
+          const userDoc = doc(db, "users", user.uid);
+          const userSnapshot = await getDoc(userDoc);
+          if (userSnapshot.exists()) {
+            const userData = userSnapshot.data();
+            if (userData && userData.firstName) {
+              setFirstName(userData.firstName);
+            } else {
+              console.log("First name not found in user data!");
+            }
+          } else {
+            console.log("No user data found!");
+          }
+        } else {
+          console.log("No user is signed in.");
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  const handleReadMorePress = (tip: any) => {
+    navigation.navigate("DailyTipDetailScreen", { tip });
+  };
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <StatusBar barStyle="light-content" backgroundColor="#318CE7" />
+      <Pressable
+        style={styles.menuIconContainer}
+        onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+      >
+        <FontAwesome5 name="bars" style={styles.menuIcon} />
+      </Pressable>
+      <View style={styles.headerContainer}>
         <View style={styles.header}>
-          <LinearGradient
-            style={styles.gradient}
-            locations={[0, 1]}
-            colors={["#318CE7", "#1F75FE"]}
-          />
-          <View>
-            <Text style={styles.campcare}>CampCare</Text>
+          <View style={styles.iconContainer}>
+            <FontAwesome5 name="user" style={styles.userIcon} />
           </View>
-          <View style={styles.topIcons}>
-            <Pressable
-              onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
-              style={styles.iconContainer}
-            >
-              <Entypo name="dots-three-vertical" style={styles.icon} />
-            </Pressable>
-            <View style={styles.greetingContainer}>
-              <Text style={styles.welcome}>Welcome!</Text>
-              <Text style={styles.greeting}>Hi, Richie</Text>
-            </View>
-            <Pressable
-              onPress={() => console.log("Bell pressed")}
-              style={styles.iconContainer}
-            >
-              <Entypo name="bell" style={styles.icon} />
-            </Pressable>
-          </View>
-
-          <View style={styles.dailyTipContainer}>
-            <Text style={styles.title}>Daily health tips</Text>
-            <View style={styles.imageContainer}>
-              {/* Put image here located at ../assets/wallpaperflar.png */}
-              <Image
-                source={require("../assets/wallpaperflare.png")}
-                style={styles.image}
-                resizeMode="cover"
-              />
-              <Text style={styles.dailyTip}>
-                Eating a variety of fresh, whole fruits daily boosts your health
-                by providing essential vitamins, minerals, and fiber. Opt for
-                seasonal fruits and choose whole fruits over juices to maximize
-                nutrient intake and aid digestion.
-              </Text>
-            </View>
-          </View>
+          <Text style={styles.headerText}>Hi, {firstName}</Text>
         </View>
-        <View style={styles.mainContainer}>
-          <View style={styles.subContainer}>
-            <Pressable
-              style={styles.button}
-              onPress={() => navigation.navigate("HealthAndWellness")}
-            >
-              <Entypo
-                name="heart"
-                size={24}
-                color="#1F75FE"
-                style={styles.buttonIcon}
-              />
-              <Text style={styles.buttonText}>Health and Wellness</Text>
-            </Pressable>
-            <Pressable
-              style={styles.button}
-              onPress={() => navigation.navigate("EmergencyProcedures")}
-            >
-              <Entypo
-                name="warning"
-                size={24}
-                color="#1F75FE"
-                style={styles.buttonIcon}
-              />
-              <Text style={styles.buttonText}>Emergency Procedures</Text>
-            </Pressable>
-          </View>
-          <View style={styles.subContainer}>
-            <Pressable
-              style={styles.button}
-              onPress={() => navigation.navigate("EmergencyContacts")}
-            >
-              <Entypo
-                name="phone"
-                size={24}
-                color="#1F75FE"
-                style={styles.buttonIcon}
-              />
-              <Text style={styles.buttonText}>Emergency Contacts</Text>
-            </Pressable>
-            <Pressable
-              style={styles.button}
-              onPress={() => navigation.navigate("CounselorSession")}
-            >
-              <Entypo
-                name="users"
-                size={24}
-                color="#1F75FE"
-                style={styles.buttonIcon}
-              />
-              <Text style={styles.buttonText}>Counselor Session</Text>
-            </Pressable>
-          </View>
+      </View>
+      <LinearGradient
+        colors={['#369AFF', '#318CE7']}
+        style={styles.dailyTipsContainer}
+      >
+        <View style={styles.dtTopicContainer}>
+          <Text style={styles.dtTopic}>Daily Tips</Text>
+        </View>
+        <View style={styles.dailyTipsSubContainer}>
+          {dailyTips.slice(0, 3).map((item, index) => (
+            <View key={index} style={styles.TipContainer}>
+             
+                <Image
+                  source={item.image}
+                  style={styles.image}
+                  resizeMode="cover"
+                />
+     
+              <View style={styles.dailyTip}>
+                <Text style={styles.dailyTipContents}>
+                  {item.content.length > 20
+                    ? `${item.content.substring(0, 20)}...`
+                    : item.content}
+                </Text>
+              </View>
+            </View>
+          ))}
+        </View>
+        <Pressable
+          style={styles.readMorebtn}
+          onPress={() => handleReadMorePress(item)}
+        >
+          <Text style={styles.readMore}>READ MORE </Text>
+          <FontAwesome5 name="arrow-right" style={styles.arrowRight} />
+        </Pressable>
+      </LinearGradient>
+      <ScrollView contentContainerStyle={styles.mainContainer}>
+        <View style={styles.subContainer}>
+          <Pressable
+            style={styles.button}
+            onPress={() => navigation.navigate("MentalHealth")}
+          >
+            <FontAwesome5 name="brain" size={50} color="#333" />
+            <Text style={[styles.buttonText, styles.iconText]}>
+              Mental Health
+            </Text>
+          </Pressable>
+          <Pressable
+            style={styles.button}
+            onPress={() => navigation.navigate("SymptomAssessment")}
+          >
+            <FontAwesome5 name="clipboard-list" size={50} color="#333" />
+            <Text style={[styles.buttonText, styles.iconText]}>
+              Symptom Assessment
+            </Text>
+          </Pressable>
+        </View>
+        <View style={styles.subContainer}>
+          <Pressable
+            style={styles.button}
+            onPress={() => navigation.navigate("ClinicAppointment")}
+          >
+            <FontAwesome5 name="hospital" size={50} color="#333" />
+            <Text style={[styles.buttonText, styles.iconText]}>
+              Clinic Appointment
+            </Text>
+          </Pressable>
+          <Pressable
+            style={styles.button}
+            onPress={() => navigation.navigate("FitnessNutrition")}
+          >
+            <FontAwesome5 name="dumbbell" size={50} color="#333" />
+            <Text style={[styles.buttonText, styles.iconText]}>
+              Fitness & Nutrition
+            </Text>
+          </Pressable>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -137,142 +169,139 @@ const Homepage = () => {
 
 const styles = StyleSheet.create({
   container: {
-    width: "100%",
-    height: "100%",
     flex: 1,
+    backgroundColor: "#fff",
   },
-  scrollContainer: {
-    flexGrow: 1,
+  menuIconContainer: {
+    position: "absolute",
+    top: responsiveHeight(2),
+    left: responsiveWidth(6),
+    zIndex: 10,
+    padding: responsiveFontSize(1),
   },
-
-  campcare: {
-    fontSize: responsiveFontSize(7.5),
-    color: "white",
-    fontWeight: "bold",
-    marginVertical: responsiveHeight(0.5),
-    marginLeft: responsiveFontSize(3),
+  menuIcon: {
+    fontSize: responsiveFontSize(6),
+    color: "#333",
+  },
+  headerContainer: {
+    marginTop: responsiveHeight(8),
+    marginBottom: responsiveHeight(2),
   },
   header: {
-    width: "100%",
-    height: responsiveHeight(66),
-    display: "flex",
-    flexDirection: "column",
-    marginBottom: responsiveFontSize(4.5),
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#318CE7",
+    width: "70%",
+    paddingLeft: responsiveFontSize(5),
+    paddingVertical: responsiveFontSize(2),
+    borderTopRightRadius: responsiveFontSize(3),
+    borderBottomRightRadius: responsiveFontSize(3),
   },
   iconContainer: {
-    width: responsiveHeight(5),
-    height: responsiveHeight(5),
-    fontSize: responsiveFontSize(6),
-    fontWeight: "bold",
-    color: "white",
-    borderRadius: responsiveHeight(4),
-    backgroundColor: "#333333",
-    display: "flex",
+    width: responsiveFontSize(10),
+    height: responsiveFontSize(10),
+    borderRadius: responsiveFontSize(5),
+    backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
   },
-  icon: {
+  userIcon: {
     fontSize: responsiveFontSize(6),
-    fontWeight: "bold",
-    color: "white",
-
-    // elevation: 5,
+    color: "#318CE7",
   },
-  greetingContainer: {
-    width: "78%",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-    marginLeft: responsiveFontSize(10.5),
-    marginBottom: responsiveFontSize(4.5),
-    // backgroundColor:"green"
-  },
-  gradient: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-  },
-  topIcons: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    paddingHorizontal: responsiveWidth(2.5),
-    width: "96%",
-    marginTop: responsiveHeight(2.5),
-    // marginBottom: responsiveHeight(3),
-    alignSelf: "center",
-    // backgroundColor: 'red'
-  },
-  dailyTipContainer: {
-    paddingHorizontal: responsiveWidth(5),
-    width: "100%",
-    height: "60%",
-    // borderTopWidth: 1,
-    // borderColor: "white",
-    position: "relative",
-  },
-  imageContainer: {
-    marginTop: responsiveHeight(2),
-    alignItems: "center",
-  },
-  image: {
-    width: responsiveWidth(95),
-    height: responsiveHeight(25),
-    borderRadius: 15,
-    // elevation: 12,
-    backgroundColor: "black",
-  },
-  title: {
-    fontSize: responsiveFontSize(5),
-    fontWeight: "bold",
+  headerText: {
+    fontSize: responsiveFontSize(6),
     color: "#fff",
-    position: "absolute",
-    left: responsiveFontSize(4.5),
-    bottom: responsiveHeight(30),
+    marginLeft: responsiveWidth(5),
+  },
+  dailyTipsContainer: {
+    flexDirection: "column",
+    justifyContent: "space-around",
+    marginVertical: responsiveHeight(2),
+    alignItems: "center",
+    padding: responsiveWidth(1),
+    height: responsiveHeight(33),
+    width: responsiveWidth(97),
+    borderRadius: responsiveWidth(5),
+    alignSelf: 'center'
+  },
+  dailyTipsSubContainer: {
+    display: "flex",
+    width: responsiveWidth(92),
+    flexDirection: "row",
+    justifyContent: "space-between",
+    borderBottomWidth: 1,
+    borderBlockColor: 'rgba(238, 234, 236, 0.26)',
+  },
+  dtTopicContainer: {
+    width: responsiveWidth(92),
+  },
+  dtTopic: {
+    color: 'white',
+    fontSize: responsiveFontSize(4.1),
+  },
+  // imageContainer: {
+  //   width: '100%'
+    
+  // },
+  image: {
+    width: "100%",
+    height: responsiveHeight(15),
+    borderRadius: responsiveFontSize(2),
+    
+    
   },
   dailyTip: {
-    width: responsiveWidth(95),
-    height: responsiveHeight(17),
-    backgroundColor: "#318CE7",
-    padding: responsiveFontSize(3),
+    alignItems: "center",
+    paddingVertical: responsiveHeight(1),
+    paddingHorizontal: responsiveWidth(2),
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  dailyTipContents: {
+    fontFamily: "Poppins-Medium",
+    color: "#fff",
+    fontSize: responsiveFontSize(3.6),
+    textAlign: "center",
+  },
+  TipContainer: {
+    width: "32%",
+  },
+  readMorebtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: responsiveHeight(1),
+  },
+  readMore: {
+    fontFamily: "Poppins-Bold",
     fontSize: responsiveFontSize(3.8),
     color: "#fff",
-    marginTop: responsiveHeight(1),
-    // textAlign: "center",
-
-    fontFamily: "Poppins-Regular",
-    borderRadius: 15,
   },
-  greeting: {
-    fontSize: responsiveFontSize(4),
+  arrowRight: {
+    fontSize: responsiveFontSize(2.8),
     color: "#fff",
-    marginLeft: 4,
-  },
-  welcome: {
-    fontSize: responsiveFontSize(5),
-    fontWeight: "bold",
-    // marginBottom: responsiveFontSize(6.5),
-    color: "#fff",
+    marginLeft: responsiveWidth(1),
   },
   mainContainer: {
-    flexDirection: "column",
-    justifyContent: "space-between",
+    flexGrow: 1,
     padding: responsiveWidth(5),
   },
   subContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
+    marginVertical: responsiveHeight(1),
   },
   button: {
     backgroundColor: "#fbfaf3",
     paddingVertical: responsiveHeight(1),
-    paddingHorizontal: responsiveWidth(5),
-    marginBottom: responsiveHeight(0.7),
     borderRadius: 10,
     flex: 1,
-    marginHorizontal: responsiveWidth(1.25),
+    marginHorizontal: responsiveWidth(2.5),
     alignItems: "center",
     justifyContent: "center",
     shadowColor: "#000",
@@ -282,19 +311,18 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.8,
     shadowRadius: 2,
-    elevation: 10,
-    flexDirection: "row",
+    elevation: 5,
+    marginVertical: responsiveHeight(0.5),
   },
   buttonText: {
-    fontSize: responsiveFontSize(4),
-    marginLeft: responsiveWidth(2),
+    fontSize: responsiveFontSize(3.2),
+    marginTop: responsiveHeight(1),
     color: "#333",
-    display: "flex",
-    alignItems: "center",
     fontFamily: "Poppins-Regular",
+    textAlign: "center",
   },
-  buttonIcon: {
-    marginRight: responsiveWidth(2),
+  iconText: {
+    color: "red",
   },
 });
 

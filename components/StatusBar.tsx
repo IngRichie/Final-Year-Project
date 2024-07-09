@@ -1,7 +1,6 @@
 import * as React from "react";
 import { StyleSheet, Text, View, Pressable, Dimensions } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get("window");
@@ -10,22 +9,22 @@ const responsiveWidth = (percent: number) => (width * percent) / 100;
 const responsiveHeight = (percent: number) => (height * percent) / 100;
 const responsiveFontSize = (percent: number) => (width * percent) / 100;
 
-const CustomStatusBar = ({ screenName }: { screenName: string }) => {
+const CustomStatusBar = ({ screenName, icon }: { screenName: string, icon?: string }) => {
   const navigation = useNavigation();
 
   return (
-    <LinearGradient
-      style={styles.statusBar}
-      locations={[0, 1]}
-      colors={["#318CE7", "#1F75FE"]}
-    >
-      <View style={styles.statusBarInner}>
+    <View style={styles.statusBar}>
         <Pressable style={styles.leftArrowParent} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={responsiveFontSize(7.5)} color="#fff" style={styles.leftArrowIcon} />
-          <Text style={styles.screenNameText}>{screenName}</Text>
         </Pressable>
+      <View style={styles.statusBarInner}>
+        <View style={styles.screenNameContainer}>
+          {icon && <Ionicons name={icon} size={responsiveFontSize(7.5)} color="#fff" style={styles.screenIcon} />}
+          <Text style={styles.screenNameText}>{screenName}</Text>
+        </View>
       </View>
-    </LinearGradient>
+   
+    </View>
   );
 };
 
@@ -34,24 +33,45 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   statusBarInner: {
-    paddingHorizontal: responsiveWidth(2.5),
-    paddingVertical: responsiveHeight(1.75),
-    justifyContent: "flex-start",
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: responsiveWidth(5),
+    width: "70%",
+    justifyContent: "center",
+    backgroundColor: "#318CE7",
+    paddingLeft: responsiveFontSize(8.0),
+    marginTop: responsiveFontSize(4.5),
+    borderTopRightRadius: responsiveFontSize(8.0),
+    borderBottomRightRadius: responsiveFontSize(8.0),
+    height: responsiveHeight(5),
   },
   leftArrowParent: {
     flexDirection: "row",
     alignItems: "center",
-    // marginTop:responsiveHeight(.75),
+    marginLeft: responsiveWidth(5.75),
+    marginTop: responsiveWidth(3.75),
   },
   leftArrowIcon: {
-    marginRight: responsiveWidth(3.75),
+ 
+    color: '#333'
+  },
+  screenNameContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  screenIcon: {
+    marginRight: responsiveWidth(2.5),
   },
   screenNameText: {
     fontSize: responsiveFontSize(5.0),
     fontWeight: "bold",
+    color: "#fff",
+  },
+  greetingContainer: {
+    paddingHorizontal: responsiveWidth(2.5),
+    paddingVertical: responsiveHeight(1.75),
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  greeting: {
+    fontSize: responsiveFontSize(4.0),
     color: "#fff",
   },
 });

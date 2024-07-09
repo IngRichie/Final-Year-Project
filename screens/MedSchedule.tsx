@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -10,6 +10,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import StatusBar from "../components/StatusBar"; // Adjust the path based on your project structure
 import FontAwesome from "react-native-vector-icons/FontAwesome"; // Import FontAwesome icons
+import { useNavigation } from "@react-navigation/native";
 
 const { width, height } = Dimensions.get("window");
 
@@ -18,9 +19,15 @@ const responsiveHeight = (percent: number) => (height * percent) / 100;
 const responsiveFontSize = (percent: number) => (width * percent) / 100;
 
 const MedSchedule = () => {
-  const handlePress = (buttonText: any) => {
-    // Replace with your navigation logic
-    console.log(`Navigating to: ${buttonText}`);
+  const navigation = useNavigation();
+
+  const handlePress = (buttonText: string) => {
+    switch (buttonText) {
+      case "Medication List":
+        navigation.navigate("MedicationList");
+        break;
+      // Add other navigation cases as needed
+    }
   };
 
   return (
@@ -40,35 +47,60 @@ const MedSchedule = () => {
             style={styles.button}
             onPress={() => handlePress("Medication List")}
           >
-            <FontAwesome name="list" size={24} color="#1F75FE" style={styles.buttonIcon} />
+            <FontAwesome
+              name="list"
+              size={24}
+              color="#1F75FE"
+              style={styles.buttonIcon}
+            />
             <Text style={styles.buttonText}>Medication List</Text>
           </Pressable>
           <Pressable
             style={styles.button}
             onPress={() => handlePress("Add/Edit Medication")}
           >
-            <FontAwesome name="edit" size={24} color="#1F75FE" style={styles.buttonIcon} />
+            <FontAwesome
+              name="edit"
+              size={24}
+              color="#1F75FE"
+              style={styles.buttonIcon}
+            />
             <Text style={styles.buttonText}>Add/Edit Medication</Text>
           </Pressable>
           <Pressable
             style={styles.button}
             onPress={() => handlePress("Schedule Overview")}
           >
-            <FontAwesome name="calendar" size={24} color="#1F75FE" style={styles.buttonIcon} />
+            <FontAwesome
+              name="calendar"
+              size={24}
+              color="#1F75FE"
+              style={styles.buttonIcon}
+            />
             <Text style={styles.buttonText}>Schedule Overview</Text>
           </Pressable>
           <Pressable
             style={styles.button}
             onPress={() => handlePress("Reminders & Notifications")}
           >
-            <FontAwesome name="bell" size={24} color="#1F75FE" style={styles.buttonIcon} />
+            <FontAwesome
+              name="bell"
+              size={24}
+              color="#1F75FE"
+              style={styles.buttonIcon}
+            />
             <Text style={styles.buttonText}>Reminders & Notifications</Text>
           </Pressable>
           <Pressable
             style={styles.button}
             onPress={() => handlePress("Medication Logging")}
           >
-            <FontAwesome name="book" size={24} color="#1F75FE" style={styles.buttonIcon} />
+            <FontAwesome
+              name="book"
+              size={24}
+              color="#1F75FE"
+              style={styles.buttonIcon}
+            />
             <Text style={styles.buttonText}>Medication Logging</Text>
           </Pressable>
         </View>
@@ -88,8 +120,8 @@ const styles = StyleSheet.create({
   section: {
     backgroundColor: "#fff",
     height: "30%",
-    // paddingHorizontal: responsiveWidth(5),
-    // paddingVertical: responsiveHeight(5),
+    paddingHorizontal: responsiveWidth(5),
+    paddingVertical: responsiveHeight(5),
   },
   BtnSection: {
     backgroundColor: "#fff",

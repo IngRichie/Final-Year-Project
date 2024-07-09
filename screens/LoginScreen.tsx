@@ -43,7 +43,7 @@ const LoginScreen = () => {
       }
 
       await signInWithEmailAndPassword(auth, email, password);
-      navigation.navigate('Homepage');  // Make sure 'Homepage' is the correct route name
+      navigation.navigate('MainTabs', { screen: 'Home', params: { screen: 'Homepage1' } }); 
     } catch (error: any) {
       const errorMessage = getErrorMessage(error);
       setError(errorMessage);
@@ -86,7 +86,7 @@ const LoginScreen = () => {
   };
 
   const onForgotPasswordPress = () => {
-    navigation.navigate('ForgotPasswordScreen');
+    navigation.navigate('ForgetPassword');
   };
 
   return (
