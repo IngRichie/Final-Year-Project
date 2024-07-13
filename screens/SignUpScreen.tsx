@@ -24,8 +24,6 @@ const SignUpScreen: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
 
-  const auth = getAuth(); // Initialize Firebase auth
-
   const onSignUpPress = async () => {
     setError(null);
     try {
@@ -36,7 +34,7 @@ const SignUpScreen: React.FC = () => {
 
       // Check if username is unique
       const usernamesSnapshot = await getDocs(collection(db, "users"));
-      const usernames = usernamesSnapshot.docs.map(doc => doc.id);
+      const usernames = usernamesSnapshot.docs.map(doc => doc.data().username);
       if (usernames.includes(username)) {
         setError("Username is already taken. Please choose another one.");
         return;
@@ -47,7 +45,15 @@ const SignUpScreen: React.FC = () => {
       const user = userCredential.user;
 
       // Send verification email
-      await sendVerificationEmail(user);
+      await sendEmailVerification(user);
+
+      // Store user information in Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        username: username,
+        firstname: firstname,
+        email: email,
+        createdAt: serverTimestamp()
+      });
 
       // Show verification note
       Alert.alert(
@@ -63,24 +69,11 @@ const SignUpScreen: React.FC = () => {
       setPassword("");
       setConfirmPassword("");
 
-      // Optionally: Navigate to a verification pending screen
-      // navigation.navigate("VerificationPendingScreen");
+      // Navigate to a verification pending screen or wait for user verification
+      navigation.navigate("LoginScreen");
 
     } catch (error: any) {
       handleError(error);
-    }
-  };
-
-  const sendVerificationEmail = async (user: any) => { // Adjust the type as per your Firebase setup
-    if (user) {
-      try {
-        await sendEmailVerification(auth.currentUser); // Correctly call sendEmailVerification with auth.currentUser
-      } catch (error) {
-        console.error('Error sending verification email:', error);
-        // Handle error appropriately
-      }
-    } else {
-      console.error('User object is null or undefined');
     }
   };
 

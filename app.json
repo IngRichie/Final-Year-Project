@@ -6,7 +6,10 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "platforms": ["ios", "android"],
+    "platforms": [
+      "ios",
+      "android"
+    ],
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -15,7 +18,9 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.campcare"
@@ -26,7 +31,6 @@
         "backgroundColor": "#FFFFFF",
         "package": "com.campcare",
         "googleServicesFile": "./android/app/google-services.json"
-
       },
       "googleServicesFile": "./android/app/google-services.json",
       "package": "com.campcare"
@@ -50,6 +54,11 @@
           ]
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "1fbe589b-f3e9-451e-aa03-3c03c066f2e2"
+      }
+    }
   }
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, Pressable, View, ScrollView, Dimensions, Image } from 'react-native';
 import { TextInput as RNPTextInput } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -9,6 +9,8 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import { db, auth } from '../firebaseConfig';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { collection, query, where, getDocs } from 'firebase/firestore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import CustomCheckBox from '../components/CustomCheckBox'; // Adjust the path as necessary
 
 const { width, height } = Dimensions.get('window');
 
@@ -25,11 +27,26 @@ const LoginScreen = () => {
   const [emailOrUsername, setEmailOrUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [rememberMe, setRememberMe] = useState(false);
   const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
 
-  const onLoginPress = async () => {
+  useEffect(() => {
+    const checkStoredCredentials = async () => {
+      const storedEmail = await AsyncStorage.getItem('emailOrUsername');
+      const storedPassword = await AsyncStorage.getItem('password');
+      if (storedEmail && storedPassword) {
+        setEmailOrUsername(storedEmail);
+        setPassword(storedPassword);
+        onLoginPress(storedEmail, storedPassword);
+      }
+    };
+    checkStoredCredentials();
+  }, []);
+
+  const onLoginPress = async (emailInput?: string, passwordInput?: string) => {
     try {
-      let email = emailOrUsername;
+      let email = emailInput || emailOrUsername;
+      let pass = passwordInput || password;
 
       if (!isValidEmail(emailOrUsername)) {
         const userQuery = query(collection(db, 'users'), where('username', '==', emailOrUsername));
@@ -42,8 +59,17 @@ const LoginScreen = () => {
         }
       }
 
-      await signInWithEmailAndPassword(auth, email, password);
-      navigation.navigate('MainTabs', { screen: 'Home', params: { screen: 'Homepage1' } }); 
+      await signInWithEmailAndPassword(auth, email, pass);
+      if (rememberMe) {
+        await AsyncStorage.setItem('emailOrUsername', emailOrUsername);
+        await AsyncStorage.setItem('password', password);
+      } else {
+        await AsyncStorage.removeItem('emailOrUsername');
+        await AsyncStorage.removeItem('password');
+      }
+      setEmailOrUsername('');
+      setPassword('');
+      navigation.navigate('MainTabs', { screen: 'Home', params: { screen: 'Homepage1' } });
     } catch (error: any) {
       const errorMessage = getErrorMessage(error);
       setError(errorMessage);
@@ -132,6 +158,13 @@ const LoginScreen = () => {
                 colors: { text: '#878787' },
               }}
             />
+            <View style={styles.rememberMeContainer}>
+              <CustomCheckBox
+                value={rememberMe}
+                onValueChange={setRememberMe}
+                label="Remember Me"
+              />
+            </View>
             <Pressable onPress={onForgotPasswordPress}>
               <Text style={styles.forgotPassword}>Forgot Password?</Text>
             </Pressable>
@@ -139,7 +172,7 @@ const LoginScreen = () => {
               colors={["#318CE7", "#1F75FE"]}
               style={styles.loginButton}
             >
-              <Pressable style={styles.pressable} onPress={onLoginPress}>
+              <Pressable style={styles.pressable} onPress={() => onLoginPress()}>
                 <Text style={styles.loginText}>Login</Text>
               </Pressable>
             </LinearGradient>
@@ -193,6 +226,17 @@ const styles = StyleSheet.create({
   },
   input: {
     marginBottom: responsiveHeight(2),
+  },
+  rememberMeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: responsiveHeight(2),
+  },
+  rememberMeText: {
+    marginLeft: responsiveWidth(2),
+    fontSize: responsiveFontSize(3.5),
+    fontFamily: 'Poppins-Regular',
+    color: '#717171',
   },
   forgotPassword: {
     color: '#1F75FE',

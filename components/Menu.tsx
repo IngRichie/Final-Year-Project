@@ -4,6 +4,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StackNavigationProp } from "@react-navigation/stack";
+import { auth } from "../firebaseConfig"; // Ensure you have this import for the auth instance
 
 // Define a RootStackParamList for navigation typings
 type RootStackParamList = {
@@ -14,6 +15,8 @@ type RootStackParamList = {
   FitnessNutrition: undefined;
   Settings: undefined;
   LoginScreen: undefined;
+  NewsPage: undefined;
+  NotificationScreen: undefined;
 };
 
 // Define navigation prop type for Menu component
@@ -28,8 +31,13 @@ const responsiveHeight = (percent: number) => (height * percent) / 100;
 const responsiveFontSize = (percent: number) => (width * percent) / 100;
 
 const Menu: React.FC<MenuProps> = ({ navigation }) => {
-  const handleLogOut = (screens: any) => {
-    navigation.navigate(screens);
+  const handleLogOut = async () => {
+    try {
+      await auth.signOut(); // Sign out the user
+      navigation.navigate("LoginScreen"); // Navigate to the LoginScreen
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
   };
 
   return (

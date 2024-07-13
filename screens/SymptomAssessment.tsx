@@ -66,19 +66,19 @@ const SymptomAssessment = () => {
 const styles = StyleSheet.create({
   safeAreaView: {
     flex: 1,
-    backgroundColor: "#1F75FE",
+    // backgroundColor: "#1F75FE",
   },
   container: {
     flex: 1,
   },
   warningContainer: {
-    backgroundColor: "#1F75FE",
+    // backgroundColor: "#1F75FE",
     paddingVertical: responsiveHeight(2),
     paddingHorizontal: responsiveWidth(5),
   },
   warningText: {
     fontSize: responsiveFontSize(4),
-    color: "#fff",
+    color: "#333",
   },
   chatContainer: {
     flexGrow: 1,
@@ -103,8 +103,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: responsiveWidth(5),
     paddingVertical: responsiveHeight(1),
     backgroundColor: "#fff",
-    borderTopWidth: 1,
-    borderColor: "#ddd",
+    // borderTopWidth: 1,
+    // borderColor: "#ddd",
   },
   textInput: {
     flex: 1,
@@ -115,6 +115,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: responsiveWidth(4),
     fontSize: responsiveFontSize(4),
     marginRight: responsiveWidth(2),
+ 
   },
   sendButton: {
     backgroundColor: "#fff",

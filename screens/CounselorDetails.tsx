@@ -36,7 +36,7 @@ const CounselorDetails: React.FC<CounselorDetailsProps> = ({ route }) => {
   };
 
   const handleBookAppointmentPress = () => {
-    navigation.navigate("BookAppointment", { counselor });
+    navigation.navigate("VideoCallScreen", { counselor });
   };
 
   return (

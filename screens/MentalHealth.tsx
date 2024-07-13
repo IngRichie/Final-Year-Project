@@ -1,8 +1,8 @@
-import * as React from "react";
-import { Text, StyleSheet, View, ScrollView, Pressable, Dimensions, Image, Linking } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import React, { useEffect, useState } from "react";
+import { Text, StyleSheet, View, ScrollView, Pressable, Dimensions, Image, Linking, SafeAreaView } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
-import StatusBar from "../components/StatusBar"; // Adjust path as per your project structure
+import StatusBar from "../components/StatusBar"; 
+import { fetchMentalHealthResources, getCachedMentalHealthResources } from "../components/api"; 
 
 const { width, height } = Dimensions.get("window");
 
@@ -10,46 +10,56 @@ const responsiveWidth = (percent: number) => (width * percent) / 100;
 const responsiveHeight = (percent: number) => (height * percent) / 100;
 const responsiveFontSize = (percent: number) => (width * percent) / 100;
 
-const MentalHealthResourcesScreen = ({ navigation }) => {
-  const resources = [
-    {
-      id: 1,
-      title: "Understanding Anxiety",
-      description: "Learn about the symptoms, causes, and treatments for anxiety disorders.",
-      imageUrl: "https://example.com/anxiety.jpg",
-      link: "https://www.example.com/anxiety",
-    },
-    {
-      id: 2,
-      title: "Dealing with Depression",
-      description: "A comprehensive guide to understanding and managing depression.",
-      imageUrl: "https://example.com/depression.jpg",
-      link: "https://www.example.com/depression",
-    },
-    {
-      id: 3,
-      title: "Meditation for Mental Health",
-      description: "Discover the benefits of meditation and how it can improve your mental health.",
-      imageUrl: "https://example.com/meditation.jpg",
-      link: "https://www.example.com/meditation",
-    },
-    {
-      id: 4,
-      title: "Mindfulness Exercises",
-      description: "Practical exercises to help you practice mindfulness in your daily life.",
-      imageUrl: "https://example.com/mindfulness.jpg",
-      link: "https://www.example.com/mindfulness",
-    },
-  ];
+const MentalHealthResourcesScreen: React.FC = ({ }) => {
+  const [resources, setResources] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  const openLink = (link) => {
+  useEffect(() => {
+    const loadResources = async () => {
+      try {
+        const cachedData = await getCachedMentalHealthResources();
+        if (cachedData && Array.isArray(cachedData) && cachedData.length > 0) {
+          setResources(cachedData);
+          setLoading(false);
+        }
+
+        const data = await fetchMentalHealthResources();
+        if (data && Array.isArray(data) && data.length > 0) {
+          setResources(data);
+        }
+      } catch (error) {
+        console.error("Error loading resources:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadResources();
+  }, []);
+
+  const openLink = (link: string) => {
     Linking.openURL(link);
   };
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
+
+  if (!Array.isArray(resources) || resources.length === 0) {
+    return (
+      <View style={styles.noResourcesContainer}>
+        <Text>No resources available</Text>
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar screenName="Mental Health Resources" />
-     
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {resources.map(resource => (
           <Pressable key={resource.id} style={styles.resourceCard} onPress={() => openLink(resource.link)}>
@@ -70,21 +80,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f0f4f8",
   },
-  header: {
-    flexDirection: "row",
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
     alignItems: "center",
-    padding: responsiveWidth(5),
-    backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
   },
-  backButton: {
-    marginRight: responsiveWidth(3),
-  },
-  headerTitle: {
-    fontSize: responsiveFontSize(5),
-    fontWeight: "bold",
-    color: "#1F75FE",
+  noResourcesContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   scrollContainer: {
     padding: responsiveWidth(5),

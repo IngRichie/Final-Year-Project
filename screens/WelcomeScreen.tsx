@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttonText: {
-    fontFamily: "Poppins_600SemiBold",
+    fontFamily: "Poppins-SemiBold",
     color: "#fff",
     fontSize: width * 0.05, 
   },

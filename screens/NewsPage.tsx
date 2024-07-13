@@ -73,9 +73,7 @@ const NewsPage: React.FC = () => {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <View style={styles.header}>
-        <Pressable style={styles.backButton} onPress={handleBackPress}>
-          <Ionicons name="arrow-back" size={responsiveFontSize(6)} color="#000" />
-        </Pressable>
+    
         <Text style={styles.headerText}>Health News</Text>
       </View>
       <ScrollView contentContainerStyle={styles.scrollContainer}>

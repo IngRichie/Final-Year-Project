@@ -17,9 +17,7 @@ const FirstAidPage = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#318CE7" />
-      <Pressable style={styles.backIconContainer} onPress={() => navigation.goBack()}>
-        <Ionicons name="arrow-back" style={styles.backIcon} />
-      </Pressable>
+    
       <View style={styles.headerContainer}>
         <View style={styles.header}>
           <View style={styles.iconContainer}>

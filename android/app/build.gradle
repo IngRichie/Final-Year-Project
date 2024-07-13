@@ -140,13 +140,43 @@ android {
 }
 
 dependencies {
-    // The version of react-native is set by the React Native Gradle Plugin
-    implementation("com.facebook.react:react-android")
 
+  implementation "com.facebook.react:react-android"
+    implementation project(':react-native-jitsi-meet')
     def isGifEnabled = (findProperty('expo.gif.enabled') ?: "") == "true";
     def isWebpEnabled = (findProperty('expo.webp.enabled') ?: "") == "true";
     def isWebpAnimatedEnabled = (findProperty('expo.webp.animated') ?: "") == "true";
+    if (isGifEnabled) {
+        implementation "com.facebook.fresco:animated-gif:${reactAndroidLibs.versions.fresco.get()}"
+    }
+    if (isWebpEnabled) {
+        implementation "com.facebook.fresco:webpsupport:${reactAndroidLibs.versions.fresco.get()}"
+        if (isWebpAnimatedEnabled) {
+            implementation "com.facebook.fresco:animated-webp:${reactAndroidLibs.versions.fresco.get()}"
+        }
+    }
+    if (hermesEnabled.toBoolean()) {
+        implementation "com.facebook.react:hermes-android"
+    } else {
+        implementation jscFlavor
+    }
 
+
+
+
+
+
+
+
+
+
+
+
+    // The version of react-native is set by the React Native Gradle Plugin
+    implementation("com.facebook.react:react-android")
+
+   
+ implementation project(':react-native-avoid-softinput')
     if (isGifEnabled) {
         // For animated gif support
         implementation("com.facebook.fresco:animated-gif:${reactAndroidLibs.versions.fresco.get()}")

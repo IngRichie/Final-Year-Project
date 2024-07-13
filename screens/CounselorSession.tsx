@@ -9,11 +9,17 @@ import {
   Dimensions,
   Pressable,
   StatusBar,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
-import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
-import { useNavigation, NavigationProp, ParamListBase } from "@react-navigation/native";
+import { FontAwesome } from "@expo/vector-icons";
+import {
+  useNavigation,
+  NavigationProp,
+  ParamListBase,
+} from "@react-navigation/native";
 import CounselorCard from "../components/counselorCard"; // Adjust the import path as needed
-import counselors from "../components/counselors";
+import counselors, { Counselor } from "../components/counselors"; // Adjust the import path as needed
 
 const { width, height } = Dimensions.get("window");
 
@@ -23,7 +29,24 @@ const responsiveFontSize = (percent: number) => (width * percent) / 100;
 
 const CounselorSession: React.FC = () => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
-  const [selectedFeeling, setSelectedFeeling] = React.useState<string | null>(null);
+  const [selectedFeeling, setSelectedFeeling] = React.useState<string | null>(
+    null
+  );
+  const [searchQuery, setSearchQuery] = React.useState<string>("");
+  const [filteredCounselors, setFilteredCounselors] =
+    React.useState<Counselor[]>(counselors);
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    if (query) {
+      const filtered = counselors.filter((counselor) =>
+        counselor.fullName.toLowerCase().includes(query.toLowerCase())
+      );
+      setFilteredCounselors(filtered);
+    } else {
+      setFilteredCounselors(counselors);
+    }
+  };
 
   const handleBackPress = () => {
     navigation.goBack();
@@ -37,56 +60,73 @@ const CounselorSession: React.FC = () => {
   ];
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-      <View style={styles.header}>
-        <Pressable style={styles.backButton} onPress={handleBackPress}>
-          <MaterialIcons name="arrow-back" size={responsiveFontSize(6)} color="#000" />
-        </Pressable>
-        <Text style={styles.headerText}>Counselor Session</Text>
-      </View>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.searchContainer}>
-          <FontAwesome name="search" style={styles.searchIcon} />
-          <TextInput style={styles.searchInput} placeholder="Search Counselor" />
-          <FontAwesome name="send" style={styles.sendIcon} />
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0} // Adjust the offset as needed
+    >
+      <SafeAreaView style={styles.container}>
+        <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+        <View style={styles.header}>
+          <Text style={styles.headerText}>Counselor Session</Text>
         </View>
-        <Text style={styles.sectionTitle}>Available Counselors</Text>
-        <ScrollView horizontal contentContainerStyle={styles.cardContainer} showsHorizontalScrollIndicator={false}>
-          {counselors.map((counselor, index) => (
-            <View key={index} style={styles.cardSpacing}>
-              <CounselorCard counselor={counselor} />
-            </View>
-          ))}
-        </ScrollView>
-        <Text style={styles.feelingsTitle}>How are you feeling today?</Text>
-        <View style={styles.feelingsContainer}>
-          {feelings.map((feeling, index) => (
-            <Pressable
-              key={index}
-              style={styles.feeling}
-              onPress={() => setSelectedFeeling(feeling.name)}
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <View style={styles.searchContainer}>
+            <FontAwesome name="search" style={styles.searchIcon} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search Counselor"
+              value={searchQuery}
+              onChangeText={handleSearch}
+            />
+          </View>
+          <Text style={styles.sectionTitle}>Available Counselors</Text>
+          {filteredCounselors.length > 0 ? (
+            <ScrollView
+              horizontal
+              contentContainerStyle={styles.cardContainer}
+              showsHorizontalScrollIndicator={false}
             >
-              <View
-                style={[
-                  styles.feelingIconContainer,
-                  selectedFeeling === feeling.name && styles.selectedFeelingIconContainer,
-                ]}
+              {filteredCounselors.map((counselor, index) => (
+                <View key={index} style={styles.cardSpacing}>
+                  <CounselorCard counselor={counselor} />
+                </View>
+              ))}
+            </ScrollView>
+          ) : (
+            <Text style={styles.noResultsText}>No counselors found</Text>
+          )}
+          <Text style={styles.feelingsTitle}>How are you feeling today?</Text>
+          <View style={styles.feelingsContainer}>
+            {feelings.map((feeling, index) => (
+              <Pressable
+                key={index}
+                style={styles.feeling}
+                onPress={() => setSelectedFeeling(feeling.name)}
               >
-                <FontAwesome name={feeling.icon} style={styles.feelingIcon} />
-              </View>
-              <Text style={styles.feelingText}>{feeling.name}</Text>
-            </Pressable>
-          ))}
-        </View>
-        <View style={styles.additionalInfo}>
-          <Text style={styles.additionalInfoTitle}>Why Counseling?</Text>
-          <Text style={styles.additionalInfoText}>
-            Counseling can help you improve your mental health, manage stress, and cope with life challenges.
-          </Text>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+                <View
+                  style={[
+                    styles.feelingIconContainer,
+                    selectedFeeling === feeling.name &&
+                      styles.selectedFeelingIconContainer,
+                  ]}
+                >
+                  <FontAwesome name={feeling.icon} style={styles.feelingIcon} />
+                </View>
+                <Text style={styles.feelingText}>{feeling.name}</Text>
+              </Pressable>
+            ))}
+          </View>
+          <View style={styles.additionalInfo}>
+            <Text style={styles.additionalInfoTitle}>Why Counseling?</Text>
+            <Text style={styles.additionalInfoText}>
+              Counseling can help you improve your mental health, manage stress,
+              and cope with life challenges.
+            </Text>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -94,6 +134,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+    marginBottom: responsiveWidth(17),
   },
   header: {
     flexDirection: "row",
@@ -129,9 +170,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: responsiveFontSize(4),
   },
-  sendIcon: {
-    fontSize: responsiveFontSize(6),
-  },
   sectionTitle: {
     fontSize: responsiveFontSize(5),
     fontWeight: "700",
@@ -144,11 +182,17 @@ const styles = StyleSheet.create({
   cardSpacing: {
     marginRight: responsiveWidth(5),
   },
+  noResultsText: {
+    fontSize: responsiveFontSize(4),
+    color: "#333",
+    textAlign: "center",
+    marginVertical: responsiveHeight(2),
+  },
   feelingsTitle: {
     fontSize: responsiveFontSize(5),
     fontWeight: "700",
     textAlign: "center",
-    marginBottom: responsiveHeight(3),
+    marginBottom: responsiveHeight(2),
   },
   feelingsContainer: {
     flexDirection: "row",
@@ -168,9 +212,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#0050a0",
   },
   feelingIcon: {
-    fontSize: responsiveFontSize(12),
+    fontSize: responsiveFontSize(8),
     color: "#fff",
-    fontWeight: "light",
   },
   feelingText: {
     fontSize: responsiveFontSize(4),

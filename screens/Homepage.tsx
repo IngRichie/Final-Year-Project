@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -12,10 +12,10 @@ import {
 } from "react-native";
 import { useNavigation, NavigationProp, DrawerActions } from "@react-navigation/native";
 import { FontAwesome5 } from "@expo/vector-icons";
-import { LinearGradient } from 'expo-linear-gradient';
+import { LinearGradient } from "expo-linear-gradient";
 import dailyTips from "./DailyTips";
 import { db, auth } from "../firebaseConfig";
-import { doc, getDoc } from "firebase/firestore";
+import { collection, query, where, getDocs } from "firebase/firestore";
 
 const { width, height } = Dimensions.get("window");
 
@@ -42,12 +42,14 @@ const Homepage: React.FC = () => {
       try {
         const user = auth.currentUser;
         if (user) {
-          const userDoc = doc(db, "users", user.uid);
-          const userSnapshot = await getDoc(userDoc);
-          if (userSnapshot.exists()) {
-            const userData = userSnapshot.data();
-            if (userData && userData.firstName) {
-              setFirstName(userData.firstName);
+          console.log("User email: ", user.email); // Log the user email
+          const userQuery = query(collection(db, "users"), where("email", "==", user.email));
+          const userSnapshot = await getDocs(userQuery);
+          if (!userSnapshot.empty) {
+            const userData = userSnapshot.docs[0].data();
+            if (userData && userData.firstname) {
+              setFirstName(userData.firstname);
+              console.log("User data found:", userData); // Log user data
             } else {
               console.log("First name not found in user data!");
             }
@@ -87,7 +89,7 @@ const Homepage: React.FC = () => {
         </View>
       </View>
       <LinearGradient
-        colors={['#369AFF', '#318CE7']}
+        colors={["#369AFF", "#318CE7"]}
         style={styles.dailyTipsContainer}
       >
         <View style={styles.dtTopicContainer}>
@@ -96,13 +98,11 @@ const Homepage: React.FC = () => {
         <View style={styles.dailyTipsSubContainer}>
           {dailyTips.slice(0, 3).map((item, index) => (
             <View key={index} style={styles.TipContainer}>
-             
-                <Image
-                  source={item.image}
-                  style={styles.image}
-                  resizeMode="cover"
-                />
-     
+              <Image
+                source={item.image}
+                style={styles.image}
+                resizeMode="cover"
+              />
               <View style={styles.dailyTip}>
                 <Text style={styles.dailyTipContents}>
                   {item.content.length > 20
@@ -115,7 +115,7 @@ const Homepage: React.FC = () => {
         </View>
         <Pressable
           style={styles.readMorebtn}
-          onPress={() => handleReadMorePress(item)}
+          // onPress={() => handleReadMorePress(item)}
         >
           <Text style={styles.readMore}>READ MORE </Text>
           <FontAwesome5 name="arrow-right" style={styles.arrowRight} />
@@ -220,10 +220,10 @@ const styles = StyleSheet.create({
     marginVertical: responsiveHeight(2),
     alignItems: "center",
     padding: responsiveWidth(1),
-    height: responsiveHeight(33),
+    height: responsiveHeight(34),
     width: responsiveWidth(97),
     borderRadius: responsiveWidth(5),
-    alignSelf: 'center'
+    alignSelf: "center",
   },
   dailyTipsSubContainer: {
     display: "flex",
@@ -231,25 +231,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     borderBottomWidth: 1,
-    borderBlockColor: 'rgba(238, 234, 236, 0.26)',
+    borderBlockColor: "rgba(238, 234, 236, 0.26)",
   },
   dtTopicContainer: {
     width: responsiveWidth(92),
   },
   dtTopic: {
-    color: 'white',
+    color: "white",
     fontSize: responsiveFontSize(4.1),
+    marginVertical: responsiveHeight(1),
   },
-  // imageContainer: {
-  //   width: '100%'
-    
-  // },
   image: {
     width: "100%",
     height: responsiveHeight(15),
     borderRadius: responsiveFontSize(2),
-    
-    
   },
   dailyTip: {
     alignItems: "center",
