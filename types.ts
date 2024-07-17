@@ -28,7 +28,7 @@ export type RootStackParamList = {
   MedicationList: undefined;
   AddMedication: undefined;
   MedicationReminderScreen: undefined; // Add this line
-  ScheduleScreen1: undefined;
+  EnrichedMedication: undefined;
   ChooseMedicationType: { medicationName: string };
   AddMedicationStrengthScreen: { medicationName: string; medicationType: string };
   AddMedicationTimeScreen: { medicationName: string; medicationType: string; strength: string; selectedUnit: string };

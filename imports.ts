@@ -32,7 +32,6 @@ import Settings from "./screens/Settings";
 import CounselorDetails from "./screens/CounselorDetails";
 import BookAppointment from "./screens/BookAppointment";
 import AddMedication from "./screens/AddMedication";
-import ScheduleScreen1 from "./screens/ChooseMedicationType";
 import Menu from "./components/Menu";
 import WelcomeScreen from "./screens/WelcomeScreen";
 import LoginScreen from "./screens/LoginScreen";
@@ -88,12 +87,9 @@ export {
   MedSchedule,
   FitnessNutrition,
   Settings,
-  
   CounselorDetails,
   BookAppointment,
-
   AddMedication,
-  ScheduleScreen1,
   Menu,
   WelcomeScreen,
   LoginScreen,
