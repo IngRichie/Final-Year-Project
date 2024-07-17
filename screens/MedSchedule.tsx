@@ -131,6 +131,7 @@ const MedicationReminderScreen: React.FC<Props> = ({ navigation }) => {
                     <MedicationName>{med.medicationName}</MedicationName>
                     <MedicationDosage>{`${med.selectedForm} ${med.selectedUnit}`}</MedicationDosage>
                     <MedTimeText>{med.times ? med.times.join(', ') : 'No time set'}</MedTimeText>
+                    <MedicationFrequency>{med.frequency ? med.frequency : 'No frequency set'}</MedicationFrequency>
                   </MedicationInfo>
                   <TouchableOpacity onPress={() => confirmDeleteMedication(med.id)}>
                     <Icon name='delete' size={responsiveFontSize(6)} color='#2e2e2d' />
@@ -239,6 +240,12 @@ const MedicationDosage = styled.Text`
 `;
 
 const MedTimeText = styled.Text`
+  color: #318ce7;
+  font-size: ${responsiveFontSize(3.5)}px;
+  margin-top: ${responsiveHeight(1.25)}px;
+`;
+
+const MedicationFrequency = styled.Text`
   color: #318ce7;
   font-size: ${responsiveFontSize(3.5)}px;
   margin-top: ${responsiveHeight(1.25)}px;
