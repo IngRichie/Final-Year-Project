@@ -19,7 +19,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { NavigationProp, ParamListBase } from "@react-navigation/native";
 import { db } from '../firebaseConfig'; // Ensure the correct path
-import { collection, setDoc, doc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const { width, height } = Dimensions.get("window");
 
@@ -94,20 +94,28 @@ const CombinedScreen: React.FC<CombinedScreenProps> = ({ navigation }) => {
       console.log("Selected Form:", selectedForm);
       console.log("Selected Unit:", selectedUnit);
       console.log("Frequency:", customFrequency.trim() !== "" ? customFrequency : frequency);
-      // console.log("Times:", times);
+      console.log("Times:", times);
 
-      const newDocRef = doc(collection(db, "medReminder")); // Generate a new document reference with an auto-generated ID
-      await setDoc(newDocRef, {
+      await addDoc(collection(db, "medReminder"), {
         medicationName,
         selectedForm,
         selectedUnit,
         frequency: customFrequency.trim() !== "" ? customFrequency : frequency,
-        // times,
+        times,
         timestamp: serverTimestamp(),
       });
-
       console.log("Document successfully added!");
-      Alert.alert("Success", "Medication details saved successfully");
+      Alert.alert(
+        "Success",
+        "Medication details saved successfully",
+        [
+          {
+            text: "OK",
+            onPress: () => navigation.navigate("MedSchedule"), // Navigate to MedSchedule screen
+          },
+        ],
+        { cancelable: false }
+      );
     } catch (error) {
       console.error("Error adding document:", error);
       Alert.alert("Error", "Failed to save medication details");

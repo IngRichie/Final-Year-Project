@@ -6,7 +6,7 @@ import { ListRenderItem } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
 import { db } from '../firebaseConfig';
-import { collection, getDocs, doc, deleteDoc, DocumentData, QuerySnapshot } from 'firebase/firestore';
+import { collection, query, onSnapshot, doc, deleteDoc, DocumentData, QuerySnapshot } from 'firebase/firestore';
 
 const { width, height } = Dimensions.get('window');
 
@@ -45,7 +45,14 @@ const MedicationReminderScreen: React.FC<Props> = ({ navigation }) => {
     setCurrentYear(date.getFullYear().toString());
 
     // Fetch medications
-    fetchMedications();
+    const medQuery = query(collection(db, 'medReminder'));
+    const unsubscribe = onSnapshot(medQuery, (querySnapshot: QuerySnapshot<DocumentData>) => {
+      const medsData = querySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id })) as Medication[];
+      setMedications(medsData);
+      console.log('Medications fetched: ', medsData);
+    });
+
+    return () => unsubscribe(); // Cleanup on unmount
   }, []);
 
   const dates = Array.from({ length: 7 }, (_, i) => {
@@ -53,22 +60,6 @@ const MedicationReminderScreen: React.FC<Props> = ({ navigation }) => {
     date.setDate(date.getDate() + i);
     return date;
   });
-
-  const fetchMedications = async () => {
-    try {
-      const medQuery = collection(db, 'medReminder');
-      const medSnapshot: QuerySnapshot<DocumentData> = await getDocs(medQuery);
-      if (!medSnapshot.empty) {
-        const medsData = medSnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id })) as Medication[];
-        setMedications(medsData);
-        console.log('Medications fetched: ', medsData);
-      } else {
-        console.log('No medications found!');
-      }
-    } catch (error) {
-      console.error('Error fetching medications:', error);
-    }
-  };
 
   const confirmDeleteMedication = (id: string) => {
     Alert.alert(
@@ -92,7 +83,6 @@ const MedicationReminderScreen: React.FC<Props> = ({ navigation }) => {
   const handleDeleteMedication = async (id: string) => {
     try {
       await deleteDoc(doc(db, 'medReminder', id));
-      fetchMedications(); // Refresh the medication list
     } catch (error) {
       console.error('Error deleting medication:', error);
     }
@@ -140,7 +130,7 @@ const MedicationReminderScreen: React.FC<Props> = ({ navigation }) => {
                   <MedicationInfo>
                     <MedicationName>{med.medicationName}</MedicationName>
                     <MedicationDosage>{`${med.selectedForm} ${med.selectedUnit}`}</MedicationDosage>
-                    <MedTimeText>{new Date(med.timestamp.seconds * 1000).toLocaleString()}</MedTimeText>
+                    <MedTimeText>{med.times ? med.times.join(', ') : 'No time set'}</MedTimeText>
                   </MedicationInfo>
                   <TouchableOpacity onPress={() => confirmDeleteMedication(med.id)}>
                     <Icon name='delete' size={responsiveFontSize(6)} color='#2e2e2d' />
@@ -229,7 +219,7 @@ const MedicationItem = styled.View`
   justify-content: space-between;
   align-items: center;
   background-color: #f2f2f2;
-  padding: ${responsiveHeight(1.75)}px;
+  padding: ${responsiveHeight(3.75)}px;
   border-radius: 10px;
   margin-bottom: ${responsiveHeight(2.5)}px;
 `;
@@ -238,7 +228,7 @@ const MedicationInfo = styled.View``;
 
 const MedicationName = styled.Text`
   color: #000;
-  font-size: ${responsiveFontSize(6)}px;
+  font-size: ${responsiveFontSize(4)}px;
   font-weight: bold;
 `;
 
