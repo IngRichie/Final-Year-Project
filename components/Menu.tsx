@@ -4,9 +4,9 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { auth } from "../firebaseConfig"; // Ensure you have this import for the auth instance
+import { auth } from "../firebaseConfig"; 
 
-// Define a RootStackParamList for navigation typings
+
 type RootStackParamList = {
   WelcomeScreen: undefined;
   SymptomAssessment: undefined;
@@ -19,7 +19,7 @@ type RootStackParamList = {
   NotificationScreen: undefined;
 };
 
-// Define navigation prop type for Menu component
+
 type MenuProps = {
   navigation: StackNavigationProp<RootStackParamList>;
 };
@@ -33,8 +33,8 @@ const responsiveFontSize = (percent: number) => (width * percent) / 100;
 const Menu: React.FC<MenuProps> = ({ navigation }) => {
   const handleLogOut = async () => {
     try {
-      await auth.signOut(); // Sign out the user
-      navigation.navigate("LoginScreen"); // Navigate to the LoginScreen
+      await auth.signOut(); 
+      navigation.navigate("LoginScreen"); 
     } catch (error) {
       console.error("Error logging out:", error);
     }
@@ -210,16 +210,18 @@ const styles = StyleSheet.create({
   nightModeIcon: {
     alignSelf: "flex-start",
     fontSize: responsiveFontSize(6),
+    
   },
   menuItems: {
     marginTop: responsiveHeight(2.5),
-    paddingHorizontal: responsiveWidth(5),
-    width: '100%'
+    width: '100%',
+  
   },
   menuItem: {
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: responsiveHeight(1.25),
+    paddingLeft: responsiveHeight(3.25),
   },
   menuIcon: {
     marginRight: responsiveWidth(3.75),

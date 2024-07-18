@@ -76,7 +76,6 @@ const Profile = () => {
 
   const handleSavePress = () => {
     setEditable(false);
-    // Add logic to save the updated information
   };
 
   return (
@@ -140,44 +139,11 @@ const Profile = () => {
                 onChangeText={setPhone}
                 iconName="phone"
               />
-              <DetailRow
-                label="Website"
-                value={website}
-                editable={editable}
-                onChangeText={setWebsite}
-                iconName="globe"
-              />
-              <DetailRow
-                label="Location"
-                value={location}
-                editable={editable}
-                onChangeText={setLocation}
-                iconName="map-marker"
-              />
+             
+            
             </View>
           </View>
-          <View style={styles.utilities}>
-            <DetailRow
-              label="Downloads"
-              iconName="download"
-              onPress={() => {}}
-            />
-            <DetailRow
-              label="Usage Analytics"
-              iconName="bar-chart"
-              onPress={() => {}}
-            />
-            <DetailRow
-              label="Ask Help-Desk"
-              iconName="question-circle"
-              onPress={() => {}}
-            />
-            <DetailRow
-              label="Log Out"
-              iconName="sign-out"
-              onPress={() => {}}
-            />
-          </View>
+          
         </ScrollView>
         {editable && (
           <Pressable

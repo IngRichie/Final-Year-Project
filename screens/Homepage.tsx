@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.8,
     shadowRadius: 2,
-    elevation: 5,
+    // elevation: 5,
     marginVertical: responsiveHeight(0.5),
   },
   buttonText: {

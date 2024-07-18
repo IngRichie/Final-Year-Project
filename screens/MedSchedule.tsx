@@ -156,7 +156,7 @@ const Container = styled.View`
 
 const Header = styled.View`
   background-color: #318ce7;
-  padding: ${responsiveWidth(5)}px;
+  padding: ${responsiveWidth(4)}px;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
@@ -171,7 +171,6 @@ const MonthText = styled.Text`
 
 const DateScrollerContainer = styled.View`
   background-color: #318ce7;
-  padding-bottom: ${responsiveHeight(2.5)}px;
 `;
 
 const DateItem = styled.TouchableOpacity<{ selected: boolean }>`
@@ -220,7 +219,7 @@ const MedicationItem = styled.View`
   justify-content: space-between;
   align-items: center;
   background-color: #f2f2f2;
-  padding: ${responsiveHeight(3.75)}px;
+  padding: ${responsiveHeight(1.75)}px;
   border-radius: 10px;
   margin-bottom: ${responsiveHeight(2.5)}px;
 `;
