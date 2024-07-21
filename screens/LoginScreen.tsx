@@ -10,7 +10,7 @@ import { db, auth } from '../firebaseConfig';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import CustomCheckBox from '../components/CustomCheckBox'; // Adjust the path as necessary
+import CustomCheckBox from '../components/CustomCheckBox';
 
 const { width, height } = Dimensions.get('window');
 
@@ -71,14 +71,11 @@ const LoginScreen = () => {
       setPassword('');
       navigation.navigate('MainTabs', { screen: 'Home', params: { screen: 'Homepage1' } });
     } catch (error: any) {
-      const errorMessage = getErrorMessage(error);
-      setError(errorMessage);
+      setError(getErrorMessage(error));
     }
   };
 
   const getErrorMessage = (error: any) => {
-    console.log(error.code);
-    
     switch (error.code) {
       case 'auth/invalid-email':
         return 'The email address is not valid.';

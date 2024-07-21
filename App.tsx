@@ -1,14 +1,21 @@
 import * as imports from "./imports";
+import { useVoiceCommands, initVoiceCommands } from './voiceCommands';
+import { useNavigation } from '@react-navigation/native';
+import { db, auth } from "./firebaseConfig";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { View, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { FontAwesome5 } from '@expo/vector-icons';
+import React, { useEffect, useState, useRef } from 'react';
+import * as Device from 'expo-device';
+import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
+
+import { registerForPushNotificationsAsync, schedulePushNotification } from './registerPushNotifications';
+import HealthNewsInterest from "./screens/HealthNewsInterest";
 
 const {
-  React,
-  View,
   Text,
-  TouchableOpacity,
-  StyleSheet,
-  Dimensions,
   NavigationContainer,
-  FontAwesome5,
   useFonts,
   AppLoading,
   Homepage1,
@@ -44,27 +51,60 @@ const {
   Stack,
 } = imports;
 
+// Initialize Notifications
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
+
 const HomeStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="Homepage1" component={Homepage1} />
     <Stack.Screen name="FirstAid" component={FirstAid} />
     <Stack.Screen name="CounselorSession" component={CounselorSession} />
-    <Stack.Screen
-      name="DailyTipDetailScreen"
-      component={DailyTipDetailScreen}
-    />
+    <Stack.Screen name="DailyTipDetailScreen" component={DailyTipDetailScreen} />
   </Stack.Navigator>
 );
 
-const CenterButton = (props: any) => (
-  <TouchableOpacity {...props} style={styles.centerButton}>
-    <View
-      style={[styles.centerButtonContainer, { backgroundColor: "#318CE7" }]}
-    >
-      <FontAwesome5 name="robot" color="#fff" size={responsiveFontSize(6)} />
-    </View>
-  </TouchableOpacity>
-);
+const CenterButton = (props: any) => {
+  const [firstName, setFirstName] = React.useState<string>("");
+  const { handleRecordButtonPress, isRecording } = useVoiceCommands();
+  const navigation = useNavigation();
+
+  React.useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const user = auth.currentUser;
+        if (user) {
+          const userQuery = query(collection(db, "users"), where("email", "==", user.email));
+          const userSnapshot = await getDocs(userQuery);
+          if (!userSnapshot.empty) {
+            const userData = userSnapshot.docs[0].data();
+            if (userData && userData.firstname) {
+              setFirstName(userData.firstname);
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+    initVoiceCommands(navigation);
+  }, [navigation]);
+
+  return (
+    <TouchableOpacity {...props} style={styles.centerButton} onPress={() => handleRecordButtonPress(firstName)}>
+      <View style={[styles.centerButtonContainer, { backgroundColor: isRecording ? "#FF6347" : "#318CE7" }]}>
+        <FontAwesome5 name="robot" color="#fff" size={responsiveFontSize(6)} />
+      </View>
+    </TouchableOpacity>
+  );
+};
 
 const MainTabs = () => (
   <Tab.Navigator
@@ -110,16 +150,8 @@ const MainTabs = () => (
       },
     })}
   >
-    <Tab.Screen
-      name="HomeTab"
-      component={HomeStack}
-      options={{ headerShown: false }}
-    />
-    <Tab.Screen
-      name="FirstAidTab"
-      component={FirstAid}
-      options={{ headerShown: false }}
-    />
+    <Tab.Screen name="HomeTab" component={HomeStack} options={{ headerShown: false }} />
+    <Tab.Screen name="FirstAidTab" component={FirstAid} options={{ headerShown: false }} />
     <Tab.Screen
       name="CenterButton"
       component={View}
@@ -128,24 +160,13 @@ const MainTabs = () => (
         headerShown: false,
       }}
     />
-    <Tab.Screen
-      name="NewsPageTab"
-      component={NewsPage}
-      options={{ headerShown: false }}
-    />
-    <Tab.Screen
-      name="CounselorSessionTab"
-      component={CounselorSession}
-      options={{ headerShown: false }}
-    />
+    <Tab.Screen name="NewsPageTab" component={NewsPage} options={{ headerShown: false }} />
+    <Tab.Screen name="CounselorSessionTab" component={CounselorSession} options={{ headerShown: false }} />
   </Tab.Navigator>
 );
 
 const AppStack = () => (
-  <Stack.Navigator
-    screenOptions={{ headerShown: false }}
-    initialRouteName="WelcomeScreen"
-  >
+  <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="WelcomeScreen">
     <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} />
     <Stack.Screen name="LoginScreen" component={LoginScreen} />
     <Stack.Screen name="SignUpScreen" component={SignUpScreen} />
@@ -162,14 +183,11 @@ const AppStack = () => (
     <Stack.Screen name="PrivacyScreen" component={PrivacyScreen} />
     <Stack.Screen name="PreferencesScreen" component={PreferencesScreen} />
     <Stack.Screen name="AccessibilityScreen" component={AccessibilityScreen} />
-    <Stack.Screen
-      name="NotificationSettings"
-      component={NotificationSettings}
-    />
+    <Stack.Screen name="NotificationSettings" component={NotificationSettings} />
     <Stack.Screen name="MentalHealth" component={MentalHealth} />
     <Stack.Screen name="AddMedication" component={AddMedication} />
-
     <Stack.Screen name="SymptomAssessment" component={SymptomAssessment} />
+    <Stack.Screen name="HealthNewsInterest" component={HealthNewsInterest} />
   </Stack.Navigator>
 );
 
@@ -181,6 +199,37 @@ const App = () => {
     "Poppins-Medium": require("./assets/fonts/Poppins-Medium.ttf"),
   });
 
+  const [expoPushToken, setExpoPushToken] = useState<string | undefined>('');
+  const [notification, setNotification] = useState<Notifications.Notification | boolean>(false);
+  const notificationListener = useRef<Notifications.Subscription>();
+  const responseListener = useRef<Notifications.Subscription>();
+
+  useEffect(() => {
+    if (Platform.OS !== 'web') {
+      registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+
+      notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+        setNotification(notification);
+      });
+
+      responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+        console.log(response);
+      });
+    }
+
+    const userEmail = auth.currentUser?.email || 'user@example.com'; // Replace with actual user email fetching logic
+    schedulePushNotification(db, userEmail); // Schedule notifications based on Firestore data
+
+    return () => {
+      if (notificationListener.current) {
+        Notifications.removeNotificationSubscription(notificationListener.current);
+      }
+      if (responseListener.current) {
+        Notifications.removeNotificationSubscription(responseListener.current);
+      }
+    };
+  }, []);
+
   if (!fontsLoaded) {
     return <AppLoading />;
   }
@@ -190,14 +239,10 @@ const App = () => {
       <Drawer.Navigator
         drawerContent={(props) => <Menu {...props} />}
         screenOptions={({ route }) => ({
-          gestureEnabled: route.name === "HomeTab", // Enable swipe only for HomeTab
+          swipeEnabled: false,
         })}
       >
-        <Drawer.Screen
-          name="AppStack"
-          component={AppStack}
-          options={{ headerShown: false }}
-        />
+        <Drawer.Screen name="Home" component={AppStack} options={{ headerShown: false }} />
       </Drawer.Navigator>
     </NavigationContainer>
   );
@@ -212,6 +257,14 @@ const styles = StyleSheet.create({
     borderTopRightRadius: responsiveHeight(1.5),
     borderTopLeftRadius: responsiveHeight(1.5),
     paddingBottom: responsiveHeight(1.25),
+    ...Platform.select({
+      web: {
+        boxShadow: "0px 0px 10px rgba(0,0,0,0.1)",
+      },
+      default: {
+        elevation: 5,
+      },
+    }),
   },
   centerButton: {
     top: -responsiveHeight(3.75),
@@ -224,7 +277,14 @@ const styles = StyleSheet.create({
     borderRadius: responsiveWidth(8.75),
     justifyContent: "center",
     alignItems: "center",
-    elevation: 5,
+    ...Platform.select({
+      web: {
+        boxShadow: "0px 0px 10px rgba(0,0,0,0.1)",
+      },
+      default: {
+        elevation: 5,
+      },
+    }),
   },
 });
 

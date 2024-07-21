@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, ScrollView, SafeAreaView, TouchableOpacity, Dimensions, Alert } from 'react-native';
+import { View, Text, FlatList, ScrollView, SafeAreaView, TouchableOpacity, Dimensions, Platform, Alert } from 'react-native';
 import styled from 'styled-components/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { ListRenderItem } from 'react-native';
@@ -62,22 +62,29 @@ const MedicationReminderScreen: React.FC<Props> = ({ navigation }) => {
   });
 
   const confirmDeleteMedication = (id: string) => {
-    Alert.alert(
-      'Confirm Delete',
-      'Are you sure you want to delete this medication?',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Delete',
-          onPress: () => handleDeleteMedication(id),
-          style: 'destructive',
-        },
-      ],
-      { cancelable: false }
-    );
+    if (Platform.OS === 'web') {
+      const result = window.confirm('Are you sure you want to delete this medication?');
+      if (result) {
+        handleDeleteMedication(id);
+      }
+    } else {
+      Alert.alert(
+        'Confirm Delete',
+        'Are you sure you want to delete this medication?',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'Delete',
+            onPress: () => handleDeleteMedication(id),
+            style: 'destructive',
+          },
+        ],
+        { cancelable: false }
+      );
+    }
   };
 
   const handleDeleteMedication = async (id: string) => {

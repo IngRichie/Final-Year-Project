@@ -1,12 +1,12 @@
 import axios from 'axios';
-// import { GEMINI_API_KEY } from '@env';
+import { GEMINI_API_KEY } from '@env';
 
 const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
 
 export async function chatWithGemini(userMessage: string): Promise<string> {
   try {
     const response = await axios.post(
-      `${API_URL}?key=AIzaSyBPjKFlK23C3Chn1GJsqKcoYAD-JcY997Y`,
+      `${API_URL}?key=AIzaSyBLul9jArDlgiX5Aa6vhL2d0ChmlvG7-80`,
       {
         contents: [
           {

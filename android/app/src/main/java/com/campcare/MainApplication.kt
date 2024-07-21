@@ -1,3 +1,5 @@
+
+import com.wmjmc.reactspeech.VoicePackage; 
 package com.campcare
 
 import android.app.Application
@@ -52,4 +54,14 @@ class MainApplication : Application(), ReactApplication {
     super.onConfigurationChanged(newConfig)
     ApplicationLifecycleDispatcher.onConfigurationChanged(this, newConfig)
   }
+}
+
+
+
+@Override
+protected List<ReactPackage> getPackages() {
+    return Arrays.<ReactPackage>asList(
+        new MainReactPackage(),
+        new VoicePackage() // Add this line
+    );
 }

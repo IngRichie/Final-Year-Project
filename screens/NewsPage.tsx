@@ -10,9 +10,14 @@ import {
   Pressable,
   StatusBar,
   Linking,
+  ActivityIndicator,
+  TouchableOpacity,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, NavigationProp, ParamListBase } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
+import axios from "axios";
+import { db, auth } from "../firebaseConfig";
+import { doc, getDoc } from "firebase/firestore";
 
 const { width, height } = Dimensions.get("window");
 
@@ -21,44 +26,51 @@ const responsiveHeight = (percent: number) => (height * percent) / 100;
 const responsiveFontSize = (percent: number) => (width * percent) / 100;
 
 type NewsArticle = {
-  id: string;
+  source: { id: string | null; name: string };
+  author: string | null;
   title: string;
   description: string;
-  image: string;
-  link: string;
+  url: string;
+  urlToImage: string | null;
+  publishedAt: string;
+  content: string;
 };
-
-const newsData: NewsArticle[] = [
-  {
-    id: "1",
-    title: "Healthy Eating Tips",
-    description: "Discover the best tips for maintaining a healthy diet...",
-    image: "https://via.placeholder.com/150",
-    link: "https://example.com/healthy-eating",
-  },
-  {
-    id: "2",
-    title: "Benefits of Regular Exercise",
-    description: "Learn about the numerous benefits of regular physical activity...",
-    image: "https://via.placeholder.com/150",
-    link: "https://example.com/regular-exercise",
-  },
-  {
-    id: "3",
-    title: "Mental Health Awareness",
-    description: "Find out why mental health is just as important as physical health...",
-    image: "https://via.placeholder.com/150",
-    link: "https://example.com/mental-health",
-  },
-];
 
 const NewsPage: React.FC = () => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const [news, setNews] = useState<NewsArticle[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    // Simulate fetching news articles from an API
-    setNews(newsData);
+    const fetchUserInterestsAndNews = async () => {
+      try {
+        const user = auth.currentUser;
+        if (user) {
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          const userInterests = userDoc.data()?.interests || [];
+
+          const query = userInterests.length > 0
+            ? userInterests.join(' OR ')
+            : 'health';
+
+          const response = await axios.get('https://newsapi.org/v2/top-headlines', {
+            params: {
+              category: 'health',
+              q: query,
+              country: 'us',
+              apiKey: 'd5438597f0d84a6aaace851b3aa26759', 
+            },
+          });
+          setNews(response.data.articles);
+        }
+      } catch (error) {
+        console.error('Error fetching personalized health news:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserInterestsAndNews();
   }, []);
 
   const handleBackPress = () => {
@@ -69,25 +81,37 @@ const NewsPage: React.FC = () => {
     Linking.openURL(link);
   };
 
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <ActivityIndicator size="large" color="#318CE7" />
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <View style={styles.header}>
-    
+        <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
+          <Ionicons name="arrow-back" size={responsiveFontSize(6)} color="#000" />
+        </TouchableOpacity>
         <Text style={styles.headerText}>Health News</Text>
       </View>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {news.map((article) => (
-          <View key={article.id} style={styles.newsItem}>
-            <Image source={{ uri: article.image }} style={styles.newsImage} />
+        {news.map((article, index) => (
+          <View key={index} style={styles.newsItem}>
+            {article.urlToImage && (
+              <Image source={{ uri: article.urlToImage }} style={styles.newsImage} />
+            )}
             <View style={styles.newsContent}>
               <Text style={styles.newsTitle}>{article.title}</Text>
               <Text style={styles.newsDescription}>
-                {article.description.length > 50
+                {article.description?.length > 50
                   ? `${article.description.substring(0, 50)}...`
                   : article.description}
               </Text>
-              <Pressable onPress={() => handleReadMore(article.link)}>
+              <Pressable onPress={() => handleReadMore(article.url)}>
                 <Text style={styles.readMore}>Read More</Text>
               </Pressable>
             </View>
@@ -121,7 +145,7 @@ const styles = StyleSheet.create({
     paddingVertical: responsiveHeight(3),
   },
   newsItem: {
-    flexDirection: "row",
+    flexDirection: "column",
     marginBottom: responsiveHeight(3),
     backgroundColor: "#f9f9f9",
     borderRadius: responsiveWidth(2),
@@ -136,10 +160,10 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   newsImage: {
-    width: responsiveWidth(30),
-    height: responsiveHeight(15),
+    width: '100%',
+    height: responsiveHeight(25),
     borderTopLeftRadius: responsiveWidth(2),
-    borderBottomLeftRadius: responsiveWidth(2),
+    borderTopRightRadius: responsiveWidth(2),
   },
   newsContent: {
     flex: 1,

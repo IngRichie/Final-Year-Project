@@ -52,7 +52,8 @@ const SignUpScreen: React.FC = () => {
         username: username,
         firstname: firstname,
         email: email,
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
+        interests: [], // Initialize with an empty array
       });
 
       // Show verification note
@@ -69,8 +70,8 @@ const SignUpScreen: React.FC = () => {
       setPassword("");
       setConfirmPassword("");
 
-      // Navigate to a verification pending screen or wait for user verification
-      navigation.navigate("LoginScreen");
+      // Navigate to the interests selection screen
+      navigation.navigate("HealthNewsInterest", { userId: user.uid });
 
     } catch (error: any) {
       handleError(error);

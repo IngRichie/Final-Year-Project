@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -9,15 +9,17 @@ import {
   Pressable,
   Dimensions,
   Image,
-} from "react-native";
-import CustomStatusBar from "../components/StatusBar";
-import { FontAwesome } from '@expo/vector-icons';
+  Platform,
+} from 'react-native';
+import CustomStatusBar from '../components/StatusBar';
+import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 import { chatWithGemini } from '../api';
-import { db, auth } from "../firebaseConfig";
-import { collection, query, where, getDocs } from "firebase/firestore";
-import symptomsKeywords from "../components/symptomsKeywords";
+import { db, auth } from '../firebaseConfig';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import symptomsKeywords from '../components/symptomsKeywords';
+import { useFocusEffect } from '@react-navigation/native';
 
-const { width, height } = Dimensions.get("window");
+const { width, height } = Dimensions.get('window');
 
 const responsiveWidth = (percent: number) => (width * percent) / 100;
 const responsiveHeight = (percent: number) => (height * percent) / 100;
@@ -29,17 +31,17 @@ interface Message {
 }
 
 const SymptomAssessment: React.FC = () => {
-  const [symptom, setSymptom] = useState<string>("");
+  const [symptom, setSymptom] = useState<string>('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [firstName, setFirstName] = useState<string>("");
-
+  const [firstName, setFirstName] = useState<string>('');
+  
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const user = auth.currentUser;
         if (user) {
-          const userQuery = query(collection(db, "users"), where("email", "==", user.email));
+          const userQuery = query(collection(db, 'users'), where('email', '==', user.email));
           const userSnapshot = await getDocs(userQuery);
           if (!userSnapshot.empty) {
             const userData = userSnapshot.docs[0].data();
@@ -49,12 +51,20 @@ const SymptomAssessment: React.FC = () => {
           }
         }
       } catch (error) {
-        console.error("Error fetching user data:", error);
+        console.error('Error fetching user data:', error);
       }
     };
 
     fetchUserData();
   }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      return () => {
+        // Cleanup on screen focus change
+      };
+    }, [])
+  );
 
   const checkForIrrelevantContent = (message: string): boolean => {
     return !symptomsKeywords.some(keyword => message.toLowerCase().includes(keyword));
@@ -64,26 +74,27 @@ const SymptomAssessment: React.FC = () => {
     if (symptom.trim()) {
       const userMessage: Message = { user: symptom };
       setMessages([...messages, userMessage]);
-      setSymptom("");
+      setSymptom('');
 
       try {
         let botResponse;
         if (checkForIrrelevantContent(symptom)) {
-          botResponse = "I am only equipped to assist with symptom assessment. Please ask about symptoms.";
+          botResponse = 'I am only equipped to assist with symptom assessment. Please ask about symptoms.';
         } else {
           botResponse = await chatWithGemini(symptom);
+          botResponse = botResponse.replace(/\*/g, ''); // Remove '*' characters
         }
         setMessages(prevMessages => [...prevMessages, { user: symptom, bot: botResponse }]);
         setError(null);
       } catch (error) {
-        setError("Failed to fetch response from AI. Please check your API key and try again.");
+        setError('Failed to fetch response from AI. Please check your API key and try again.');
       }
     }
   };
 
   return (
     <SafeAreaView style={styles.safeAreaView}>
-      <CustomStatusBar screenName={"Symptom Assessment"} />
+      <CustomStatusBar screenName={'Symptom Assessment'} />
 
       <View style={styles.container}>
         <View style={styles.warningContainer}>
@@ -112,7 +123,7 @@ const SymptomAssessment: React.FC = () => {
                     <View style={[styles.chatBubble, styles.botBubble]}>
                       <Text style={styles.nameText}>CampCare</Text>
                       <Text style={styles.chatText}>
-                        {message.bot.replace(/\*/g, '')}
+                        {message.bot}
                       </Text>
                     </View>
                   </View>
@@ -146,8 +157,8 @@ const SymptomAssessment: React.FC = () => {
             placeholder="Type a symptom"
             placeholderTextColor="#6b6b6b"
           />
-          <Pressable style={styles.sendButton} onPress={handleSend}>
-            <FontAwesome name="send" size={24} color="#1F75FE" />
+          <Pressable style={styles.sendButton} onPress={symptom ? handleSend : () => {}}>
+            <MaterialCommunityIcons name="send-circle" size={36} color="#1F75FE" />
           </Pressable>
         </View>
       </View>
@@ -168,13 +179,12 @@ const styles = StyleSheet.create({
   },
   warningText: {
     fontSize: responsiveFontSize(4),
-    color: "#333",
+    color: '#333',
   },
   chatContainer: {
     flexGrow: 1,
     padding: responsiveWidth(2),
-    backgroundColor: "#fff",
-   
+    backgroundColor: '#fff',
   },
   chatRow: {
     flexDirection: 'row',
@@ -194,7 +204,7 @@ const styles = StyleSheet.create({
     width: responsiveWidth(10),
     height: responsiveWidth(10),
     borderRadius: responsiveWidth(5),
-    backgroundColor: "#318CE7",
+    backgroundColor: '#318CE7',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -202,36 +212,36 @@ const styles = StyleSheet.create({
     width: responsiveWidth(10),
     height: responsiveWidth(10),
     borderRadius: responsiveWidth(5),
-    backgroundColor: "#e5e5ea",
+    backgroundColor: '#e5e5ea',
   },
   thumbnailText: {
-    color: "#fff",
+    color: '#fff',
     fontSize: responsiveFontSize(6),
   },
   messageContainer: {
     flexDirection: 'column',
-    maxWidth: "70%",
+    maxWidth: '70%',
     marginBottom: responsiveHeight(2.5),
   },
   nameText: {
     fontSize: responsiveFontSize(3),
-    color: "#666",
+    color: '#666',
     marginBottom: responsiveHeight(0.5),
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   chatBubble: {
     borderRadius: 10,
     padding: responsiveWidth(3),
   },
   userBubble: {
-    backgroundColor: "#e5e5ea",
+    backgroundColor: '#e5e5ea',
   },
   botBubble: {
-    backgroundColor: "#d1f1ff",
+    backgroundColor: '#d1f1ff',
   },
   chatText: {
     fontSize: responsiveFontSize(4),
-    color: "#000",
+    color: '#000',
   },
   errorText: {
     color: 'red',
@@ -239,25 +249,29 @@ const styles = StyleSheet.create({
     marginVertical: responsiveHeight(1),
   },
   inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: responsiveWidth(5),
     paddingVertical: responsiveHeight(3),
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
   },
   textInput: {
     flex: 1,
     height: responsiveHeight(6),
     borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 20,
+    borderColor: '#ddd',
+    borderRadius: 10,
     paddingHorizontal: responsiveWidth(4),
     fontSize: responsiveFontSize(4),
     marginRight: responsiveWidth(2),
+    ...Platform.select({
+      web: {
+        outlineWidth: 0, // Remove the yellow border on web
+      },
+    }),
   },
   sendButton: {
-    backgroundColor: "#fff",
-    padding: responsiveWidth(2),
+    backgroundColor: '#fff',
     borderRadius: 20,
   },
 });

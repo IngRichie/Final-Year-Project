@@ -18,8 +18,8 @@ import styled from "styled-components/native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { NavigationProp, ParamListBase } from "@react-navigation/native";
-import { db } from '../firebaseConfig'; // Ensure the correct path
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from "../firebaseConfig"; // Ensure the correct path
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 const { width, height } = Dimensions.get("window");
 
@@ -67,13 +67,12 @@ const CombinedScreen: React.FC<CombinedScreenProps> = ({ navigation }) => {
   const frequencies = ["Every Day", "Every Week", "Every Month", "Other"];
 
   const handleTimeChange = (event: { type: string }, selectedTime?: Date) => {
-    const currentTime = selectedTime || time;
-    setShowTimePicker(Platform.OS === "ios");
-    setTime(currentTime);
-
     if (event.type === "set") {
+      const currentTime = selectedTime || time;
+      setTime(currentTime);
       setTimes([...times, currentTime.toLocaleTimeString()]);
     }
+    setShowTimePicker(false);
   };
 
   const selectFrequency = (selectedFrequency: string) => {
@@ -89,13 +88,6 @@ const CombinedScreen: React.FC<CombinedScreenProps> = ({ navigation }) => {
 
   const handleAddMedicine = async () => {
     try {
-      console.log("Attempting to add document to Firestore...");
-      console.log("Medication Name:", medicationName);
-      console.log("Selected Form:", selectedForm);
-      console.log("Selected Unit:", selectedUnit);
-      console.log("Frequency:", customFrequency.trim() !== "" ? customFrequency : frequency);
-      console.log("Times:", times);
-
       await addDoc(collection(db, "medReminder"), {
         medicationName,
         selectedForm,
@@ -104,14 +96,13 @@ const CombinedScreen: React.FC<CombinedScreenProps> = ({ navigation }) => {
         times,
         timestamp: serverTimestamp(),
       });
-      console.log("Document successfully added!");
       Alert.alert(
         "Success",
         "Medication details saved successfully",
         [
           {
             text: "OK",
-            onPress: () => navigation.navigate("MedSchedule"), // Navigate to MedSchedule screen
+            onPress: () => navigation.goBack(), // Navigate to previous screen
           },
         ],
         { cancelable: false }
@@ -194,7 +185,7 @@ const CombinedScreen: React.FC<CombinedScreenProps> = ({ navigation }) => {
             </AddButton>
           </FormContainer>
 
-          {showTimePicker && (
+          {showTimePicker && Platform.OS !== 'web' && (
             <DateTimePicker
               testID="dateTimePicker"
               value={time}
@@ -203,6 +194,35 @@ const CombinedScreen: React.FC<CombinedScreenProps> = ({ navigation }) => {
               display="default"
               onChange={handleTimeChange}
             />
+          )}
+
+          {showTimePicker && Platform.OS === 'web' && (
+            <Modal
+              animationType="fade"
+              transparent={true}
+              visible={showTimePicker}
+              onRequestClose={() => setShowTimePicker(false)}
+            >
+              <CenteredModalContainer>
+                <ModalContent>
+                  <ModalTitle>Select Time</ModalTitle>
+                  <input
+                    type="time"
+                    value={time.toLocaleTimeString('en-US', { hour12: false }).substring(0, 5)}
+                    onChange={(e) => handleTimeChange({ type: 'set' }, new Date(`1970-01-01T${e.target.value}:00`))}
+                    style={{ width: '100%', padding: 10, borderRadius: 10, borderWidth: 1, borderColor: '#ccc' }}
+                  />
+                  <ButtonRow>
+                    <CloseButton onPress={() => setShowTimePicker(false)}>
+                      <CloseButtonText>Cancel</CloseButtonText>
+                    </CloseButton>
+                    <ConfirmButton onPress={() => handleTimeChange({ type: 'set' }, time)}>
+                      <ConfirmButtonText>OK</ConfirmButtonText>
+                    </ConfirmButton>
+                  </ButtonRow>
+                </ModalContent>
+              </CenteredModalContainer>
+            </Modal>
           )}
 
           {/* Medication Type Modal */}
@@ -308,7 +328,7 @@ const CombinedScreen: React.FC<CombinedScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f0f0f5",
+    backgroundColor: "#ccccca",
   },
   scrollContainer: {
     flexGrow: 1,
@@ -403,6 +423,10 @@ const ModalContainer = styled.View`
   background-color: rgba(0, 0, 0, 0.5);
 `;
 
+const CenteredModalContainer = styled(ModalContainer)`
+  justify-content: center;
+`;
+
 const ModalContent = styled.View`
   width: 80%;
   background-color: #fff;
@@ -427,6 +451,25 @@ const CloseButton = styled.TouchableOpacity`
 const CloseButtonText = styled.Text`
   color: #fff;
   font-size: ${responsiveFontSize(4)}px;
+`;
+
+const ConfirmButton = styled.TouchableOpacity`
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #318CE7;
+  border-radius: 10px;
+`;
+
+const ConfirmButtonText = styled.Text`
+  color: #fff;
+  font-size: ${responsiveFontSize(4)}px;
+`;
+
+const ButtonRow = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: ${responsiveHeight(2)}px;
 `;
 
 const OptionsContainer = styled.ScrollView`
@@ -457,6 +500,12 @@ const StyledInput = styled.TextInput`
   width: 100%;
   margin-bottom: 20px;
   font-size: ${responsiveFontSize(4)};
+  outline: none;
+  box-shadow: none;
+  &:focus {
+    outline: none;
+    box-shadow: none;
+  }
 `;
 
 export default CombinedScreen;
