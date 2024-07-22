@@ -1,18 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, Pressable, View, ScrollView, Dimensions, Image } from 'react-native';
-import { TextInput as RNPTextInput } from 'react-native-paper';
-import { LinearGradient } from 'expo-linear-gradient';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { useNavigation, ParamListBase } from '@react-navigation/native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { db, auth } from '../firebaseConfig';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { collection, query, where, getDocs } from 'firebase/firestore';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import CustomCheckBox from '../components/CustomCheckBox';
+import React, { useState, useEffect } from "react";
+import {
+  StyleSheet,
+  Text,
+  Pressable,
+  View,
+  ScrollView,
+  Dimensions,
+  Image,
+  Platform,
+} from "react-native";
+import { TextInput as RNPTextInput } from "react-native-paper";
+import { LinearGradient } from "expo-linear-gradient";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { useNavigation, ParamListBase } from "@react-navigation/native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { db, auth } from "../firebaseConfig";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import CustomCheckBox from "../components/CustomCheckBox";
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get("window");
 
 const responsiveWidth = (percent: number) => (width * percent) / 100;
 const responsiveHeight = (percent: number) => (height * percent) / 100;
@@ -24,20 +33,31 @@ const isValidEmail = (email: string) => {
 };
 
 const LoginScreen = () => {
-  const [emailOrUsername, setEmailOrUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [emailOrUsername, setEmailOrUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [rememberMe, setRememberMe] = useState(false);
   const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
 
   useEffect(() => {
     const checkStoredCredentials = async () => {
-      const storedEmail = await AsyncStorage.getItem('emailOrUsername');
-      const storedPassword = await AsyncStorage.getItem('password');
-      if (storedEmail && storedPassword) {
-        setEmailOrUsername(storedEmail);
-        setPassword(storedPassword);
-        onLoginPress(storedEmail, storedPassword);
+      try {
+        let storedEmail = "";
+        let storedPassword = "";
+        if (Platform.OS === "web") {
+          storedEmail = localStorage.getItem("emailOrUsername") || "";
+          storedPassword = localStorage.getItem("password") || "";
+        } else {
+          storedEmail = (await AsyncStorage.getItem("emailOrUsername")) || "";
+          storedPassword = (await AsyncStorage.getItem("password")) || "";
+        }
+        if (storedEmail && storedPassword) {
+          setEmailOrUsername(storedEmail);
+          setPassword(storedPassword);
+          onLoginPress(storedEmail, storedPassword);
+        }
+      } catch (error) {
+        console.error("Error checking stored credentials:", error);
       }
     };
     checkStoredCredentials();
@@ -48,47 +68,72 @@ const LoginScreen = () => {
       let email = emailInput || emailOrUsername;
       let pass = passwordInput || password;
 
+      if (!email || !pass) {
+        throw new Error("Email and password are required.");
+      }
+
       if (!isValidEmail(emailOrUsername)) {
-        const userQuery = query(collection(db, 'users'), where('username', '==', emailOrUsername));
+        const userQuery = query(
+          collection(db, "users"),
+          where("username", "==", emailOrUsername)
+        );
         const userSnapshot = await getDocs(userQuery);
         if (!userSnapshot.empty) {
           const userData = userSnapshot.docs[0].data();
           email = userData.email;
         } else {
-          throw new Error('User not found');
+          throw new Error("User not found");
         }
       }
 
       await signInWithEmailAndPassword(auth, email, pass);
       if (rememberMe) {
-        await AsyncStorage.setItem('emailOrUsername', emailOrUsername);
-        await AsyncStorage.setItem('password', password);
+        if (Platform.OS === "web") {
+          localStorage.setItem("emailOrUsername", emailOrUsername);
+          localStorage.setItem("password", password);
+        } else {
+          await AsyncStorage.setItem("emailOrUsername", emailOrUsername);
+          await AsyncStorage.setItem("password", password);
+        }
       } else {
-        await AsyncStorage.removeItem('emailOrUsername');
-        await AsyncStorage.removeItem('password');
+        if (Platform.OS === "web") {
+          localStorage.removeItem("emailOrUsername");
+          localStorage.removeItem("password");
+        } else {
+          await AsyncStorage.removeItem("emailOrUsername");
+          await AsyncStorage.removeItem("password");
+        }
       }
-      setEmailOrUsername('');
-      setPassword('');
-      navigation.navigate('MainTabs', { screen: 'Home', params: { screen: 'Homepage1' } });
+      setEmailOrUsername("");
+      setPassword("");
+      navigation.navigate("MainTabs", {
+        screen: "Home",
+        params: { screen: "Homepage1" },
+      });
     } catch (error: any) {
+      console.error("Login error:", error);
       setError(getErrorMessage(error));
     }
   };
 
   const getErrorMessage = (error: any) => {
     switch (error.code) {
-      case 'auth/invalid-email':
-        return 'The email address is not valid.';
-      case 'auth/user-disabled':
-        return 'Your account has been disabled. Please contact support.';
-      case 'auth/user-not-found':
-        return 'Invalid email or password.';
-      case 'auth/wrong-password':
-        return 'Invalid email or password.';
-      case 'auth/invalid-credential':
-        return 'Incorrect email or password.';
+      case "auth/invalid-email":
+        return "The email address is not valid.";
+      case "auth/user-disabled":
+        return "Your account has been disabled. Please contact support.";
+      case "auth/user-not-found":
+        return "Invalid email or password.";
+      case "auth/wrong-password":
+        return "Invalid email or password.";
+      case "auth/invalid-credential":
+        return "Incorrect email or password.";
+      case "auth/network-request-failed":
+        return "Network error.";
       default:
-        return 'An unexpected error occurred. Please try again.';
+        return (
+          error.message || "An unexpected error occurred. Please try again."
+        );
     }
   };
 
@@ -105,11 +150,11 @@ const LoginScreen = () => {
   };
 
   const onSignUpPress = () => {
-    navigation.navigate('SignUpScreen');
+    navigation.navigate("SignUpScreen");
   };
 
   const onForgotPasswordPress = () => {
-    navigation.navigate('ForgetPassword');
+    navigation.navigate("ForgetPassword");
   };
 
   return (
@@ -119,7 +164,7 @@ const LoginScreen = () => {
           <Image
             style={styles.logo}
             resizeMode="contain"
-            source={require('../assets/campuscare-logo-1.png')}
+            source={require("../assets/campuscare-logo-1.png")}
           />
           <View style={styles.formContainer}>
             {error && <Text style={styles.errorText}>{error}</Text>}
@@ -135,8 +180,10 @@ const LoginScreen = () => {
               activeOutlineColor="#085ea9"
               keyboardType="default"
               theme={{
-                fonts: { regular: { fontFamily: 'Poppins-Regular', fontWeight: '300' } },
-                colors: { text: '#818181' },
+                fonts: {
+                  regular: { fontFamily: "Poppins-Regular", fontWeight: "300" },
+                },
+                colors: { text: "#818181" },
               }}
             />
             <RNPTextInput
@@ -151,8 +198,10 @@ const LoginScreen = () => {
               outlineColor="#1F75FE"
               activeOutlineColor="#133e85"
               theme={{
-                fonts: { regular: { fontFamily: 'Poppins-Regular', fontWeight: '300' } },
-                colors: { text: '#878787' },
+                fonts: {
+                  regular: { fontFamily: "Poppins-Regular", fontWeight: "300" },
+                },
+                colors: { text: "#878787" },
               }}
             />
             <View style={styles.rememberMeContainer}>
@@ -169,7 +218,10 @@ const LoginScreen = () => {
               colors={["#318CE7", "#1F75FE"]}
               style={styles.loginButton}
             >
-              <Pressable style={styles.pressable} onPress={() => onLoginPress()}>
+              <Pressable
+                style={styles.pressable}
+                onPress={() => onLoginPress()}
+              >
                 <Text style={styles.loginText}>Login</Text>
               </Pressable>
             </LinearGradient>
@@ -177,13 +229,25 @@ const LoginScreen = () => {
           <Text style={styles.orLoginWith}>Or Login with</Text>
           <View style={styles.socialMediaLogin}>
             <Pressable onPress={onGoogleLoginPress}>
-              <FontAwesome name="google" size={responsiveFontSize(7)} color="#DB4437" />
+              <FontAwesome
+                name="google"
+                size={responsiveFontSize(7)}
+                color="#DB4437"
+              />
             </Pressable>
             <Pressable onPress={onFacebookLoginPress}>
-              <FontAwesome name="facebook" size={responsiveFontSize(7)} color="#3b5998" />
+              <FontAwesome
+                name="facebook"
+                size={responsiveFontSize(7)}
+                color="#3b5998"
+              />
             </Pressable>
             <Pressable onPress={onXLoginPress}>
-              <FontAwesome name="twitter" size={responsiveFontSize(7)} color="#1DA1F2" />
+              <FontAwesome
+                name="twitter"
+                size={responsiveFontSize(7)}
+                color="#1DA1F2"
+              />
             </Pressable>
           </View>
           <View style={styles.dontHaveAnContainer}>
@@ -201,15 +265,15 @@ const LoginScreen = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   scrollView: {
     flexGrow: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   container: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
     paddingTop: responsiveHeight(5),
     paddingHorizontal: responsiveWidth(5),
   },
@@ -225,46 +289,46 @@ const styles = StyleSheet.create({
     marginBottom: responsiveHeight(2),
   },
   rememberMeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: responsiveHeight(2),
   },
   rememberMeText: {
     marginLeft: responsiveWidth(2),
     fontSize: responsiveFontSize(3.5),
-    fontFamily: 'Poppins-Regular',
-    color: '#717171',
+    fontFamily: "Poppins-Regular",
+    color: "#717171",
   },
   forgotPassword: {
-    color: '#1F75FE',
+    color: "#1F75FE",
     marginBottom: responsiveHeight(2),
     fontSize: responsiveFontSize(3.5),
-    fontFamily: 'Poppins-Regular',
-    textAlign: 'right',
+    fontFamily: "Poppins-Regular",
+    textAlign: "right",
   },
   loginButton: {
-    width: '100%',
+    width: "100%",
     borderRadius: 10,
-    overflow: 'hidden',
+    overflow: "hidden",
     marginBottom: responsiveHeight(2),
   },
   pressable: {
     padding: responsiveWidth(3),
-    alignItems: 'center',
+    alignItems: "center",
   },
   loginText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: responsiveFontSize(5),
-    fontFamily: 'Poppins-Bold',
+    fontFamily: "Poppins-Bold",
   },
   orLoginWith: {
     marginVertical: responsiveHeight(2),
     fontSize: responsiveFontSize(4.0),
-    fontFamily: 'Poppins-Regular',
+    fontFamily: "Poppins-Regular",
   },
   socialMediaLogin: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
     width: responsiveWidth(60),
     marginBottom: responsiveHeight(2),
   },
@@ -274,28 +338,28 @@ const styles = StyleSheet.create({
   },
   dontHaveAnContainer: {
     marginTop: responsiveHeight(12),
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   dontHaveAn: {
     fontSize: responsiveFontSize(4.0),
-    fontFamily: 'Poppins-Regular',
+    fontFamily: "Poppins-Regular",
   },
   signUp: {
     marginLeft: responsiveWidth(1),
   },
   signUpBtn: {
     color: "#1F75FE",
-    fontWeight: 'bold',
+    fontWeight: "bold",
     fontSize: responsiveFontSize(4.0),
-    fontFamily: 'Poppins-SemiBold',
+    fontFamily: "Poppins-SemiBold",
   },
   errorText: {
-    color: 'red',
+    color: "red",
     marginBottom: responsiveHeight(2),
     fontSize: responsiveFontSize(4),
-    fontFamily: 'Poppins-Regular',
-    textAlign: 'center',
+    fontFamily: "Poppins-Regular",
+    textAlign: "center",
   },
 });
 

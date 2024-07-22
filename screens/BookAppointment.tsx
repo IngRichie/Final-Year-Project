@@ -1,8 +1,16 @@
-import * as React from "react";
-import { ScrollView, StyleSheet, Text, View, SafeAreaView, TextInput, Button, Dimensions, Pressable } from "react-native";
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { useNavigation, NavigationProp, ParamListBase } from '@react-navigation/native';
-import { useState } from "react";
+import React, { useState } from "react";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  SafeAreaView,
+  TextInput,
+  Pressable,
+  Dimensions,
+} from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { useNavigation, NavigationProp, ParamListBase } from "@react-navigation/native";
 import MaterialIcons from "@expo/vector-icons/build/MaterialIcons";
 
 const { width, height } = Dimensions.get("window");
@@ -28,7 +36,7 @@ const BookAppointmentScreen: React.FC<BookAppointmentScreenProps> = ({ route }) 
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const { counselor } = route.params;
   const [date, setDate] = useState(new Date());
-  const [mode, setMode] = useState('date');
+  const [mode, setMode] = useState<"date" | "time">("date");
   const [show, setShow] = useState(false);
   const [appointmentDetails, setAppointmentDetails] = useState("");
   const [counselingMode, setCounselingMode] = useState<"video" | "audio" | "face-to-face">("video");
@@ -43,17 +51,17 @@ const BookAppointmentScreen: React.FC<BookAppointmentScreenProps> = ({ route }) 
     setDate(currentDate);
   };
 
-  const showMode = (currentMode: 'date' | 'time') => {
+  const showMode = (currentMode: "date" | "time") => {
     setShow(true);
     setMode(currentMode);
   };
 
   const showDatePicker = () => {
-    showMode('date');
+    showMode("date");
   };
 
   const showTimePicker = () => {
-    showMode('time');
+    showMode("time");
   };
 
   const handleBookPress = () => {

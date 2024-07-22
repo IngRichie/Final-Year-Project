@@ -25,9 +25,11 @@ const responsiveFontSize = (percent: number) => (width * percent) / 100;
 
 type Notification = {
   id: string;
-  title: string;
-  description: string;
-  date: string;
+  medicationName: string;
+  selectedForm: string;
+  selectedUnit: string;
+  frequency: string;
+  times: string[];
 };
 
 const NotificationPage: React.FC = () => {
@@ -37,15 +39,17 @@ const NotificationPage: React.FC = () => {
   const [selectedNotifications, setSelectedNotifications] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, 'notifications'), (querySnapshot) => {
+    const unsubscribe = onSnapshot(collection(db, 'medReminder'), (querySnapshot) => {
       const fetchedNotifications: Notification[] = [];
       querySnapshot.forEach((doc) => {
         const data = doc.data();
         fetchedNotifications.push({
           id: doc.id,
-          title: data.title,
-          description: data.description,
-          date: data.date,
+          medicationName: data.medicationName,
+          selectedForm: data.selectedForm,
+          selectedUnit: data.selectedUnit,
+          frequency: data.frequency,
+          times: data.times || [], // Default to empty array if undefined
         });
       });
       setNotifications(fetchedNotifications);
@@ -73,7 +77,7 @@ const NotificationPage: React.FC = () => {
 
   const handleDelete = async () => {
     try {
-      await Promise.all(Array.from(selectedNotifications).map(id => deleteDoc(doc(db, 'notifications', id))));
+      await Promise.all(Array.from(selectedNotifications).map(id => deleteDoc(doc(db, 'medReminder', id))));
       Alert.alert("Success", "Selected notifications have been deleted.");
       setSelectedNotifications(new Set());
     } catch (error) {
@@ -94,13 +98,14 @@ const NotificationPage: React.FC = () => {
         ]}
       >
         <View style={styles.notificationContent}>
-          <Text style={styles.notificationTitle}>{notification.title}</Text>
+          <Text style={styles.notificationTitle}>{notification.medicationName}</Text>
           <Text style={styles.notificationDescription}>
-            {notification.description.length > 50
-              ? `${notification.description.substring(0, 50)}...`
-              : notification.description}
+            {notification.selectedForm} {notification.selectedUnit}
           </Text>
-          <Text style={styles.notificationDate}>{notification.date}</Text>
+          <Text style={styles.notificationDate}>{notification.frequency}</Text>
+          <Text style={styles.notificationTimes}>
+            {notification.times.join(", ")}
+          </Text>
         </View>
       </TouchableOpacity>
     );
@@ -210,6 +215,11 @@ const styles = StyleSheet.create({
     fontSize: responsiveFontSize(3),
     color: "#888",
   },
+  notificationTimes: {
+    fontSize: responsiveFontSize(3),
+    color: "#555",
+    marginTop: responsiveHeight(1),
+  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -227,6 +237,70 @@ const styles = StyleSheet.create({
   noNotificationsText: {
     fontSize: responsiveFontSize(4),
     color: "#888",
+  },
+  // Media queries for tablet
+  '@media (min-width: 768px)': {
+    header: {
+      paddingHorizontal: responsiveWidth(3),
+      paddingVertical: responsiveHeight(1.5),
+    },
+    headerText: {
+      fontSize: responsiveFontSize(4.5),
+    },
+    scrollContainer: {
+      paddingHorizontal: responsiveWidth(4),
+    },
+    notificationItem: {
+      marginBottom: responsiveHeight(2.5),
+      borderRadius: responsiveWidth(1.5),
+    },
+    notificationContent: {
+      padding: responsiveWidth(3.5),
+    },
+    notificationTitle: {
+      fontSize: responsiveFontSize(3.5),
+    },
+    notificationDescription: {
+      fontSize: responsiveFontSize(3),
+    },
+    notificationDate: {
+      fontSize: responsiveFontSize(2.5),
+    },
+    notificationTimes: {
+      fontSize: responsiveFontSize(2.5),
+    },
+  },
+  // Media queries for desktop
+  '@media (min-width: 1024px)': {
+    header: {
+      paddingHorizontal: responsiveWidth(2.5),
+      paddingVertical: responsiveHeight(1),
+    },
+    headerText: {
+      fontSize: responsiveFontSize(4),
+    },
+    scrollContainer: {
+      paddingHorizontal: responsiveWidth(3.5),
+    },
+    notificationItem: {
+      marginBottom: responsiveHeight(2),
+      borderRadius: responsiveWidth(1),
+    },
+    notificationContent: {
+      padding: responsiveWidth(3),
+    },
+    notificationTitle: {
+      fontSize: responsiveFontSize(3),
+    },
+    notificationDescription: {
+      fontSize: responsiveFontSize(2.5),
+    },
+    notificationDate: {
+      fontSize: responsiveFontSize(2),
+    },
+    notificationTimes: {
+      fontSize: responsiveFontSize(2),
+    },
   },
 });
 

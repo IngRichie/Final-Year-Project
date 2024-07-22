@@ -16,61 +16,56 @@ import {
 import { useNavigation, NavigationProp, ParamListBase } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
-import { db, auth } from "../firebaseConfig";
-import { doc, getDoc } from "firebase/firestore";
-
-const { width, height } = Dimensions.get("window");
-
-const responsiveWidth = (percent: number) => (width * percent) / 100;
-const responsiveHeight = (percent: number) => (height * percent) / 100;
-const responsiveFontSize = (percent: number) => (width * percent) / 100;
-
-type NewsArticle = {
-  source: { id: string | null; name: string };
-  author: string | null;
-  title: string;
-  description: string;
-  url: string;
-  urlToImage: string | null;
-  publishedAt: string;
-  content: string;
-};
 
 const NewsPage: React.FC = () => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const [news, setNews] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
+  const [screenWidth, setScreenWidth] = useState(Dimensions.get("window").width);
+  const [screenHeight, setScreenHeight] = useState(Dimensions.get("window").height);
+
   useEffect(() => {
-    const fetchUserInterestsAndNews = async () => {
+    const handleResize = ({ window }) => {
+      setScreenWidth(window.width);
+      setScreenHeight(window.height);
+    };
+
+    const dimensionListener = Dimensions.addEventListener("change", handleResize);
+
+    return () => {
+      dimensionListener?.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    const fetchNews = async () => {
       try {
-        const user = auth.currentUser;
-        if (user) {
-          const userDoc = await getDoc(doc(db, "users", user.uid));
-          const userInterests = userDoc.data()?.interests || [];
+        const response = await axios.get("https://newsapi.org/v2/top-headlines", {
+          params: {
+            category: "health",
+            country: "us",
+            apiKey: "d5438597f0d84a6aaace851b3aa26759",
+          },
+        });
 
-          const query = userInterests.length > 0
-            ? userInterests.join(' OR ')
-            : 'health';
-
-          const response = await axios.get('https://newsapi.org/v2/top-headlines', {
-            params: {
-              category: 'health',
-              q: query,
-              country: 'us',
-              apiKey: 'd5438597f0d84a6aaace851b3aa26759', 
-            },
-          });
+        if (response.status === 200) {
           setNews(response.data.articles);
+        } else {
+          console.error(`Error fetching news: ${response.status} ${response.statusText}`);
         }
       } catch (error) {
-        console.error('Error fetching personalized health news:', error);
+        console.error("Error fetching health news:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUserInterestsAndNews();
+    fetchNews();
+
+    const interval = setInterval(fetchNews, 300000); // Refresh news every 5 minutes
+
+    return () => clearInterval(interval);
   }, []);
 
   const handleBackPress = () => {
@@ -83,36 +78,41 @@ const NewsPage: React.FC = () => {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={getDynamicStyles(screenWidth, screenHeight).container}>
         <ActivityIndicator size="large" color="#318CE7" />
       </SafeAreaView>
     );
   }
 
+  const vw = screenWidth / 100;
+  const vh = screenHeight / 100;
+
+  const dynamicStyles = getDynamicStyles(vw, vh, screenWidth);
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={dynamicStyles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
-          <Ionicons name="arrow-back" size={responsiveFontSize(6)} color="#000" />
+      <View style={dynamicStyles.header}>
+        <TouchableOpacity style={dynamicStyles.backButton} onPress={handleBackPress}>
+          <Ionicons name="arrow-back" size={responsiveFontSize(vw, 6)} color="#000" />
         </TouchableOpacity>
-        <Text style={styles.headerText}>Health News</Text>
+        <Text style={dynamicStyles.headerText}>Health News</Text>
       </View>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <ScrollView contentContainerStyle={dynamicStyles.scrollContainer}>
         {news.map((article, index) => (
-          <View key={index} style={styles.newsItem}>
+          <View key={index} style={dynamicStyles.newsItem}>
             {article.urlToImage && (
-              <Image source={{ uri: article.urlToImage }} style={styles.newsImage} />
+              <Image source={{ uri: article.urlToImage }} style={dynamicStyles.newsImage} />
             )}
-            <View style={styles.newsContent}>
-              <Text style={styles.newsTitle}>{article.title}</Text>
-              <Text style={styles.newsDescription}>
+            <View style={dynamicStyles.newsContent}>
+              <Text style={dynamicStyles.newsTitle}>{article.title}</Text>
+              <Text style={dynamicStyles.newsDescription}>
                 {article.description?.length > 50
                   ? `${article.description.substring(0, 50)}...`
                   : article.description}
               </Text>
               <Pressable onPress={() => handleReadMore(article.url)}>
-                <Text style={styles.readMore}>Read More</Text>
+                <Text style={dynamicStyles.readMore}>Read More</Text>
               </Pressable>
             </View>
           </View>
@@ -122,68 +122,85 @@ const NewsPage: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: responsiveWidth(5),
-    paddingVertical: responsiveHeight(2),
-  },
-  backButton: {
-    marginRight: responsiveWidth(2),
-  },
-  headerText: {
-    fontSize: responsiveFontSize(5),
-    fontWeight: "bold",
-  },
-  scrollContainer: {
-    paddingHorizontal: responsiveWidth(5),
-    paddingVertical: responsiveHeight(3),
-  },
-  newsItem: {
-    flexDirection: "column",
-    marginBottom: responsiveHeight(3),
-    backgroundColor: "#f9f9f9",
-    borderRadius: responsiveWidth(2),
-    overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
+type NewsArticle = {
+  source: { id: string | null; name: string };
+  author: string | null;
+  title: string;
+  description: string;
+  url: string;
+  urlToImage: string | null;
+  publishedAt: string;
+  content: string;
+};
+
+const responsiveWidth = (vw: number, percent: number) => vw * percent;
+const responsiveHeight = (vh: number, percent: number) => vh * percent;
+const responsiveFontSize = (vw: number, percent: number) => vw * percent;
+
+const getDynamicStyles = (vw: number, vh: number, screenWidth: number) => {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: "#fff",
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  newsImage: {
-    width: '100%',
-    height: responsiveHeight(25),
-    borderTopLeftRadius: responsiveWidth(2),
-    borderTopRightRadius: responsiveWidth(2),
-  },
-  newsContent: {
-    flex: 1,
-    padding: responsiveWidth(3),
-  },
-  newsTitle: {
-    fontSize: responsiveFontSize(4),
-    fontWeight: "bold",
-    marginBottom: responsiveHeight(1),
-  },
-  newsDescription: {
-    fontSize: responsiveFontSize(3.5),
-    color: "#333",
-    marginBottom: responsiveHeight(1),
-  },
-  readMore: {
-    fontSize: responsiveFontSize(3.5),
-    color: "#318CE7",
-    fontWeight: "bold",
-  },
-});
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingHorizontal: responsiveWidth(vw, 5),
+      paddingVertical: responsiveHeight(vh, 2),
+    },
+    backButton: {
+      marginRight: responsiveWidth(vw, 2),
+    },
+    headerText: {
+      fontSize: responsiveFontSize(vw, 5),
+      fontWeight: "bold",
+    },
+    scrollContainer: {
+      paddingHorizontal: responsiveWidth(vw, 5),
+      paddingVertical: responsiveHeight(vh, 3),
+    },
+    newsItem: {
+      flexDirection: "column",
+      marginBottom: responsiveHeight(vh, 3),
+      backgroundColor: "#f9f9f9",
+      borderRadius: responsiveWidth(vw, 2),
+      overflow: "hidden",
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.1,
+      shadowRadius: 3.84,
+      elevation: 5,
+    },
+    newsImage: {
+      width: "100%",
+      height: responsiveHeight(vh, 25),
+      borderTopLeftRadius: responsiveWidth(vw, 2),
+      borderTopRightRadius: responsiveWidth(vw, 2),
+    },
+    newsContent: {
+      flex: 1,
+      padding: responsiveWidth(vw, 3),
+    },
+    newsTitle: {
+      fontSize: responsiveFontSize(vw, 4),
+      fontWeight: "bold",
+      marginBottom: responsiveHeight(vh, 1),
+    },
+    newsDescription: {
+      fontSize: responsiveFontSize(vw, 3.5),
+      color: "#333",
+      marginBottom: responsiveHeight(vh, 1),
+    },
+    readMore: {
+      fontSize: responsiveFontSize(vw, 3.5),
+      color: "#318CE7",
+      fontWeight: "bold",
+    },
+  });
+};
 
 export default NewsPage;

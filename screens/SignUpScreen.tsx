@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, Pressable, View, ScrollView, Dimensions, Image, Alert } from "react-native";
 import { TextInput as RNPTextInput } from "react-native-paper";
 import { LinearGradient } from "expo-linear-gradient";
@@ -9,34 +9,40 @@ import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from "
 import { setDoc, doc, serverTimestamp, getDocs, collection } from "firebase/firestore";
 import { auth, db } from "../firebaseConfig"; // Ensure you import auth from your Firebase config correctly
 
-const { width, height } = Dimensions.get("window");
-
-const responsiveWidth = (percent: number) => (width * percent) / 100;
-const responsiveHeight = (percent: number) => (height * percent) / 100;
-const responsiveFontSize = (percent: number) => (width * percent) / 100;
-
 const SignUpScreen: React.FC = () => {
-  const [username, setUsername] = useState<string>("");
   const [firstname, setFirstname] = useState<string>("");
+  const [lastname, setLastname] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  const [screenWidth, setScreenWidth] = useState(Dimensions.get("window").width);
+  const [screenHeight, setScreenHeight] = useState(Dimensions.get("window").height);
   const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
+
+  useEffect(() => {
+    const handleResize = ({ window }) => {
+      setScreenWidth(window.width);
+      setScreenHeight(window.height);
+    };
+
+    const dimensionListener = Dimensions.addEventListener("change", handleResize);
+
+    return () => {
+      dimensionListener?.remove();
+    };
+  }, []);
+
+  const vw = screenWidth / 100;
+  const vh = screenHeight / 100;
+
+  const dynamicStyles = getDynamicStyles(vw, vh);
 
   const onSignUpPress = async () => {
     setError(null);
     try {
       if (password !== confirmPassword) {
         setError("Passwords do not match");
-        return;
-      }
-
-      // Check if username is unique
-      const usernamesSnapshot = await getDocs(collection(db, "users"));
-      const usernames = usernamesSnapshot.docs.map(doc => doc.data().username);
-      if (usernames.includes(username)) {
-        setError("Username is already taken. Please choose another one.");
         return;
       }
 
@@ -49,8 +55,8 @@ const SignUpScreen: React.FC = () => {
 
       // Store user information in Firestore
       await setDoc(doc(db, "users", user.uid), {
-        username: username,
         firstname: firstname,
+        lastname: lastname,
         email: email,
         createdAt: serverTimestamp(),
         interests: [], // Initialize with an empty array
@@ -64,8 +70,8 @@ const SignUpScreen: React.FC = () => {
       );
 
       // Clear input fields
-      setUsername("");
       setFirstname("");
+      setLastname("");
       setEmail("");
       setPassword("");
       setConfirmPassword("");
@@ -106,30 +112,18 @@ const SignUpScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.scrollView}>
-        <View style={styles.container}>
+    <SafeAreaView style={dynamicStyles.safeArea}>
+      <ScrollView contentContainerStyle={dynamicStyles.scrollView}>
+        <View style={dynamicStyles.container}>
           <Image
-            style={styles.logo}
+            style={dynamicStyles.logo}
             resizeMode="contain"
             source={require("../assets/campuscare-logo-1.png")}
           />
-          <View style={styles.formContainer}>
-            {error && <Text style={styles.errorText}>{error}</Text>}
+          <View style={dynamicStyles.formContainer}>
+            {error && <Text style={dynamicStyles.errorText}>{error}</Text>}
             <RNPTextInput
-              style={styles.input}
-              label="Username"
-              placeholder="Username"
-              mode="outlined"
-              value={username}
-              onChangeText={setUsername}
-              placeholderTextColor="#545454"
-              outlineColor="#0b6fab"
-              activeOutlineColor="#175689"
-              theme={{ colors: { text: "#626262" } }}
-            />
-            <RNPTextInput
-              style={styles.input}
+              style={dynamicStyles.input}
               label="Firstname"
               placeholder="Firstname"
               mode="outlined"
@@ -141,7 +135,19 @@ const SignUpScreen: React.FC = () => {
               theme={{ colors: { text: "#626262" } }}
             />
             <RNPTextInput
-              style={styles.input}
+              style={dynamicStyles.input}
+              label="Lastname"
+              placeholder="Lastname"
+              mode="outlined"
+              value={lastname}
+              onChangeText={setLastname}
+              placeholderTextColor="#545454"
+              outlineColor="#0b6fab"
+              activeOutlineColor="#175689"
+              theme={{ colors: { text: "#626262" } }}
+            />
+            <RNPTextInput
+              style={dynamicStyles.input}
               label="Email"
               placeholder="Email"
               mode="outlined"
@@ -154,7 +160,7 @@ const SignUpScreen: React.FC = () => {
               theme={{ colors: { text: "#626262" } }}
             />
             <RNPTextInput
-              style={styles.input}
+              style={dynamicStyles.input}
               label="Password"
               placeholder="Password"
               mode="outlined"
@@ -167,7 +173,7 @@ const SignUpScreen: React.FC = () => {
               theme={{ colors: { text: "#4b4b4b" } }}
             />
             <RNPTextInput
-              style={styles.input}
+              style={dynamicStyles.input}
               label="Confirm Password"
               placeholder="Confirm Password"
               mode="outlined"
@@ -181,18 +187,18 @@ const SignUpScreen: React.FC = () => {
             />
             <LinearGradient
               colors={["#318CE7", "#1F75FE"]}
-              style={styles.signupButton}
+              style={dynamicStyles.signupButton}
             >
-              <Pressable style={styles.pressable} onPress={onSignUpPress}>
-                <Text style={styles.signupText}>Sign Up</Text>
+              <Pressable style={dynamicStyles.pressable} onPress={onSignUpPress}>
+                <Text style={dynamicStyles.signupText}>Sign Up</Text>
               </Pressable>
             </LinearGradient>
           </View>
 
-          <View style={styles.haveAnAccount}>
-            <Text style={styles.haveAnAccountText}>Already have an account? </Text>
+          <View style={dynamicStyles.haveAnAccount}>
+            <Text style={dynamicStyles.haveAnAccountText}>Already have an account? </Text>
             <Pressable onPress={() => navigation.navigate("LoginScreen")}>
-              <Text style={styles.loginBtn}>Login</Text>
+              <Text style={dynamicStyles.loginBtn}>Login</Text>
             </Pressable>
           </View>
         </View>
@@ -201,66 +207,72 @@ const SignUpScreen: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  scrollView: {
-    flexGrow: 1,
-    justifyContent: "center",
-  },
-  container: {
-    flex: 1,
-    alignItems: "center",
-    paddingTop: responsiveHeight(5),
-    paddingHorizontal: responsiveWidth(5),
-  },
-  logo: {
-    width: responsiveWidth(70),
-    height: responsiveHeight(17),
-    marginBottom: responsiveHeight(2),
-  },
-  formContainer: {
-    width: responsiveWidth(80),
-    marginBottom: responsiveHeight(2),
-  },
-  input: {
-    marginBottom: responsiveHeight(2),
-  },
-  signupButton: {
-    width: "100%",
-    borderRadius: 10,
-    overflow: "hidden",
-  },
-  pressable: {
-    padding: responsiveWidth(3),
-    alignItems: "center",
-  },
-  signupText: {
-    color: "#fff",
-    fontSize: responsiveFontSize(5),
-  },
-  haveAnAccount: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: responsiveHeight(2),
-    marginBottom: responsiveHeight(5),
-  },
-  haveAnAccountText: {
-    fontSize: responsiveFontSize(4.0),
-  },
-  loginBtn: {
-    color: "#1F75FE",
-    fontSize: responsiveFontSize(4.0),
-    fontWeight: "600",
-    marginLeft: responsiveWidth(1),
-  },
-  errorText: {
-    color: "red",
-    marginBottom: responsiveHeight(2),
-    fontSize: responsiveFontSize(3.5),
-  },
-});
+const responsiveWidth = (vw, percent) => vw * percent;
+const responsiveHeight = (vh, percent) => vh * percent;
+const responsiveFontSize = (vw, percent) => vw * percent;
+
+const getDynamicStyles = (vw, vh) => {
+  return StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: "#fff",
+    },
+    scrollView: {
+      flexGrow: 1,
+      justifyContent: "center",
+    },
+    container: {
+      flex: 1,
+      alignItems: "center",
+      paddingTop: responsiveHeight(vh, 5),
+      paddingHorizontal: responsiveWidth(vw, 5),
+    },
+    logo: {
+      width: responsiveWidth(vw, 70),
+      height: responsiveHeight(vh, 17),
+      marginBottom: responsiveHeight(vh, 2),
+    },
+    formContainer: {
+      width: responsiveWidth(vw, 80),
+      marginBottom: responsiveHeight(vh, 2),
+    },
+    input: {
+      marginBottom: responsiveHeight(vh, 2),
+    },
+    signupButton: {
+      width: "100%",
+      borderRadius: 10,
+      overflow: "hidden",
+    },
+    pressable: {
+      padding: responsiveWidth(vw, 3),
+      alignItems: "center",
+    },
+    signupText: {
+      color: "#fff",
+      fontSize: responsiveFontSize(vw, 5),
+    },
+    haveAnAccount: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginTop: responsiveHeight(vh, 2),
+      marginBottom: responsiveHeight(vh, 5),
+    },
+    haveAnAccountText: {
+      fontSize: responsiveFontSize(vw, 4.0),
+    },
+    loginBtn: {
+      color: "#1F75FE",
+      fontSize: responsiveFontSize(vw, 4.0),
+      fontWeight: "600",
+      marginLeft: responsiveWidth(vw, 1),
+    },
+    errorText: {
+      color: "red",
+      marginBottom: responsiveHeight(vh, 2),
+      fontSize: responsiveFontSize(vw, 3.5),
+    },
+  });
+};
 
 export default SignUpScreen;

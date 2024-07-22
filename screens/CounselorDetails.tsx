@@ -1,7 +1,16 @@
-import * as React from "react";
-import { ScrollView, StyleSheet, Text, View, Image, SafeAreaView, Dimensions, Pressable } from "react-native";
-import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
-import { useNavigation, NavigationProp, ParamListBase } from '@react-navigation/native';
+import React from "react";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  SafeAreaView,
+  Dimensions,
+  Pressable,
+} from "react-native";
+import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
+import { useNavigation, NavigationProp, ParamListBase } from "@react-navigation/native";
 
 const { width, height } = Dimensions.get("window");
 
@@ -14,8 +23,8 @@ interface Counselor {
   position: string;
   description: string;
   available: boolean;
-  experience: number; 
-  rating: number; 
+  experience: number;
+  rating: number;
   specialization: string;
 }
 
@@ -50,10 +59,7 @@ const CounselorDetails: React.FC<CounselorDetailsProps> = ({ route }) => {
             <MaterialIcons name="more-vert" size={responsiveFontSize(6)} color="#000" />
           </Pressable>
         </View>
-        <Image
-          style={styles.counselorImage}
-          source={require("../assets/counselor.png")} 
-        />
+        <Image style={styles.counselorImage} source={require("../assets/counselor.png")} />
         <View style={styles.counselorInfoContainer}>
           <Text style={styles.counselorName}>{counselor.fullName}</Text>
           <Text style={styles.counselorSpecialization}>{counselor.specialization}</Text>

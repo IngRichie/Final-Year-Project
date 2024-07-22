@@ -9,11 +9,12 @@ import {
   StatusBar,
   ScrollView,
   Pressable,
+  Platform,
 } from "react-native";
 import { useNavigation, NavigationProp, DrawerActions } from "@react-navigation/native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import dailyTips from "./DailyTips";
+import dailyTips from "../components/DailyTips";
 import { db, auth } from "../firebaseConfig";
 import { collection, query, where, getDocs } from "firebase/firestore";
 
@@ -88,6 +89,7 @@ const Homepage: React.FC = () => {
           <Text style={styles.headerText}>Hi, {firstName}</Text>
         </View>
       </View>
+      <ScrollView contentContainerStyle={styles.mainContainer}>
       <LinearGradient
         colors={["#369AFF", "#318CE7"]}
         style={styles.dailyTipsContainer}
@@ -121,13 +123,13 @@ const Homepage: React.FC = () => {
           <FontAwesome5 name="arrow-right" style={styles.arrowRight} />
         </Pressable>
       </LinearGradient>
-      <ScrollView contentContainerStyle={styles.mainContainer}>
+   
         <View style={styles.subContainer}>
           <Pressable
             style={styles.button}
             onPress={() => navigation.navigate("MentalHealth")}
           >
-            <FontAwesome5 name="brain" size={50} color="#333" />
+            <FontAwesome5 name="brain" size={responsiveFontSize(8)} color="#333" />
             <Text style={[styles.buttonText, styles.iconText]}>
               Mental Health
             </Text>
@@ -136,7 +138,7 @@ const Homepage: React.FC = () => {
             style={styles.button}
             onPress={() => navigation.navigate("SymptomAssessment")}
           >
-            <FontAwesome5 name="clipboard-list" size={50} color="#333" />
+            <FontAwesome5 name="clipboard-list" size={responsiveFontSize(8)} color="#333" />
             <Text style={[styles.buttonText, styles.iconText]}>
               Symptom Assessment
             </Text>
@@ -147,7 +149,7 @@ const Homepage: React.FC = () => {
             style={styles.button}
             onPress={() => navigation.navigate("ClinicAppointment")}
           >
-            <FontAwesome5 name="hospital" size={50} color="#333" />
+            <FontAwesome5 name="hospital" size={responsiveFontSize(8)} color="#333" />
             <Text style={[styles.buttonText, styles.iconText]}>
               Clinic Appointment
             </Text>
@@ -156,7 +158,7 @@ const Homepage: React.FC = () => {
             style={styles.button}
             onPress={() => navigation.navigate("FitnessNutrition")}
           >
-            <FontAwesome5 name="dumbbell" size={50} color="#333" />
+            <FontAwesome5 name="dumbbell" size={responsiveFontSize(8)} color="#333" />
             <Text style={[styles.buttonText, styles.iconText]}>
               Fitness & Nutrition
             </Text>
@@ -170,7 +172,7 @@ const Homepage: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+
   },
   menuIconContainer: {
     position: "absolute",
@@ -220,7 +222,7 @@ const styles = StyleSheet.create({
     marginVertical: responsiveHeight(2),
     alignItems: "center",
     padding: responsiveWidth(1),
-    height: responsiveHeight(34),
+    height: responsiveHeight(40), // Increased height
     width: responsiveWidth(97),
     borderRadius: responsiveWidth(5),
     alignSelf: "center",
@@ -231,7 +233,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     borderBottomWidth: 1,
-    borderBlockColor: "rgba(238, 234, 236, 0.26)",
+    borderBottomColor: "rgba(238, 234, 236, 0.26)",
+    
   },
   dtTopicContainer: {
     width: responsiveWidth(92),
@@ -250,13 +253,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: responsiveHeight(1),
     paddingHorizontal: responsiveWidth(2),
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+      },
+      android: {
+        elevation: 5,
+      },
+      web: {
+        boxShadow: "none", 
+      },
+    }),
   },
   dailyTipContents: {
     fontFamily: "Poppins-Medium",
@@ -285,11 +295,14 @@ const styles = StyleSheet.create({
   mainContainer: {
     flexGrow: 1,
     padding: responsiveWidth(5),
+    marginBottom: responsiveHeight(7),
+   
   },
   subContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginVertical: responsiveHeight(1),
+    marginBottom: responsiveHeight(4),
   },
   button: {
     backgroundColor: "#fbfaf3",
@@ -299,14 +312,17 @@ const styles = StyleSheet.create({
     marginHorizontal: responsiveWidth(2.5),
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.8,
-    shadowRadius: 2,
-    // elevation: 5,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,
+      },
+      android: {
+        elevation: 5,
+      },
+    }),
     marginVertical: responsiveHeight(0.5),
   },
   buttonText: {

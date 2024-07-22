@@ -5,7 +5,7 @@ import { Platform } from 'react-native';
 import { collection, getDocs, Firestore, addDoc } from "firebase/firestore";
 
 export async function registerForPushNotificationsAsync(): Promise<string | undefined> {
-  let token: string | PromiseLike<string | undefined> | undefined;
+  let token: string | undefined;
 
   if (Platform.OS === 'android') {
     await Notifications.setNotificationChannelAsync('default', {
@@ -13,7 +13,6 @@ export async function registerForPushNotificationsAsync(): Promise<string | unde
       importance: Notifications.AndroidImportance.MAX,
       vibrationPattern: [0, 250, 250, 250],
       lightColor: '#FF231F7C',
-    //   sound: true,
     });
   }
 
@@ -58,7 +57,9 @@ export async function schedulePushNotification(db: Firestore, userEmail: string)
       data.times.forEach(async (time: string) => {
         const reminderTime = new Date();
         const [hour, minute] = time.split(':');
-        reminderTime.setHours(parseInt(hour));
+        const [hourPart, period] = hour.split(' ');
+        const formattedHour = period === 'PM' ? parseInt(hourPart) + 12 : parseInt(hourPart);
+        reminderTime.setHours(formattedHour);
         reminderTime.setMinutes(parseInt(minute));
         reminderTime.setSeconds(0);
 

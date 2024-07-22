@@ -1,15 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, Pressable, FlatList, SafeAreaView, Dimensions } from "react-native";
 import { useNavigation, RouteProp, ParamListBase } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../firebaseConfig";
-
-const { width, height } = Dimensions.get("window");
-
-const responsiveWidth = (percent: number) => (width * percent) / 100;
-const responsiveHeight = (percent: number) => (height * percent) / 100;
-const responsiveFontSize = (percent: number) => (width * percent) / 100;
 
 type InterestScreenNavigationProp = StackNavigationProp<
   ParamListBase,
@@ -41,6 +35,26 @@ const interestsList = [
 const InterestsScreen: React.FC<Props> = ({ route, navigation }) => {
   const { userId } = route.params;
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  const [screenWidth, setScreenWidth] = useState(Dimensions.get("window").width);
+  const [screenHeight, setScreenHeight] = useState(Dimensions.get("window").height);
+
+  useEffect(() => {
+    const handleResize = ({ window }) => {
+      setScreenWidth(window.width);
+      setScreenHeight(window.height);
+    };
+
+    const dimensionListener = Dimensions.addEventListener("change", handleResize);
+
+    return () => {
+      dimensionListener?.remove();
+    };
+  }, []);
+
+  const vw = screenWidth / 100;
+  const vh = screenHeight / 100;
+
+  const dynamicStyles = getDynamicStyles(vw, vh);
 
   const toggleInterest = (interest: string) => {
     setSelectedInterests((prevInterests) =>
@@ -66,8 +80,8 @@ const InterestsScreen: React.FC<Props> = ({ route, navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.header}>Select Your Interests</Text>
+    <SafeAreaView style={dynamicStyles.container}>
+      <Text style={dynamicStyles.header}>Select Your Interests</Text>
       <FlatList
         data={interestsList}
         keyExtractor={(item) => item}
@@ -75,76 +89,82 @@ const InterestsScreen: React.FC<Props> = ({ route, navigation }) => {
         renderItem={({ item }) => (
           <Pressable
             style={[
-              styles.interestItem,
-              selectedInterests.includes(item) && styles.selectedInterestItem,
+              dynamicStyles.interestItem,
+              selectedInterests.includes(item) && dynamicStyles.selectedInterestItem,
             ]}
             onPress={() => toggleInterest(item)}
           >
-            <Text style={styles.interestText}>{item}</Text>
+            <Text style={dynamicStyles.interestText}>{item}</Text>
           </Pressable>
         )}
-        contentContainerStyle={styles.interestsContainer}
+        contentContainerStyle={dynamicStyles.interestsContainer}
       />
-      <View style={styles.buttonContainer}>
-        <Pressable style={styles.button} onPress={handleSave}>
-          <Text style={styles.buttonText}>Save</Text>
+      <View style={dynamicStyles.buttonContainer}>
+        <Pressable style={dynamicStyles.button} onPress={handleSave}>
+          <Text style={dynamicStyles.buttonText}>Save</Text>
         </Pressable>
-        <Pressable style={styles.button} onPress={handleSkip}>
-          <Text style={styles.buttonText}>Skip</Text>
+        <Pressable style={dynamicStyles.button} onPress={handleSkip}>
+          <Text style={dynamicStyles.buttonText}>Skip</Text>
         </Pressable>
       </View>
     </SafeAreaView>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#fff",
-  },
-  header: {
-    fontSize: responsiveFontSize(6),
-    fontWeight: "bold",
-    marginVertical: responsiveHeight(2),
-  },
-  interestsContainer: {
-    justifyContent: "center",
-  },
-  interestItem: {
-    backgroundColor: "#e0e0e0",
-    padding: responsiveHeight(2),
-    margin: responsiveWidth(2),
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-    width: responsiveWidth(40),
-  },
-  selectedInterestItem: {
-    backgroundColor: "#318CE7",
-  },
-  interestText: {
-    fontSize: responsiveFontSize(4),
-    color: "#333",
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginTop: responsiveHeight(2),
-  },
-  button: {
-    backgroundColor: "#318CE7",
-    padding: responsiveHeight(2),
-    borderRadius: 10,
-    marginHorizontal: responsiveWidth(5),
-    width: responsiveWidth(30),
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: responsiveFontSize(4),
-  },
-});
+const responsiveWidth = (vw, percent) => vw * percent;
+const responsiveHeight = (vh, percent) => vh * percent;
+const responsiveFontSize = (vw, percent) => vw * percent;
+
+const getDynamicStyles = (vw, vh) => {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: "#fff",
+    },
+    header: {
+      fontSize: responsiveFontSize(vw, 6),
+      fontWeight: "bold",
+      marginVertical: responsiveHeight(vh, 2),
+    },
+    interestsContainer: {
+      justifyContent: "center",
+    },
+    interestItem: {
+      backgroundColor: "#e0e0e0",
+      padding: responsiveHeight(vh, 2),
+      margin: responsiveWidth(vw, 2),
+      borderRadius: 10,
+      alignItems: "center",
+      justifyContent: "center",
+      width: responsiveWidth(vw, 40),
+    },
+    selectedInterestItem: {
+      backgroundColor: "#318CE7",
+    },
+    interestText: {
+      fontSize: responsiveFontSize(vw, 4),
+      color: "#333",
+    },
+    buttonContainer: {
+      flexDirection: "row",
+      justifyContent: "space-around",
+      marginTop: responsiveHeight(vh, 2),
+    },
+    button: {
+      backgroundColor: "#318CE7",
+      padding: responsiveHeight(vh, 2),
+      borderRadius: 10,
+      marginHorizontal: responsiveWidth(vw, 5),
+      width: responsiveWidth(vw, 30),
+      alignItems: "center",
+    },
+    buttonText: {
+      color: "#fff",
+      fontSize: responsiveFontSize(vw, 4),
+    },
+  });
+};
 
 export default InterestsScreen;

@@ -1,5 +1,15 @@
 import * as React from "react";
-import { Text, StyleSheet, View, ScrollView, Pressable, Dimensions, Image, Linking } from "react-native";
+import {
+  Text,
+  StyleSheet,
+  View,
+  ScrollView,
+  Pressable,
+  Dimensions,
+  Image,
+  Linking,
+  Platform,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FontAwesome } from "@expo/vector-icons";
 import StatusBar from "../components/StatusBar"; // Adjust path as per your project structure
@@ -49,10 +59,16 @@ const FitnessNutritionScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar screenName="Fitness & Nutrition" />
-    
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {resources.map(resource => (
-          <Pressable key={resource.id} style={styles.resourceCard} onPress={() => openLink(resource.link)}>
+        {resources.map((resource) => (
+          <Pressable
+            key={resource.id}
+            style={[
+              styles.resourceCard,
+              Platform.OS === 'web' && styles.webResourceCard
+            ]}
+            onPress={() => openLink(resource.link)}
+          >
             <Image source={{ uri: resource.imageUrl }} style={styles.resourceImage} />
             <View style={styles.resourceInfo}>
               <Text style={styles.resourceTitle}>{resource.title}</Text>
@@ -104,6 +120,9 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
     marginBottom: responsiveHeight(2),
+  },
+  webResourceCard: {
+    cursor: 'pointer', // Web-specific style
   },
   resourceImage: {
     width: responsiveWidth(25),

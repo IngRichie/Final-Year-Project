@@ -57,17 +57,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
-  backIconContainer: {
-    top: responsiveHeight(2),
-    marginLeft: responsiveHeight(3),
-    width: responsiveHeight(4),
-    zIndex: 10,
-    padding: responsiveFontSize(1),
-  },
-  backIcon: {
-    fontSize: responsiveFontSize(6),
-    color: "#333",
-  },
   headerContainer: {
     marginTop: responsiveHeight(6), // Adjusted to make space for the back icon
   },
@@ -125,32 +114,8 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: responsiveFontSize(6),
-    color: "red",
+    color: "#318CE7",
     fontFamily: "Poppins-Bold",
-  },
-  homeButton: {
-    position: "absolute",
-    bottom: 0,
-    alignSelf: "center",
-    width: responsiveWidth(45),
-    height: responsiveHeight(12),
-    backgroundColor: "#318CE7",
-    borderWidth: 2,
-    borderColor: "#fff",
-    borderTopLeftRadius: responsiveWidth(30),
-    borderTopRightRadius: responsiveWidth(30),
-    alignItems: "center",
-    justifyContent: "center",
-    elevation: 10,
-  },
-  homeIcon: {
-    fontSize: responsiveFontSize(9),
-    color: "#fff",
-  },
-  homeButtonText: {
-    fontSize: responsiveFontSize(3),
-    color: "#fff",
-    marginTop: responsiveHeight(0.5),
   },
 });
 

@@ -74,10 +74,14 @@ const CounselorSession: React.FC = () => {
           <View style={styles.searchContainer}>
             <FontAwesome name="search" style={styles.searchIcon} />
             <TextInput
-              style={styles.searchInput}
+              style={[
+                styles.searchInput,
+                Platform.OS === "web" && styles.webSearchInput,
+              ]}
               placeholder="Search Counselor"
               value={searchQuery}
               onChangeText={handleSearch}
+              placeholderTextColor="#888"
             />
           </View>
           <Text style={styles.sectionTitle}>Available Counselors</Text>
@@ -134,16 +138,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    marginBottom: responsiveWidth(17),
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     paddingHorizontal: responsiveWidth(5),
     paddingVertical: responsiveHeight(2),
-  },
-  backButton: {
-    marginRight: responsiveWidth(2),
   },
   headerText: {
     fontSize: responsiveFontSize(5),
@@ -152,15 +153,21 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
     paddingHorizontal: responsiveWidth(5),
-    paddingVertical: responsiveHeight(3),
+    paddingBottom: responsiveHeight(10),
   },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: responsiveHeight(2),
-    padding: responsiveWidth(3),
+    paddingHorizontal: responsiveWidth(3),
+    paddingVertical: responsiveHeight(1),
     borderRadius: responsiveWidth(2),
     backgroundColor: "#f0f0f0",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+    elevation: 2,
   },
   searchIcon: {
     fontSize: responsiveFontSize(6),
@@ -168,7 +175,12 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    fontSize: responsiveFontSize(4),
+    fontSize: responsiveFontSize(5),
+    // paddingVertical: responsiveHeight(0.1),
+    borderBottomWidth: 0,
+  },
+  webSearchInput: {
+    outlineStyle: "none",
   },
   sectionTitle: {
     fontSize: responsiveFontSize(5),
@@ -181,6 +193,10 @@ const styles = StyleSheet.create({
   },
   cardSpacing: {
     marginRight: responsiveWidth(5),
+    backgroundColor: "#fff",
+    borderRadius: responsiveWidth(2),
+    overflow: "hidden",
+    
   },
   noResultsText: {
     fontSize: responsiveFontSize(4),
@@ -234,6 +250,38 @@ const styles = StyleSheet.create({
   additionalInfoText: {
     fontSize: responsiveFontSize(4),
     color: "#333",
+  },
+  '@media (min-width: 768px)': {
+    headerText: {
+      fontSize: responsiveFontSize(4),
+    },
+    searchInput: {
+      fontSize: responsiveFontSize(4),
+    },
+    sectionTitle: {
+      fontSize: responsiveFontSize(4),
+    },
+    cardSpacing: {
+      marginRight: responsiveWidth(4),
+    },
+    noResultsText: {
+      fontSize: responsiveFontSize(3.5),
+    },
+    feelingsTitle: {
+      fontSize: responsiveFontSize(4),
+    },
+    feelingIcon: {
+      fontSize: responsiveFontSize(7),
+    },
+    feelingText: {
+      fontSize: responsiveFontSize(3.5),
+    },
+    additionalInfoTitle: {
+      fontSize: responsiveFontSize(4),
+    },
+    additionalInfoText: {
+      fontSize: responsiveFontSize(3.5),
+    },
   },
 });
 
