@@ -302,11 +302,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginVertical: responsiveHeight(1),
-    marginBottom: responsiveHeight(4),
+    // marginBottom: responsiveHeight(4),
   },
   button: {
     backgroundColor: "#fbfaf3",
-    paddingVertical: responsiveHeight(1),
+    paddingVertical: responsiveHeight(2),
     borderRadius: 10,
     flex: 1,
     marginHorizontal: responsiveWidth(2.5),

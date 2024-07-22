@@ -1,0 +1,36 @@
+{
+  "files": {
+    "main.js": "/static/js/main.8b5247d2.js",
+    "static/js/39.6a88f77c.js": "/static/js/39.6a88f77c.js",
+    "static/media/wallpaperflare.png": "/static/media/wallpaperflare.65db68319e49a89addc8.png",
+    "static/media/MaterialCommunityIcons.ttf": "/static/media/MaterialCommunityIcons.5d42b4e60858731e7b65.ttf",
+    "static/media/Ionicons.ttf": "/static/media/Ionicons.9b6b1954a5eb6efeaf11.ttf",
+    "static/media/MaterialIcons.ttf": "/static/media/MaterialIcons.f20305dee9d396fea5c7.ttf",
+    "static/media/medicine.png": "/static/media/medicine.52cc46579777a1b6deca.png",
+    "static/media/FontAwesome5_Solid.ttf": "/static/media/FontAwesome5_Solid.07c3313b24f7b1ca85ee.ttf",
+    "static/media/FontAwesome.ttf": "/static/media/FontAwesome.1e59d2330b4c6deb84b3.ttf",
+    "static/media/Poppins-Regular.ttf": "/static/media/Poppins-Regular.35d26b781dc5fda684cc.ttf",
+    "static/media/Poppins-Medium.ttf": "/static/media/Poppins-Medium.673ed42382ab264e0bf5.ttf",
+    "static/media/Poppins-SemiBold.ttf": "/static/media/Poppins-SemiBold.ac8d04b620e54be9b0f0.ttf",
+    "static/media/Poppins-Bold.ttf": "/static/media/Poppins-Bold.cdb29a5d7ccf57ff05a3.ttf",
+    "static/media/FontAwesome5_Brands.ttf": "/static/media/FontAwesome5_Brands.9e138496e8f1719c6ebf.ttf",
+    "static/media/image.png": "/static/media/image.bcd343b60fc9ab0fff46.png",
+    "static/media/profilephoto.png": "/static/media/profilephoto.f0c9794af648d13c23c2.png",
+    "static/media/counselor.png": "/static/media/counselor.7adfe78f1833d355210e.png",
+    "static/media/FontAwesome5_Regular.ttf": "/static/media/FontAwesome5_Regular.1017bce89c72f95bcf8e.ttf",
+    "favicon.ico": "/favicon.ico",
+    "index.html": "/index.html",
+    "static/media/Campcare.png": "/static/media/Campcare.ab5960a7b85f77c3cc2e.png",
+    "static/media/campuscare-logo-1.png": "/static/media/campuscare-logo-1.ab5960a7b85f77c3cc2e.png",
+    "favicon-32.png": "/favicon-32.png",
+    "favicon-16.png": "/favicon-16.png",
+    "manifest.json": "/manifest.json",
+    "serve.json": "/serve.json",
+    "main.8b5247d2.js.map": "/static/js/main.8b5247d2.js.map",
+    "39.6a88f77c.js.map": "/static/js/39.6a88f77c.js.map"
+  },
+  "entrypoints": [
+    "static/js/39.6a88f77c.js",
+    "static/js/main.8b5247d2.js"
+  ]
+}

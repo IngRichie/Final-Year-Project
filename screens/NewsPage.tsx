@@ -11,11 +11,14 @@ import {
   StatusBar,
   Linking,
   ActivityIndicator,
-  TouchableOpacity,
+  Platform,
 } from "react-native";
 import { useNavigation, NavigationProp, ParamListBase } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
+
+// Conditionally import based on the platform
+const TouchableOpacity = Platform.OS === 'web' ? require('react-native-web').TouchableOpacity : require('react-native').TouchableOpacity;
 
 const NewsPage: React.FC = () => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();

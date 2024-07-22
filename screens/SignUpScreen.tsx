@@ -118,7 +118,7 @@ const SignUpScreen: React.FC = () => {
           <Image
             style={dynamicStyles.logo}
             resizeMode="contain"
-            source={require("../assets/campuscare-logo-1.png")}
+            // source={require("../assets/campuscare-logo-1.png")}
           />
           <View style={dynamicStyles.formContainer}>
             {error && <Text style={dynamicStyles.errorText}>{error}</Text>}

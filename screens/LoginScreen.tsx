@@ -164,7 +164,7 @@ const LoginScreen = () => {
           <Image
             style={styles.logo}
             resizeMode="contain"
-            source={require("../assets/campuscare-logo-1.png")}
+            // source={require("../assets/campuscare-logo-1.png")}
           />
           <View style={styles.formContainer}>
             {error && <Text style={styles.errorText}>{error}</Text>}

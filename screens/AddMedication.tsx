@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  TouchableOpacity,
   StyleSheet,
   Image,
   ScrollView,
@@ -12,6 +11,8 @@ import {
   Modal,
   Alert,
   Platform,
+  TextInput as RNTextInput,
+  TouchableOpacity as RNTouchableOpacity,
 } from "react-native";
 import styled from "styled-components/native";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -19,6 +20,9 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import { NavigationProp, ParamListBase } from "@react-navigation/native";
 import { db } from "../firebaseConfig"; // Ensure the correct path
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+
+// Conditionally import TouchableOpacity
+const TouchableOpacity = Platform.OS === 'web' ? require('react-native-web').TouchableOpacity : RNTouchableOpacity;
 
 interface CombinedScreenProps {
   navigation: NavigationProp<ParamListBase>;
@@ -521,7 +525,7 @@ const OptionText = styled.Text<{ vw: number }>`
   color: #000;
 `;
 
-const StyledInput = styled.TextInput<{ vw: number }>`
+const StyledInput = styled(RNTextInput)<{ vw: number }>`
   border-width: 1px;
   border-color: #ccc;
   padding: 10px;

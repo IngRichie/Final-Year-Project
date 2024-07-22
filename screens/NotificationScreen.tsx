@@ -9,13 +9,15 @@ import {
   Pressable,
   StatusBar,
   Alert,
-  TouchableOpacity,
   Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, NavigationProp, ParamListBase } from "@react-navigation/native";
 import { collection, onSnapshot, deleteDoc, doc } from "firebase/firestore";
 import { db } from "../firebaseConfig"; // Ensure this path is correct
+
+// Conditionally import based on the platform
+const TouchableOpacity = Platform.OS === 'web' ? require('react-native-web').TouchableOpacity : require('react-native').TouchableOpacity;
 
 const { width, height } = Dimensions.get("window");
 

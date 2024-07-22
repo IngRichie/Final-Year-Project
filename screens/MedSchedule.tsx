@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, ScrollView, SafeAreaView, TouchableOpacity, Dimensions, Platform, Alert } from 'react-native';
+import { View, Text, FlatList, ScrollView, SafeAreaView, Dimensions, Platform, Alert } from 'react-native';
 import styled from 'styled-components/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { ListRenderItem } from 'react-native';
@@ -7,6 +7,9 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
 import { db } from '../firebaseConfig';
 import { collection, query, onSnapshot, doc, deleteDoc, DocumentData, QuerySnapshot } from 'firebase/firestore';
+
+// Conditionally import based on the platform
+const TouchableOpacity = Platform.OS === 'web' ? require('react-native-web').TouchableOpacity : require('react-native').TouchableOpacity;
 
 const { width, height } = Dimensions.get('window');
 
@@ -180,7 +183,7 @@ const DateScrollerContainer = styled.View`
   background-color: #318ce7;
 `;
 
-const DateItem = styled.TouchableOpacity<{ selected: boolean }>`
+const DateItem = styled(TouchableOpacity)<{ selected: boolean }>`
   align-items: center;
   margin: 0 ${responsiveWidth(2.5)}px;
   background-color: ${({ selected }) => (selected ? '#fff' : 'transparent')};
@@ -257,7 +260,7 @@ const MedicationFrequency = styled.Text`
   margin-top: ${responsiveHeight(1.25)}px;
 `;
 
-const AddButton = styled.TouchableOpacity`
+const AddButton = styled(TouchableOpacity)`
   position: absolute;
   right: ${responsiveWidth(5)}px;
   bottom: ${responsiveHeight(5)}px;

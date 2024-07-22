@@ -6,12 +6,15 @@
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "build:web": "expo build:web",
+    "build:android": "eas build -p android --profile production"
   },
   "dependencies": {
     "@expo-google-fonts/poppins": "^0.2.3",
     "@expo/metro-runtime": "~3.2.1",
     "@expo/vector-icons": "^14.0.2",
+    "@expo/webpack-config": "^19.0.1",
     "@firebase/auth": "^1.7.4",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@google-cloud/dialogflow": "^6.7.0",
@@ -47,6 +50,7 @@
     "assemblyai": "^4.6.1",
     "axios": "^1.7.2",
     "body-parser": "^1.20.2",
+    "crypto-browserify": "^3.12.0",
     "dialogflow": "^1.2.0",
     "dialogflow-fulfillment": "^0.5.0",
     "expo": "~51.0.21",
@@ -91,10 +95,12 @@
     "react-native-voice": "^0.3.0",
     "react-native-web": "^0.19.12",
     "react-native-webrtc": "^124.0.3",
+    "stream-browserify": "^3.0.0",
     "stream-chat-react-native": "^5.33.1",
     "styled-components": "^5.3.5",
     "typescript": "~5.3.3",
-    "uuid": "^10.0.0"
+    "uuid": "^10.0.0",
+    "vm-browserify": "^1.1.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
