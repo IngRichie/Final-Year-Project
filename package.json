@@ -16,8 +16,7 @@
     "@firebase/auth": "^1.7.4",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@google-cloud/dialogflow": "^6.7.0",
-    "@react-native-async-storage/async-storage": "^1.24.0",
-    "@react-native-community/async-storage": "^1.12.1",
+    "@react-native-async-storage/async-storage": "^1.17.10",
     "@react-native-community/checkbox": "^0.5.17",
     "@react-native-community/datetimepicker": "^8.0.1",
     "@react-native-community/slider": "^4.5.2",
@@ -92,7 +91,6 @@
     "react-native-voice": "^0.3.0",
     "react-native-web": "^0.19.12",
     "react-native-webrtc": "^124.0.3",
-    "stream-chat-react-native": "^5.33.1",
     "styled-components": "^5.3.5",
     "typescript": "~5.3.3",
     "uuid": "^10.0.0"
