@@ -1,12 +1,44 @@
 [build]
   base = "/"
-  publish = "web-build"  # Change this to your publish directory
-  command = "npm run build"  # Change this to your build command
-
-[build.environment]
-  NODE_ENV = "production"
-  # Add any other environment variables you need
-
-[build]
-  # Change the install command
+  publish = "web-build"  # Adjust this if your build output is in a different directory
+  command = "npm run build"
   install = "npm install --legacy-peer-deps"
+
+# Context-specific settings for production deploys
+[context.production]
+  publish = "output/"
+  command = "make publish"
+
+# Context-specific settings for deploy previews
+[context.deploy-preview]
+  publish = "dist/"
+
+# Context-specific settings for branch deploys
+[context.branch-deploy]
+  command = "echo branch"
+
+# Context-specific settings for local development with Netlify Dev
+[context.dev.environment]
+  NODE_ENV = "development"
+
+# Context-specific settings for a specific branch (e.g., "staging")
+[context.staging]
+  command = "echo 'staging'"
+  base = "staging"
+
+# Redirects and headers are global for all builds
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    cache-control = '''
+      max-age=0,
+      no-cache,
+      no-store,
+      must-revalidate'''
