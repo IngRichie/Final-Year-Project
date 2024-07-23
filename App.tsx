@@ -6,9 +6,9 @@ import { collection, query, where, getDocs } from "firebase/firestore";
 import { View, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import React, { useEffect, useState, useRef } from 'react';
-import * as Device from 'expo-device';
+
 import * as Notifications from 'expo-notifications';
-import Constants from 'expo-constants';
+
 
 import { registerForPushNotificationsAsync, schedulePushNotification } from './registerPushNotifications';
 import HealthNewsInterest from "./screens/HealthNewsInterest";
