@@ -1,0 +1,12 @@
+[build]
+  base = "/"
+  publish = "web-build"  # Change this to your publish directory
+  command = "npm run build"  # Change this to your build command
+
+[build.environment]
+  NODE_ENV = "production"
+  # Add any other environment variables you need
+
+[build]
+  # Change the install command
+  install = "npm install --legacy-peer-deps"
