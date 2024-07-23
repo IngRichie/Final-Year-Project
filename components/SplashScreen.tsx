@@ -32,7 +32,7 @@ const SplashScreen = () => {
   return (
     <Animated.View style={[styles.container, { opacity }]}>
       <Image source={require('../assets/Campcare.png')} style={styles.image} />
-      <Text style={styles.text}>Welcome to Our App</Text>
+      <Text style={styles.text}>Health At Your Fingertips</Text>
     </Animated.View>
   );
 };
