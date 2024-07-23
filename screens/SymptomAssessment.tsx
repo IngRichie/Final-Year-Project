@@ -77,14 +77,14 @@ const SymptomAssessment: React.FC = () => {
       setSymptom('');
 
       try {
-        let botResponse;
+        let botResponse: string;
         if (checkForIrrelevantContent(symptom)) {
           botResponse = 'I am only equipped to assist with symptom assessment. Please ask about symptoms.';
         } else {
           botResponse = await chatWithGemini(symptom);
           botResponse = botResponse.replace(/\*/g, ''); // Remove '*' characters
         }
-        setMessages(prevMessages => [...prevMessages, { user: symptom, bot: botResponse }]);
+        setMessages((prevMessages: any) => [...prevMessages, { user: symptom, bot: botResponse }]);
         setError(null);
       } catch (error) {
         setError('Failed to fetch response from AI. Please check your API key and try again.');
@@ -103,7 +103,7 @@ const SymptomAssessment: React.FC = () => {
           </Text>
         </View>
         <ScrollView contentContainerStyle={styles.chatContainer}>
-          {messages.map((message, index) => (
+          {messages.map((message: { bot: any; user: any; }, index: any) => (
             <View
               key={index}
               style={[
