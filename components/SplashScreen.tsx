@@ -1,28 +1,39 @@
-import React, { useEffect } from 'react';
-import { View, Image, StyleSheet, Dimensions, Text } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, Image, StyleSheet, Dimensions, Text, Animated } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get('window');
 
-const responsiveWidth = (percent) => (width * percent) / 100;
-const responsiveHeight = (percent) => (height * percent) / 100;
+const responsiveWidth = (percent: number) => (width * percent) / 100;
+const responsiveHeight = (percent: number) => (height * percent) / 100;
 
 const SplashScreen = () => {
   const navigation = useNavigation();
+  const opacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      navigation.navigate('LoginScreen'); 
-    }, 3000); 
-
-    return () => clearTimeout(timer);
-  }, [navigation]);
+    Animated.sequence([
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 1000,
+        useNativeDriver: true,
+      }),
+      Animated.delay(2000),
+      Animated.timing(opacity, {
+        toValue: 0,
+        duration: 1000,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      navigation.navigate('WelcomeScreen');
+    });
+  }, [navigation, opacity]);
 
   return (
-    <View style={styles.container}>
+    <Animated.View style={[styles.container, { opacity }]}>
       <Image source={require('../assets/Campcare.png')} style={styles.image} />
-      <Text style={styles.text}>Health At Your Fingertips</Text>
-    </View>
+      <Text style={styles.text}>Welcome to Our App</Text>
+    </Animated.View>
   );
 };
 
@@ -47,3 +58,5 @@ const styles = StyleSheet.create({
 });
 
 export default SplashScreen;
+
+
