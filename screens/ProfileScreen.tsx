@@ -1,10 +1,9 @@
 import * as React from "react";
-import { Text, StyleSheet, View, Pressable, Dimensions, ScrollView, Alert, Image, TextInput, KeyboardAvoidingView, Platform } from "react-native";
+import { Text, StyleSheet, View, Pressable, Dimensions, ScrollView, Alert, TextInput, KeyboardAvoidingView, Platform } from "react-native";
 import { FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getAuth } from "firebase/auth";
-import { getFirestore, doc, getDoc, updateDoc, collection, query, where, getDocs, addDoc } from "firebase/firestore";
-import * as ImagePicker from 'expo-image-picker';
+import { getFirestore, doc, getDoc, updateDoc } from "firebase/firestore";
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
@@ -114,10 +113,8 @@ const Profile = () => {
   const [firstName, setFirstName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [phone, setPhone] = React.useState("9898712132");
-  const [profileImage, setProfileImage] = React.useState(require("../assets/profilephoto.png"));
   const auth = getAuth();
   const db = getFirestore();
-  const fileInputRef = React.useRef(null);
 
   React.useEffect(() => {
     const fetchUserData = async () => {
@@ -134,94 +131,6 @@ const Profile = () => {
 
     fetchUserData();
   }, []);
-
-  const handleProfilePictureChange = () => {
-    if (Platform.OS === 'web') {
-      fileInputRef.current.click();
-    } else {
-      handleImagePicker();
-    }
-  };
-
-  const handleImagePicker = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permission Denied', 'Please grant permission to access the photo library.');
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 4],
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      setProfileImage({ uri: result.assets[0].uri });
-    }
-  };
-
-  const handleFileInputChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setProfileImage({ uri: reader.result });
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleCamera = async () => {
-    if (Platform.OS === 'web') {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      const video = document.createElement('video');
-      video.srcObject = stream;
-      video.play();
-      const canvas = document.createElement('canvas');
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      const context = canvas.getContext('2d');
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const dataUrl = canvas.toDataURL('image/png');
-      setProfileImage({ uri: dataUrl });
-      stream.getTracks().forEach(track => track.stop());
-    } else {
-      const { status } = await ImagePicker.requestCameraPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permission Denied', 'Please grant permission to access the camera.');
-        return;
-      }
-
-      const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 4],
-        quality: 1,
-      });
-
-      if (!result.canceled) {
-        setProfileImage({ uri: result.uri });
-      }
-    }
-  };
-
-  const openCameraAndLibrary = () => {
-    if (Platform.OS === 'web') {
-      handleProfilePictureChange();
-    } else {
-      Alert.alert(
-        "Upload Photo",
-        "Choose an option",
-        [
-          { text: "Camera", onPress: handleCamera },
-          { text: "Photo Library", onPress: handleImagePicker },
-          { text: "Cancel", style: "cancel" }
-        ]
-      );
-    }
-  };
 
   const handleEditPress = () => {
     setEditable(true);
@@ -264,7 +173,7 @@ const Profile = () => {
             />
           </Pressable>
           <View style={styles.profileHeader}>
-            <Image source={profileImage} style={styles.profileImage} />
+            <FontAwesome name="user-circle" size={responsiveWidth(20)} color="#fff" />
             <View style={styles.profileInfo}>
               {editable ? (
                 <TextInput
@@ -278,7 +187,7 @@ const Profile = () => {
               )}
             </View>
             <Pressable
-              onPress={openCameraAndLibrary}
+              onPress={handleEditPress}
               style={styles.cameraIconContainer}
             >
               <MaterialCommunityIcons
@@ -288,15 +197,6 @@ const Profile = () => {
                 style={styles.cameraIcon}
               />
             </Pressable>
-            {Platform.OS === 'web' && (
-              <input
-                type="file"
-                accept="image/*"
-                style={{ display: 'none' }}
-                ref={fileInputRef}
-                onChange={handleFileInputChange}
-              />
-            )}
           </View>
           <View style={styles.profileDetails}>
             <View style={styles.personalDetails}>
@@ -380,11 +280,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: responsiveHeight(2),
     position: 'relative',
-  },
-  profileImage: {
-    width: responsiveWidth(20),
-    height: responsiveWidth(20),
-    borderRadius: responsiveWidth(10),
   },
   profileInfo: {
     marginLeft: responsiveWidth(5),

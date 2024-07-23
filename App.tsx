@@ -9,9 +9,9 @@ import React, { useEffect, useState, useRef } from 'react';
 
 import * as Notifications from 'expo-notifications';
 
-
 import { registerForPushNotificationsAsync, schedulePushNotification } from './registerPushNotifications';
 import HealthNewsInterest from "./screens/HealthNewsInterest";
+import SplashScreen from "./components/SplashScreen";
 
 const {
   Text,
@@ -69,12 +69,12 @@ const HomeStack = () => (
   </Stack.Navigator>
 );
 
-const CenterButton = (props: any) => {
-  const [firstName, setFirstName] = React.useState<string>("");
+const CenterButton = (props) => {
+  const [firstName, setFirstName] = useState("");
   const { handleRecordButtonPress, isRecording } = useVoiceCommands();
   const navigation = useNavigation();
 
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchUserData = async () => {
       try {
         const user = auth.currentUser;
@@ -112,7 +112,7 @@ const MainTabs = () => (
       tabBarShowLabel: true,
       tabBarStyle: styles.tabBar,
       tabBarIcon: ({ color, size }) => {
-        let iconName: string;
+        let iconName;
         if (route.name === "HomeTab") {
           iconName = "home";
         } else if (route.name === "FirstAidTab") {
@@ -126,7 +126,7 @@ const MainTabs = () => (
         return <FontAwesome5 name={iconName} size={size} color={color} />;
       },
       tabBarLabel: ({ focused }) => {
-        let label: string;
+        let label;
         if (route.name === "HomeTab") {
           label = "Home";
         } else if (route.name === "FirstAidTab") {
@@ -166,7 +166,8 @@ const MainTabs = () => (
 );
 
 const AppStack = () => (
-  <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="WelcomeScreen">
+  <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="SplashScreen">
+    <Stack.Screen name="SplashScreen" component={SplashScreen} />
     <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} />
     <Stack.Screen name="LoginScreen" component={LoginScreen} />
     <Stack.Screen name="SignUpScreen" component={SignUpScreen} />
@@ -199,10 +200,10 @@ const App = () => {
     "Poppins-Medium": require("./assets/fonts/Poppins-Medium.ttf"),
   });
 
-  const [expoPushToken, setExpoPushToken] = useState<string | undefined>('');
-  const [notification, setNotification] = useState<Notifications.Notification | boolean>(false);
-  const notificationListener = useRef<Notifications.Subscription>();
-  const responseListener = useRef<Notifications.Subscription>();
+  const [expoPushToken, setExpoPushToken] = useState('');
+  const [notification, setNotification] = useState(false);
+  const notificationListener = useRef();
+  const responseListener = useRef();
 
   useEffect(() => {
     if (Platform.OS !== 'web') {
