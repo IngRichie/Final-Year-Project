@@ -13,10 +13,9 @@ import {
 } from 'react-native';
 import CustomStatusBar from '../components/StatusBar';
 import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
-import { chatWithGemini } from '../api';
+import axios from 'axios';
 import { db, auth } from '../firebaseConfig';
 import { collection, query, where, getDocs } from 'firebase/firestore';
-import symptomsKeywords from '../components/symptomsKeywords';
 import { useFocusEffect } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get('window');
@@ -35,7 +34,7 @@ const SymptomAssessment: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [firstName, setFirstName] = useState<string>('');
-  
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -66,10 +65,6 @@ const SymptomAssessment: React.FC = () => {
     }, [])
   );
 
-  const checkForIrrelevantContent = (message: string): boolean => {
-    return !symptomsKeywords.some(keyword => message.toLowerCase().includes(keyword));
-  };
-
   const handleSend = async () => {
     if (symptom.trim()) {
       const userMessage: Message = { user: symptom };
@@ -77,17 +72,25 @@ const SymptomAssessment: React.FC = () => {
       setSymptom('');
 
       try {
-        let botResponse: string;
-        if (checkForIrrelevantContent(symptom)) {
-          botResponse = 'I am only equipped to assist with symptom assessment. Please ask about symptoms.';
-        } else {
-          botResponse = await chatWithGemini(symptom);
-          botResponse = botResponse.replace(/\*/g, ''); // Remove '*' characters
-        }
+        const options = {
+          method: 'POST',
+          url: 'https://endlessmedicalapi1.p.rapidapi.com/UpdateFeature',
+          headers: {
+            'x-rapidapi-key': '2cc6301901mshbbe1253dc40a9edp1c490ejsncb1308e1613d',
+            'x-rapidapi-host': 'endlessmedicalapi1.p.rapidapi.com',
+            'Content-Type': 'application/json',
+          },
+          data: { Name: 'symptom', Value: symptom },
+        };
+
+        const response = await axios.request(options);
+        const botResponse = response.data.Status === 'ok' ? response.data.Diagnoses : 'No relevant information found.';
+
         setMessages((prevMessages: any) => [...prevMessages, { user: symptom, bot: botResponse }]);
         setError(null);
       } catch (error) {
-        setError('Failed to fetch response from AI. Please check your API key and try again.');
+        console.error(error);
+        setError('Failed to fetch response from API. Please check your API key and try again.');
       }
     }
   };
@@ -103,7 +106,7 @@ const SymptomAssessment: React.FC = () => {
           </Text>
         </View>
         <ScrollView contentContainerStyle={styles.chatContainer}>
-          {messages.map((message: { bot: any; user: any; }, index: any) => (
+          {messages.map((message: Message, index: number) => (
             <View
               key={index}
               style={[

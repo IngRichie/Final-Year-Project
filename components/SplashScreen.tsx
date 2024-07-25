@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
   text: {
     marginTop: responsiveHeight(2),
     fontSize: responsiveWidth(5),
-    color: '#318CE7',
+    color: '#073BD9',
     fontWeight: 'bold',
   },
 });

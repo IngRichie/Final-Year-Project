@@ -14,12 +14,13 @@ import { LinearGradient } from "expo-linear-gradient";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { useNavigation, ParamListBase } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import { db, auth } from "../firebaseConfig";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomCheckBox from "../components/CustomCheckBox";
+import * as Google from "expo-auth-session/providers/google";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 const { width, height } = Dimensions.get("window");
 
@@ -38,6 +39,20 @@ const LoginScreen = () => {
   const [error, setError] = useState<string | null>(null);
   const [rememberMe, setRememberMe] = useState(false);
   const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
+
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    expoClientId: "549195152079-55haub8lb64lkhm66ehidjpui9j0723r.apps.googleusercontent.com",
+    iosClientId: "549195152079-366ujglsn1t97ke7qh4gfeh3vo4pjcjs.apps.googleusercontent.com",
+    androidClientId: "549195152079-fgn2r7kfapu3p4u76d2ropartevciqic.apps.googleusercontent.com",
+    webClientId: "549195152079-27q4qanm3i7c4bvm8akm844iflp37u3p.apps.googleusercontent.com",
+  });
+
+  useEffect(() => {
+    if (response?.type === 'success') {
+      const { authentication } = response;
+      handleGoogleSignIn(authentication.accessToken);
+    }
+  }, [response]);
 
   useEffect(() => {
     const checkStoredCredentials = async () => {
@@ -62,6 +77,19 @@ const LoginScreen = () => {
     };
     checkStoredCredentials();
   }, []);
+
+  const handleGoogleSignIn = async (token: string) => {
+    const credential = GoogleAuthProvider.credential(token);
+    try {
+      const userCredential = await signInWithCredential(auth, credential);
+      navigation.navigate("MainTabs", {
+        screen: "Home",
+        params: { screen: "Homepage1" },
+      });
+    } catch (error) {
+      console.error("Google Sign-In error:", error);
+    }
+  };
 
   const onLoginPress = async (emailInput?: string, passwordInput?: string) => {
     try {
@@ -137,26 +165,6 @@ const LoginScreen = () => {
     }
   };
 
-  const onGoogleLoginPress = () => {
-    // Handle Google login here
-  };
-
-  const onFacebookLoginPress = () => {
-    // Handle Facebook login here
-  };
-
-  const onXLoginPress = () => {
-    // Handle X (Twitter) login here
-  };
-
-  const onSignUpPress = () => {
-    navigation.navigate("SignUpScreen");
-  };
-
-  const onForgotPasswordPress = () => {
-    navigation.navigate("ForgetPassword");
-  };
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.scrollView}>
@@ -211,7 +219,7 @@ const LoginScreen = () => {
                 label="Remember Me"
               />
             </View>
-            <Pressable onPress={onForgotPasswordPress}>
+            <Pressable onPress={() => navigation.navigate("ForgetPassword")}>
               <Text style={styles.forgotPassword}>Forgot Password?</Text>
             </Pressable>
             <LinearGradient
@@ -227,32 +235,13 @@ const LoginScreen = () => {
             </LinearGradient>
           </View>
           <Text style={styles.orLoginWith}>Or Login with</Text>
-          <View style={styles.socialMediaLogin}>
-            <Pressable onPress={onGoogleLoginPress}>
-              <FontAwesome
-                name="google"
-                size={responsiveFontSize(7)}
-                color="#DB4437"
-              />
-            </Pressable>
-            <Pressable onPress={onFacebookLoginPress}>
-              <FontAwesome
-                name="facebook"
-                size={responsiveFontSize(7)}
-                color="#3b5998"
-              />
-            </Pressable>
-            <Pressable onPress={onXLoginPress}>
-              <FontAwesome
-                name="twitter"
-                size={responsiveFontSize(7)}
-                color="#1DA1F2"
-              />
-            </Pressable>
-          </View>
+          <Pressable style={styles.googleButton} onPress={() => promptAsync()}>
+            <FontAwesome name="google" size={responsiveFontSize(5)} color="#fff" />
+            <Text style={styles.googleButtonText}>Login with Google</Text>
+          </Pressable>
           <View style={styles.dontHaveAnContainer}>
             <Text style={styles.dontHaveAn}>Don't have an account yet?</Text>
-            <Pressable style={styles.signUp} onPress={onSignUpPress}>
+            <Pressable style={styles.signUp} onPress={() => navigation.navigate("SignUpScreen")}>
               <Text style={styles.signUpBtn}>Sign Up</Text>
             </Pressable>
           </View>
@@ -293,12 +282,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: responsiveHeight(2),
   },
-  rememberMeText: {
-    marginLeft: responsiveWidth(2),
-    fontSize: responsiveFontSize(3.5),
-    fontFamily: "Poppins-Regular",
-    color: "#717171",
-  },
   forgotPassword: {
     color: "#1F75FE",
     marginBottom: responsiveHeight(2),
@@ -319,22 +302,27 @@ const styles = StyleSheet.create({
   loginText: {
     color: "#fff",
     fontSize: responsiveFontSize(5),
-    fontFamily: "Poppins-Bold",
   },
   orLoginWith: {
-    marginVertical: responsiveHeight(2),
-    fontSize: responsiveFontSize(4.0),
+    // marginVertical: responsiveHeight(2),
+    fontSize: responsiveFontSize(3.5),
     fontFamily: "Poppins-Regular",
   },
-  socialMediaLogin: {
+  googleButton: {
     flexDirection: "row",
-    justifyContent: "space-around",
-    width: responsiveWidth(60),
-    marginBottom: responsiveHeight(2),
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    backgroundColor: "#DB4437",
+    width: "90%",
   },
-  socialIcon: {
-    width: responsiveWidth(10),
-    height: responsiveWidth(10),
+  googleButtonText: {
+    color: "#fff",
+    fontSize: responsiveFontSize(5),
+    marginLeft: 10,
   },
   dontHaveAnContainer: {
     marginTop: responsiveHeight(12),

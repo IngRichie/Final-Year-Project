@@ -6,11 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "platforms": [
-      "ios",
-      "android",
-      "web"
-    ],
+    "platforms": ["ios", "android", "web"],
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -19,19 +15,20 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.campcare"
+      "bundleIdentifier": "com.campcare",
+      "config": {
+        "googleSignIn": {
+          "reservedClientId": "YOUR_IOS_REVERSED_CLIENT_ID.apps.googleusercontent.com"
+        }
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF",
-        "package": "com.campcare",
-        "googleServicesFile": "./android/app/google-services.json"
+        "backgroundColor": "#FFFFFF"
       },
       "googleServicesFile": "./android/app/google-services.json",
       "package": "com.campcare"
@@ -56,6 +53,7 @@
         }
       ]
     ],
+    "scheme": "campcare",
     "extra": {
       "eas": {
         "projectId": "1fbe589b-f3e9-451e-aa03-3c03c066f2e2"

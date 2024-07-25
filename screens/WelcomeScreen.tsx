@@ -63,14 +63,17 @@ const getDynamicStyles = (vw: number, vh: number, screenWidth: number) => {
       textAlign: "center",
     },
     buttonContainer: {
-      marginVertical: Platform.OS === 'web' ? 1 * vh : screenWidth * 0.01, // Use vh for web
-      width: Platform.OS === 'web' ? 80 * vw : screenWidth * 0.8, // Use vw for web
+      marginVertical: Platform.OS === 'web' ? 1 * vh : screenWidth * 0.025, // Use vh for web
+      width: Platform.OS === 'web' ? 80 * vw : screenWidth * 0.8, 
+     
     },
     button: {
-      paddingVertical: Platform.OS === 'web' ? 1.5 * vh : screenWidth * 0.012, // Use vh for web
-      paddingHorizontal: Platform.OS === 'web' ? 10 * vw : screenWidth * 0.1, // Use vw for web
+      paddingVertical: Platform.OS === 'web' ? 1.5 * vh : screenWidth * 0.012,
+      paddingHorizontal: Platform.OS === 'web' ? 10 * vw : screenWidth * 0.1, 
       borderRadius: 10,
+      height: Platform.OS === 'web' ? 14 * vw : screenWidth * 0.14, 
       alignItems: "center",
+      justifyContent: "center"
     },
     buttonText: {
       fontFamily: "Poppins-SemiBold",

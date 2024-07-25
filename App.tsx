@@ -8,7 +8,6 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import React, { useEffect, useState, useRef } from 'react';
 
 import * as Notifications from 'expo-notifications';
-
 import { registerForPushNotificationsAsync, schedulePushNotification } from './registerPushNotifications';
 import HealthNewsInterest from "./screens/HealthNewsInterest";
 import SplashScreen from "./components/SplashScreen";
@@ -69,9 +68,9 @@ const HomeStack = () => (
   </Stack.Navigator>
 );
 
-const CenterButton = (props) => {
+const CenterButton = (props: any) => {
   const [firstName, setFirstName] = useState("");
-  const { handleRecordButtonPress, isRecording } = useVoiceCommands();
+  const { startRecording, stopRecording, isRecording } = useVoiceCommands();
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -97,8 +96,16 @@ const CenterButton = (props) => {
     initVoiceCommands(navigation);
   }, [navigation]);
 
+  const handleRecordButtonPress = () => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  };
+
   return (
-    <TouchableOpacity {...props} style={styles.centerButton} onPress={() => handleRecordButtonPress(firstName)}>
+    <TouchableOpacity {...props} style={styles.centerButton} onPress={handleRecordButtonPress}>
       <View style={[styles.centerButtonContainer, { backgroundColor: isRecording ? "#FF6347" : "#318CE7" }]}>
         <FontAwesome5 name="robot" color="#fff" size={responsiveFontSize(6)} />
       </View>

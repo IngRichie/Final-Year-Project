@@ -12,6 +12,7 @@ import {
   Linking,
   ActivityIndicator,
   Platform,
+  Alert,
 } from "react-native";
 import { useNavigation, NavigationProp, ParamListBase } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
@@ -56,9 +57,11 @@ const NewsPage: React.FC = () => {
           setNews(response.data.articles);
         } else {
           console.error(`Error fetching news: ${response.status} ${response.statusText}`);
+          Alert.alert("Error", `Error fetching news: ${response.status} ${response.statusText}`);
         }
       } catch (error) {
         console.error("Error fetching health news:", error);
+        Alert.alert("Error", "Error fetching health news. Please try again later.");
       } finally {
         setLoading(false);
       }

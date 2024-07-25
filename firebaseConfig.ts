@@ -1,4 +1,4 @@
-import { getApps, initializeApp } from "firebase/app";
+import { FirebaseApp, getApps, initializeApp } from "firebase/app";
 import { getAuth, initializeAuth, browserLocalPersistence } from "firebase/auth";
 import { getFirestore, Firestore } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -13,7 +13,7 @@ const firebaseConfig = {
   appId: process.env.REACT_APP_FIREBASE_APP_ID
 };
 
-let app;
+let app: FirebaseApp;
 if (!getApps().length) {
   app = initializeApp(firebaseConfig);
 } else {
