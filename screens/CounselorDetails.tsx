@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation, NavigationProp, ParamListBase } from "@react-navigation/native";
+import { useDarkMode } from '../components/DarkModeContext'; // Import the dark mode context
 
 const { width, height } = Dimensions.get("window");
 
@@ -39,6 +40,7 @@ interface CounselorDetailsProps {
 const CounselorDetails: React.FC<CounselorDetailsProps> = ({ route }) => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const { counselor } = route.params;
+  const { isDarkModeEnabled } = useDarkMode(); // Consume the dark mode context
 
   const handleBackPress = () => {
     navigation.goBack();
@@ -48,54 +50,56 @@ const CounselorDetails: React.FC<CounselorDetailsProps> = ({ route }) => {
     navigation.navigate("BookAppointment", { counselor });
   };
 
+  const dynamicStyles = getDynamicStyles(isDarkModeEnabled);
+
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.header}>
-          <Pressable style={styles.backButton} onPress={handleBackPress}>
-            <MaterialIcons name="arrow-back" size={responsiveFontSize(6)} color="#000" />
+    <SafeAreaView style={dynamicStyles.container}>
+      <ScrollView contentContainerStyle={dynamicStyles.scrollContainer}>
+        <View style={dynamicStyles.header}>
+          <Pressable style={dynamicStyles.backButton} onPress={handleBackPress}>
+            <MaterialIcons name="arrow-back" size={responsiveFontSize(6)} color={isDarkModeEnabled ? "#fff" : "#000"} />
           </Pressable>
-          <Pressable style={styles.menuButton}>
-            <MaterialIcons name="more-vert" size={responsiveFontSize(6)} color="#000" />
+          <Pressable style={dynamicStyles.menuButton}>
+            <MaterialIcons name="more-vert" size={responsiveFontSize(6)} color={isDarkModeEnabled ? "#fff" : "#000"} />
           </Pressable>
         </View>
-        <Image style={styles.counselorImage} source={require("../assets/counselor.png")} />
-        <View style={styles.counselorInfoContainer}>
-          <Text style={styles.counselorName}>{counselor.fullName}</Text>
-          <Text style={styles.counselorSpecialization}>{counselor.specialization}</Text>
-          <View style={styles.ratingContainer}>
+        <Image style={dynamicStyles.counselorImage} source={require("../assets/counselor.png")} />
+        <View style={dynamicStyles.counselorInfoContainer}>
+          <Text style={dynamicStyles.counselorName}>{counselor.fullName}</Text>
+          <Text style={dynamicStyles.counselorSpecialization}>{counselor.specialization}</Text>
+          <View style={dynamicStyles.ratingContainer}>
             <FontAwesome name="star" size={responsiveFontSize(4)} color="#FFD700" />
-            <Text style={styles.ratingText}>{counselor.rating}</Text>
+            <Text style={dynamicStyles.ratingText}>{counselor.rating}</Text>
           </View>
-          <Text style={styles.counselorPosition}>{counselor.position}</Text>
-          <Text style={styles.counselorExperience}>Experience: {counselor.experience} years</Text>
+          <Text style={dynamicStyles.counselorPosition}>{counselor.position}</Text>
+          <Text style={dynamicStyles.counselorExperience}>Experience: {counselor.experience} years</Text>
         </View>
-        <View style={styles.buttonGroup}>
-          <Pressable style={styles.videoCallButton} onPress={() => { /* Handle Video Call */ }}>
+        <View style={dynamicStyles.buttonGroup}>
+          <Pressable style={dynamicStyles.videoCallButton} onPress={() => { /* Handle Video Call */ }}>
             <MaterialIcons name="videocam" size={responsiveFontSize(5)} color="#fff" />
-            <Text style={styles.buttonText}>Video Call</Text>
+            <Text style={dynamicStyles.buttonText}>Video Call</Text>
           </Pressable>
-          <Pressable style={styles.chatButton} onPress={() => { /* Handle Online Chat */ }}>
+          <Pressable style={dynamicStyles.chatButton} onPress={() => { /* Handle Online Chat */ }}>
             <MaterialIcons name="chat" size={responsiveFontSize(5)} color="#fff" />
-            <Text style={styles.buttonText}>Online Chat</Text>
+            <Text style={dynamicStyles.buttonText}>Online Chat</Text>
           </Pressable>
         </View>
-        <View style={styles.aboutContainer}>
-          <Text style={styles.aboutTitle}>About Therapists</Text>
-          <Text style={styles.aboutDescription}>{counselor.description}</Text>
+        <View style={dynamicStyles.aboutContainer}>
+          <Text style={dynamicStyles.aboutTitle}>About Therapists</Text>
+          <Text style={dynamicStyles.aboutDescription}>{counselor.description}</Text>
         </View>
-        <Pressable style={styles.bookNowButton} onPress={handleBookAppointmentPress}>
-          <Text style={styles.bookNowText}>Book Now</Text>
+        <Pressable style={dynamicStyles.bookNowButton} onPress={handleBookAppointmentPress}>
+          <Text style={dynamicStyles.bookNowText}>Book Now</Text>
         </Pressable>
       </ScrollView>
     </SafeAreaView>
   );
 };
 
-const styles = StyleSheet.create({
+const getDynamicStyles = (isDarkModeEnabled: boolean) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: isDarkModeEnabled ? "#121212" : "#fff",
   },
   scrollContainer: {
     flexGrow: 1,
@@ -130,6 +134,7 @@ const styles = StyleSheet.create({
   counselorName: {
     fontSize: responsiveFontSize(5),
     fontWeight: "bold",
+    color: isDarkModeEnabled ? "#fff" : "#000",
   },
   counselorSpecialization: {
     fontSize: responsiveFontSize(3.5),
@@ -144,15 +149,16 @@ const styles = StyleSheet.create({
   ratingText: {
     fontSize: responsiveFontSize(4),
     marginLeft: responsiveWidth(1),
+    color: isDarkModeEnabled ? "#fff" : "#000",
   },
   counselorPosition: {
     fontSize: responsiveFontSize(4),
-    color: "#666",
+    color: isDarkModeEnabled ? "#ccc" : "#666",
     marginBottom: responsiveHeight(1),
   },
   counselorExperience: {
     fontSize: responsiveFontSize(3.5),
-    color: "#666",
+    color: isDarkModeEnabled ? "#ccc" : "#666",
   },
   buttonGroup: {
     flexDirection: "row",
@@ -192,10 +198,11 @@ const styles = StyleSheet.create({
     fontSize: responsiveFontSize(4.5),
     fontWeight: "bold",
     marginBottom: responsiveHeight(1),
+    color: isDarkModeEnabled ? "#fff" : "#000",
   },
   aboutDescription: {
     fontSize: responsiveFontSize(3.5),
-    color: "#333",
+    color: isDarkModeEnabled ? "#ccc" : "#333",
   },
   bookNowButton: {
     width: "80%",

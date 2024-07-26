@@ -36,3 +36,10 @@ export type RootStackParamList = {
   ChooseMedicationTypeScreen: { medicationName: string };
 
 };
+// types.ts
+export type MentalHealthTip = {
+  tip: string;
+  description: string;
+  // source: string;
+  image: string;
+};

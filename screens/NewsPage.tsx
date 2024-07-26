@@ -17,12 +17,14 @@ import {
 import { useNavigation, NavigationProp, ParamListBase } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
+import { useDarkMode } from '../components/DarkModeContext'; // Import the dark mode context
 
 // Conditionally import based on the platform
 const TouchableOpacity = Platform.OS === 'web' ? require('react-native-web').TouchableOpacity : require('react-native').TouchableOpacity;
 
 const NewsPage: React.FC = () => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
+  const { isDarkModeEnabled } = useDarkMode(); // Consume the dark mode context
   const [news, setNews] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -84,7 +86,7 @@ const NewsPage: React.FC = () => {
 
   if (loading) {
     return (
-      <SafeAreaView style={getDynamicStyles(screenWidth, screenHeight).container}>
+      <SafeAreaView style={getDynamicStyles(screenWidth, screenHeight, isDarkModeEnabled).container}>
         <ActivityIndicator size="large" color="#318CE7" />
       </SafeAreaView>
     );
@@ -93,14 +95,14 @@ const NewsPage: React.FC = () => {
   const vw = screenWidth / 100;
   const vh = screenHeight / 100;
 
-  const dynamicStyles = getDynamicStyles(vw, vh, screenWidth);
+  const dynamicStyles = getDynamicStyles(vw, vh, screenWidth, isDarkModeEnabled);
 
   return (
     <SafeAreaView style={dynamicStyles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      <StatusBar barStyle={isDarkModeEnabled ? "light-content" : "dark-content"} backgroundColor={isDarkModeEnabled ? "#121212" : "#fff"} />
       <View style={dynamicStyles.header}>
         <TouchableOpacity style={dynamicStyles.backButton} onPress={handleBackPress}>
-          <Ionicons name="arrow-back" size={responsiveFontSize(vw, 6)} color="#000" />
+          <Ionicons name="arrow-back" size={responsiveFontSize(vw, 6)} color={isDarkModeEnabled ? "#fff" : "#000"} />
         </TouchableOpacity>
         <Text style={dynamicStyles.headerText}>Health News</Text>
       </View>
@@ -143,11 +145,11 @@ const responsiveWidth = (vw: number, percent: number) => vw * percent;
 const responsiveHeight = (vh: number, percent: number) => vh * percent;
 const responsiveFontSize = (vw: number, percent: number) => vw * percent;
 
-const getDynamicStyles = (vw: number, vh: number, screenWidth: number) => {
+const getDynamicStyles = (vw: number, vh: number, screenWidth: number, isDarkModeEnabled: boolean) => {
   return StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: "#fff",
+      backgroundColor: isDarkModeEnabled ? "#121212" : "#fff",
     },
     header: {
       flexDirection: "row",
@@ -161,6 +163,7 @@ const getDynamicStyles = (vw: number, vh: number, screenWidth: number) => {
     headerText: {
       fontSize: responsiveFontSize(vw, 5),
       fontWeight: "bold",
+      color: isDarkModeEnabled ? "#fff" : "#000",
     },
     scrollContainer: {
       paddingHorizontal: responsiveWidth(vw, 5),
@@ -169,7 +172,7 @@ const getDynamicStyles = (vw: number, vh: number, screenWidth: number) => {
     newsItem: {
       flexDirection: "column",
       marginBottom: responsiveHeight(vh, 3),
-      backgroundColor: "#f9f9f9",
+      backgroundColor: isDarkModeEnabled ? "#333" : "#f9f9f9",
       borderRadius: responsiveWidth(vw, 2),
       overflow: "hidden",
       shadowColor: "#000",
@@ -195,10 +198,11 @@ const getDynamicStyles = (vw: number, vh: number, screenWidth: number) => {
       fontSize: responsiveFontSize(vw, 4),
       fontWeight: "bold",
       marginBottom: responsiveHeight(vh, 1),
+      color: isDarkModeEnabled ? "#fff" : "#000",
     },
     newsDescription: {
       fontSize: responsiveFontSize(vw, 3.5),
-      color: "#333",
+      color: isDarkModeEnabled ? "#aaa" : "#333",
       marginBottom: responsiveHeight(vh, 1),
     },
     readMore: {

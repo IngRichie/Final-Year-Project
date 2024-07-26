@@ -8,6 +8,7 @@ import {
   ScrollView,
   Pressable,
 } from "react-native";
+import { useRoute } from "@react-navigation/native";
 import { useNavigation, NavigationProp, RouteProp } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FontAwesome5 } from "@expo/vector-icons";
@@ -18,15 +19,22 @@ const responsiveWidth = (percent: number) => (width * percent) / 100;
 const responsiveHeight = (percent: number) => (height * percent) / 100;
 const responsiveFontSize = (percent: number) => (width * percent) / 100;
 
+type MentalHealthTip = {
+  tip: string;
+  description: string;
+  source: string;
+  image: string;
+};
+
 type RootStackParamList = {
-  DailyTipDetailScreen: { tip: any };
+  DailyTipDetailScreen: { tip: MentalHealthTip };
 };
 
 type DailyTipDetailScreenRouteProp = RouteProp<RootStackParamList, 'DailyTipDetailScreen'>;
 
 const DailyTipDetailScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const route = useNavigation<DailyTipDetailScreenRouteProp>();
+  const route = useRoute<DailyTipDetailScreenRouteProp>();
   const { tip } = route.params;
 
   const handleBackPress = () => {
@@ -44,13 +52,14 @@ const DailyTipDetailScreen: React.FC = () => {
         </Pressable>
         <View style={styles.imageContainer}>
           <Image
-            source={tip.image}
+            source={{ uri: tip.image }}  // Ensure this is a valid URI
             style={styles.image}
             resizeMode="cover"
           />
         </View>
         <View style={styles.contentContainer}>
-          <Text style={styles.contentText}>{tip.content}</Text>
+          <Text style={styles.contentText}>{tip.description}</Text>
+          <Text style={styles.sourceText}>{tip.source}</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -91,6 +100,11 @@ const styles = StyleSheet.create({
   contentText: {
     fontSize: responsiveFontSize(4),
     color: "#333",
+  },
+  sourceText: {
+    fontSize: responsiveFontSize(3.5),
+    color: "#007bff",
+    marginTop: responsiveHeight(2),
   },
 });
 

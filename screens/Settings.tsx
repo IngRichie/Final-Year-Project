@@ -19,8 +19,7 @@ const Settings = () => {
     const screenComponents: { [key: string]: React.ComponentType } = {
       Profile: require("./ProfileScreen").default, // Adjust path as needed
       Privacy: require("./PrivacyScreen").default, // Adjust path as needed
-      Notification: require("./NotificationScreen").default, // Adjust path as needed
-      Accessibility: require("./AccessibilityScreen").default, // Adjust path as needed
+      Notifications: require("./NotificationScreen").default, // Adjust path as needed
       Preferences: require("./PreferencesScreen").default, // Adjust path as needed
     };
 
@@ -32,23 +31,19 @@ const Settings = () => {
     <SafeAreaView style={styles.container}>
       <StatusBar screenName="Settings" />
       <View style={styles.buttonContainer}>
-        <Pressable style={styles.button} onPress={() => handlePress("ProfileScreen")}>
+        <Pressable style={styles.button} onPress={() => handlePress("Profile")}>
           <FontAwesome name="user" size={24} color="#1F75FE" style={styles.buttonIcon} />
           <Text style={styles.buttonText}>Profile</Text>
         </Pressable>
-        <Pressable style={styles.button} onPress={() => handlePress("PrivacyScreen")}>
+        <Pressable style={styles.button} onPress={() => handlePress("Privacy")}>
           <FontAwesome name="lock" size={24} color="#1F75FE" style={styles.buttonIcon} />
           <Text style={styles.buttonText}>Privacy</Text>
         </Pressable>
-        <Pressable style={styles.button} onPress={() => handlePress("NotificationSettings")}>
+        <Pressable style={styles.button} onPress={() => handlePress("Notifications")}>
           <FontAwesome name="bell" size={24} color="#1F75FE" style={styles.buttonIcon} />
-          <Text style={styles.buttonText}>Notification</Text>
+          <Text style={styles.buttonText}>Notifications</Text>
         </Pressable>
-        <Pressable style={styles.button} onPress={() => handlePress("AccessibilityScreen")}>
-          <FontAwesome name="universal-access" size={24} color="#1F75FE" style={styles.buttonIcon} />
-          <Text style={styles.buttonText}>Accessibility</Text>
-        </Pressable>
-        <Pressable style={styles.button} onPress={() => handlePress("PreferencesScreen")}>
+        <Pressable style={styles.button} onPress={() => handlePress("Preferences")}>
           <FontAwesome name="sliders" size={24} color="#1F75FE" style={styles.buttonIcon} />
           <Text style={styles.buttonText}>Preferences</Text>
         </Pressable>

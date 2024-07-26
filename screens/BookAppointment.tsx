@@ -12,6 +12,7 @@ import {
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation, NavigationProp, ParamListBase } from "@react-navigation/native";
 import MaterialIcons from "@expo/vector-icons/build/MaterialIcons";
+import { useDarkMode } from '../components/DarkModeContext'; // Import the dark mode context
 
 const { width, height } = Dimensions.get("window");
 
@@ -35,6 +36,7 @@ interface BookAppointmentScreenProps {
 const BookAppointmentScreen: React.FC<BookAppointmentScreenProps> = ({ route }) => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const { counselor } = route.params;
+  const { isDarkModeEnabled } = useDarkMode(); // Consume the dark mode context
   const [date, setDate] = useState(new Date());
   const [mode, setMode] = useState<"date" | "time">("date");
   const [show, setShow] = useState(false);
@@ -70,58 +72,61 @@ const BookAppointmentScreen: React.FC<BookAppointmentScreenProps> = ({ route }) 
     navigation.goBack();
   };
 
+  const dynamicStyles = getDynamicStyles(isDarkModeEnabled);
+
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.header}>
-          <Pressable style={styles.backButton} onPress={handleBackPress}>
-            <MaterialIcons name="arrow-back" size={responsiveFontSize(6)} color="#000" />
+    <SafeAreaView style={dynamicStyles.container}>
+      <ScrollView contentContainerStyle={dynamicStyles.scrollContainer}>
+        <View style={dynamicStyles.header}>
+          <Pressable style={dynamicStyles.backButton} onPress={handleBackPress}>
+            <MaterialIcons name="arrow-back" size={responsiveFontSize(6)} color={isDarkModeEnabled ? "#fff" : "#000"} />
           </Pressable>
-          <Text style={styles.headerText}>Book Appointment</Text>
+          <Text style={dynamicStyles.headerText}>Book Appointment</Text>
         </View>
-        <Text style={styles.label}>Counselor:</Text>
-        <Text style={styles.text}>{counselor.fullName}</Text>
-        <Text style={styles.label}>Select Date:</Text>
-        <Pressable style={styles.button} onPress={showDatePicker}>
-          <Text style={styles.buttonText}>Choose Date</Text>
+        <Text style={dynamicStyles.label}>Counselor:</Text>
+        <Text style={dynamicStyles.text}>{counselor.fullName}</Text>
+        <Text style={dynamicStyles.label}>Select Date:</Text>
+        <Pressable style={dynamicStyles.button} onPress={showDatePicker}>
+          <Text style={dynamicStyles.buttonText}>Choose Date</Text>
         </Pressable>
-        <Text style={styles.text}>{date.toDateString()}</Text>
-        <Text style={styles.label}>Select Time:</Text>
-        <Pressable style={styles.button} onPress={showTimePicker}>
-          <Text style={styles.buttonText}>Choose Time</Text>
+        <Text style={dynamicStyles.text}>{date.toDateString()}</Text>
+        <Text style={dynamicStyles.label}>Select Time:</Text>
+        <Pressable style={dynamicStyles.button} onPress={showTimePicker}>
+          <Text style={dynamicStyles.buttonText}>Choose Time</Text>
         </Pressable>
-        <Text style={styles.text}>{date.toTimeString()}</Text>
-        <Text style={styles.label}>Mode of Counseling:</Text>
-        <View style={styles.modeContainer}>
+        <Text style={dynamicStyles.text}>{date.toTimeString()}</Text>
+        <Text style={dynamicStyles.label}>Mode of Counseling:</Text>
+        <View style={dynamicStyles.modeContainer}>
           <Pressable
-            style={[styles.modeButton, counselingMode === "video" && styles.selectedModeButton]}
+            style={[dynamicStyles.modeButton, counselingMode === "video" && dynamicStyles.selectedModeButton]}
             onPress={() => setCounselingMode("video")}
           >
-            <Text style={styles.modeButtonText}>Video</Text>
+            <Text style={dynamicStyles.modeButtonText}>Video</Text>
           </Pressable>
           <Pressable
-            style={[styles.modeButton, counselingMode === "audio" && styles.selectedModeButton]}
+            style={[dynamicStyles.modeButton, counselingMode === "audio" && dynamicStyles.selectedModeButton]}
             onPress={() => setCounselingMode("audio")}
           >
-            <Text style={styles.modeButtonText}>Audio</Text>
+            <Text style={dynamicStyles.modeButtonText}>Audio</Text>
           </Pressable>
           <Pressable
-            style={[styles.modeButton, counselingMode === "face-to-face" && styles.selectedModeButton]}
+            style={[dynamicStyles.modeButton, counselingMode === "face-to-face" && dynamicStyles.selectedModeButton]}
             onPress={() => setCounselingMode("face-to-face")}
           >
-            <Text style={styles.modeButtonText}>Face to Face</Text>
+            <Text style={dynamicStyles.modeButtonText}>Face to Face</Text>
           </Pressable>
         </View>
-        <Text style={styles.label}>Details:</Text>
+        <Text style={dynamicStyles.label}>Details:</Text>
         <TextInput
-          style={styles.input}
+          style={dynamicStyles.input}
           placeholder="Enter appointment details"
+          placeholderTextColor={isDarkModeEnabled ? "#aaa" : "#555"}
           value={appointmentDetails}
           onChangeText={setAppointmentDetails}
           multiline
         />
-        <Pressable style={styles.bookButton} onPress={handleBookPress}>
-          <Text style={styles.bookButtonText}>Book Appointment</Text>
+        <Pressable style={dynamicStyles.bookButton} onPress={handleBookPress}>
+          <Text style={dynamicStyles.bookButtonText}>Book Appointment</Text>
         </Pressable>
         {show && (
           <DateTimePicker
@@ -138,10 +143,10 @@ const BookAppointmentScreen: React.FC<BookAppointmentScreenProps> = ({ route }) 
   );
 };
 
-const styles = StyleSheet.create({
+const getDynamicStyles = (isDarkModeEnabled: boolean) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: isDarkModeEnabled ? "#121212" : "#fff",
   },
   scrollContainer: {
     flexGrow: 1,
@@ -159,20 +164,23 @@ const styles = StyleSheet.create({
   },
   backButtonText: {
     fontSize: responsiveFontSize(4),
-    color: "#007bff",
+    color: isDarkModeEnabled ? "#007bff" : "#007bff",
   },
   headerText: {
     fontSize: responsiveFontSize(5),
     fontWeight: "bold",
     textAlign: "center",
+    color: isDarkModeEnabled ? "#fff" : "#000",
   },
   label: {
     fontSize: responsiveFontSize(4),
     marginBottom: responsiveHeight(1),
+    color: isDarkModeEnabled ? "#fff" : "#000",
   },
   text: {
     fontSize: responsiveFontSize(3.5),
     marginBottom: responsiveHeight(2),
+    color: isDarkModeEnabled ? "#aaa" : "#000",
   },
   button: {
     backgroundColor: "#007bff",
@@ -186,7 +194,8 @@ const styles = StyleSheet.create({
     fontSize: responsiveFontSize(3.5),
   },
   input: {
-    backgroundColor: "#f0f0f0",
+    backgroundColor: isDarkModeEnabled ? "#333" : "#f0f0f0",
+    color: isDarkModeEnabled ? "#fff" : "#000",
     padding: responsiveWidth(4),
     borderRadius: responsiveWidth(2),
     fontSize: responsiveFontSize(3.5),

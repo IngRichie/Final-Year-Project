@@ -3,14 +3,16 @@ import { useVoiceCommands, initVoiceCommands } from './voiceCommands';
 import { useNavigation } from '@react-navigation/native';
 import { db, auth } from "./firebaseConfig";
 import { collection, query, where, getDocs } from "firebase/firestore";
-import { View, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Platform, KeyboardAvoidingView, SafeAreaView } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import React, { useEffect, useState, useRef } from 'react';
-
 import * as Notifications from 'expo-notifications';
 import { registerForPushNotificationsAsync, schedulePushNotification } from './registerPushNotifications';
 import HealthNewsInterest from "./screens/HealthNewsInterest";
 import SplashScreen from "./components/SplashScreen";
+import { DarkModeProvider } from './components/DarkModeContext'; // Import DarkModeProvider
+import { useDarkMode } from './components/DarkModeContext'; // Import useDarkMode hook
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'; // Import KeyboardAwareScrollView
 
 const {
   Text,
@@ -118,8 +120,9 @@ const MainTabs = () => (
     screenOptions={({ route }) => ({
       tabBarShowLabel: true,
       tabBarStyle: styles.tabBar,
+      tabBarHideOnKeyboard: true,
       tabBarIcon: ({ color, size }) => {
-        let iconName;
+        let iconName: string;
         if (route.name === "HomeTab") {
           iconName = "home";
         } else if (route.name === "FirstAidTab") {
@@ -133,7 +136,7 @@ const MainTabs = () => (
         return <FontAwesome5 name={iconName} size={size} color={color} />;
       },
       tabBarLabel: ({ focused }) => {
-        let label;
+        let label: string | number | boolean | imports.React.ReactElement<any, string | imports.React.JSXElementConstructor<any>> | Iterable<imports.React.ReactNode> | null | undefined;
         if (route.name === "HomeTab") {
           label = "Home";
         } else if (route.name === "FirstAidTab") {
@@ -192,14 +195,14 @@ const AppStack = () => (
     <Stack.Screen name="PreferencesScreen" component={PreferencesScreen} />
     <Stack.Screen name="AccessibilityScreen" component={AccessibilityScreen} />
     <Stack.Screen name="NotificationSettings" component={NotificationSettings} />
-    <Stack.Screen name="MentalHealth" component={MentalHealth} />
+    {/* <Stack.Screen name="MentalHealth" component={MentalHealth} /> */}
     <Stack.Screen name="AddMedication" component={AddMedication} />
     <Stack.Screen name="SymptomAssessment" component={SymptomAssessment} />
     <Stack.Screen name="HealthNewsInterest" component={HealthNewsInterest} />
   </Stack.Navigator>
 );
 
-const App = () => {
+const App: React.FC = () => {
   const [fontsLoaded] = useFonts({
     "Poppins-Regular": require("./assets/fonts/Poppins-Regular.ttf"),
     "Poppins-Bold": require("./assets/fonts/Poppins-Bold.ttf"),
@@ -209,8 +212,8 @@ const App = () => {
 
   const [expoPushToken, setExpoPushToken] = useState('');
   const [notification, setNotification] = useState(false);
-  const notificationListener = useRef();
-  const responseListener = useRef();
+  const notificationListener = useRef<any>();
+  const responseListener = useRef<any>();
 
   useEffect(() => {
     if (Platform.OS !== 'web') {
@@ -223,19 +226,12 @@ const App = () => {
       responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
         console.log(response);
       });
-    }
 
-    const userEmail = auth.currentUser?.email || 'user@example.com'; // Replace with actual user email fetching logic
-    schedulePushNotification(db, userEmail); // Schedule notifications based on Firestore data
-
-    return () => {
-      if (notificationListener.current) {
+      return () => {
         Notifications.removeNotificationSubscription(notificationListener.current);
-      }
-      if (responseListener.current) {
         Notifications.removeNotificationSubscription(responseListener.current);
-      }
-    };
+      };
+    }
   }, []);
 
   if (!fontsLoaded) {
@@ -243,16 +239,26 @@ const App = () => {
   }
 
   return (
-    <NavigationContainer>
-      <Drawer.Navigator
-        drawerContent={(props) => <Menu {...props} />}
-        screenOptions={({ route }) => ({
-          swipeEnabled: false,
-        })}
-      >
-        <Drawer.Screen name="Home" component={AppStack} options={{ headerShown: false }} />
-      </Drawer.Navigator>
-    </NavigationContainer>
+    <DarkModeProvider>
+      <SafeAreaView style={{ flex: 1 }}>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0} // Adjust as needed
+        >
+          <NavigationContainer>
+            <Drawer.Navigator
+              drawerContent={(props) => <Menu {...props} />}
+              screenOptions={({ route }) => ({
+                swipeEnabled: false,
+              })}
+            >
+              <Drawer.Screen name="Home" component={AppStack} options={{ headerShown: false }} />
+            </Drawer.Navigator>
+          </NavigationContainer>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </DarkModeProvider>
   );
 };
 
@@ -265,6 +271,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: responsiveHeight(1.5),
     borderTopLeftRadius: responsiveHeight(1.5),
     paddingBottom: responsiveHeight(1.25),
+    width: "100%",
     ...Platform.select({
       web: {
         boxShadow: "0px 0px 10px rgba(0,0,0,0.1)",

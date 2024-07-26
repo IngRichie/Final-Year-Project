@@ -148,23 +148,37 @@ const CombinedScreen: React.FC<CombinedScreenProps> = ({ navigation }) => {
           <Image source={require("../assets/medicine.png")} style={dynamicStyles.icon} />
 
           <FormContainer vw={vw} vh={vh}>
-            <SectionTitle vw={vw} vh={vh}>Pill Name</SectionTitle>
+            <SectionTitle vw={vw} vh={vh}>Medication Name</SectionTitle>
             <StyledInput
               vw={vw}
-              placeholder="Enter the pill name"
+              placeholder="Enter the medication name"
               value={medicationName}
               onChangeText={setMedicationName}
               placeholderTextColor="#888"
             />
 
-            <SectionTitle vw={vw} vh={vh}>Dose</SectionTitle>
+            <SectionTitle vw={vw} vh={vh}>Form</SectionTitle>
+            <Row vw={vw} vh={vh}>
+              <DropdownButton vw={vw} vh={vh} onPress={() => setShowFormModal(true)}>
+                <DropdownButtonText vw={vw}>{selectedForm}</DropdownButtonText>
+                <Icon name="arrow-drop-down" size={responsiveFontSize(vw, 6)} color="#318CE7" />
+              </DropdownButton>
+            </Row>
+
+            <SectionTitle vw={vw} vh={vh}>Unit</SectionTitle>
             <Row vw={vw} vh={vh}>
               <DropdownButton vw={vw} vh={vh} onPress={() => setShowUnitModal(true)}>
                 <DropdownButtonText vw={vw}>{selectedUnit}</DropdownButtonText>
                 <Icon name="arrow-drop-down" size={responsiveFontSize(vw, 6)} color="#318CE7" />
               </DropdownButton>
-              <DropdownButton vw={vw} vh={vh} onPress={() => setShowFormModal(true)}>
-                <DropdownButtonText vw={vw}>{selectedForm}</DropdownButtonText>
+            </Row>
+
+            <SectionTitle vw={vw} vh={vh}>Frequency</SectionTitle>
+            <Row vw={vw} vh={vh}>
+              <DropdownButton vw={vw} vh={vh} onPress={() => setShowFrequencyModal(true)}>
+                <DropdownButtonText vw={vw}>
+                  {customFrequency.trim() !== "" ? customFrequency : frequency}
+                </DropdownButtonText>
                 <Icon name="arrow-drop-down" size={responsiveFontSize(vw, 6)} color="#318CE7" />
               </DropdownButton>
             </Row>
@@ -181,16 +195,11 @@ const CombinedScreen: React.FC<CombinedScreenProps> = ({ navigation }) => {
                 <Icon name="arrow-drop-down" size={responsiveFontSize(vw, 6)} color="#318CE7" />
               </DropdownButton>
             </Row>
-
-            <SectionTitle vw={vw} vh={vh}>How to Use</SectionTitle>
-            <Row vw={vw} vh={vh}>
-              <DropdownButton vw={vw} vh={vh} onPress={() => setShowFrequencyModal(true)}>
-                <DropdownButtonText vw={vw}>
-                  {customFrequency.trim() !== "" ? customFrequency : frequency}
-                </DropdownButtonText>
-                <Icon name="arrow-drop-down" size={responsiveFontSize(vw, 6)} color="#318CE7" />
-              </DropdownButton>
-            </Row>
+           
+            <Text style={{ color: '#318CE7', fontSize: 16, fontWeight: 'bold' }}>Selected Times:</Text>
+            {times.map((time, index) => (
+              <Text key={index} style={{ color: '#318CE7' }}>{time}</Text>
+            ))}
 
             <AddButton vw={vw} vh={vh} disabled={medicationName.trim() === ""} onPress={handleAddMedicine}>
               <AddButtonText vw={vw} disabled={medicationName.trim() === ""}>
@@ -239,7 +248,7 @@ const CombinedScreen: React.FC<CombinedScreenProps> = ({ navigation }) => {
             </Modal>
           )}
 
-          {/* Medication Type Modal */}
+          {/* Medication Form Modal */}
           <Modal
             animationType="fade"
             transparent={true}
@@ -248,7 +257,7 @@ const CombinedScreen: React.FC<CombinedScreenProps> = ({ navigation }) => {
           >
             <ModalContainer>
               <ModalContent vw={vw}>
-                <ModalTitle vw={vw} vh={vh}>Select Medication Type</ModalTitle>
+                <ModalTitle vw={vw} vh={vh}>Select Medication Form</ModalTitle>
                 <OptionsContainer vw={vw} vh={vh}>
                   {forms.map((form) => (
                     <OptionItem

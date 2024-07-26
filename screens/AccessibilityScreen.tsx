@@ -1,29 +1,27 @@
 import * as React from "react";
 import { Text, StyleSheet, View, ScrollView, Switch, Dimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { FontAwesome } from "@expo/vector-icons";
 import StatusBar from "../components/StatusBar";
 import * as Speech from 'expo-speech';
 import Slider from '@react-native-community/slider';
 import ModalSelector from 'react-native-modal-selector';
+import { useDarkMode } from '../components/DarkModeContext';
 
-const AccessibilityScreen = ({ navigation }) => {
+const AccessibilityScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+  const { isDarkModeEnabled, toggleDarkMode } = useDarkMode();
   const [isVoiceOverEnabled, setIsVoiceOverEnabled] = React.useState(false);
-  const [isDarkModeEnabled, setIsDarkModeEnabled] = React.useState(false);
   const [selectedVoice, setSelectedVoice] = React.useState<string | null>(null);
-  const [pitch, setPitch] = React.useState<number>(1.0);
   const [rate, setRate] = React.useState<number>(1.0);
   const [voices, setVoices] = React.useState<Speech.Voice[]>([]);
   const [screenWidth, setScreenWidth] = React.useState(Dimensions.get("window").width);
   const [screenHeight, setScreenHeight] = React.useState(Dimensions.get("window").height);
 
   const toggleVoiceOverSwitch = () => setIsVoiceOverEnabled(previousState => !previousState);
-  const toggleDarkModeSwitch = () => setIsDarkModeEnabled(previousState => !previousState);
 
   React.useEffect(() => {
     Speech.getAvailableVoicesAsync().then(setVoices);
 
-    const handleResize = ({ window }) => {
+    const handleResize = ({ window }: any) => {
       setScreenWidth(window.width);
       setScreenHeight(window.height);
     };
@@ -38,7 +36,7 @@ const AccessibilityScreen = ({ navigation }) => {
   const vw = screenWidth / 100;
   const vh = screenHeight / 100;
 
-  const dynamicStyles = getDynamicStyles(vw, vh);
+  const dynamicStyles = getDynamicStyles(vw, vh, isDarkModeEnabled);
 
   return (
     <SafeAreaView style={dynamicStyles.container}>
@@ -59,7 +57,7 @@ const AccessibilityScreen = ({ navigation }) => {
           <Switch
             trackColor={{ false: "#767577", true: "#1F75FE" }}
             thumbColor={isDarkModeEnabled ? "#fff" : "#f4f3f4"}
-            onValueChange={toggleDarkModeSwitch}
+            onValueChange={toggleDarkMode}
             value={isDarkModeEnabled}
           />
         </View>
@@ -75,17 +73,6 @@ const AccessibilityScreen = ({ navigation }) => {
           </ModalSelector>
         </View>
         <View style={dynamicStyles.accessibilityItem}>
-          <Text style={dynamicStyles.label}>Pitch</Text>
-          <Slider
-            style={dynamicStyles.slider}
-            minimumValue={0.5}
-            maximumValue={2.0}
-            value={pitch}
-            onValueChange={(value) => setPitch(value)}
-          />
-          <Text>{pitch.toFixed(1)}</Text>
-        </View>
-        <View style={dynamicStyles.accessibilityItem}>
           <Text style={dynamicStyles.label}>Rate</Text>
           <Slider
             style={dynamicStyles.slider}
@@ -96,20 +83,38 @@ const AccessibilityScreen = ({ navigation }) => {
           />
           <Text>{rate.toFixed(1)}</Text>
         </View>
+        <View style={dynamicStyles.accessibilityItem}>
+          <Text style={dynamicStyles.label}>Large Text</Text>
+          <Switch
+            trackColor={{ false: "#767577", true: "#1F75FE" }}
+            thumbColor={false ? "#fff" : "#f4f3f4"}
+            onValueChange={() => {}}
+            value={false}
+          />
+        </View>
+        <View style={dynamicStyles.accessibilityItem}>
+          <Text style={dynamicStyles.label}>Reduce Motion</Text>
+          <Switch
+            trackColor={{ false: "#767577", true: "#1F75FE" }}
+            thumbColor={false ? "#fff" : "#f4f3f4"}
+            onValueChange={() => {}}
+            value={false}
+          />
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
 };
 
-const responsiveWidth = (vw, percent) => vw * percent;
-const responsiveHeight = (vh, percent) => vh * percent;
-const responsiveFontSize = (vw, percent) => vw * percent;
+const responsiveWidth = (vw: number, percent: number) => vw * percent;
+const responsiveHeight = (vh: number, percent: number) => vh * percent;
+const responsiveFontSize = (vw: number, percent: number) => vw * percent;
 
-const getDynamicStyles = (vw, vh) => {
+const getDynamicStyles = (vw: number, vh: number, isDarkModeEnabled: boolean) => {
   return StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: "#f0f4f8",
+      backgroundColor: isDarkModeEnabled ? "#121212" : "#f0f4f8",
     },
     scrollContainer: {
       padding: responsiveWidth(vw, 5),
@@ -120,11 +125,11 @@ const getDynamicStyles = (vw, vh) => {
       alignItems: "center",
       paddingVertical: responsiveHeight(vh, 2),
       borderBottomWidth: 1,
-      borderBottomColor: "rgba(204, 204, 204, 0.3)",
+      borderBottomColor: isDarkModeEnabled ? "rgba(255, 255, 255, 0.3)" : "rgba(204, 204, 204, 0.3)",
     },
     label: {
       fontSize: responsiveFontSize(vw, 4.5),
-      color: "#000",
+      color: isDarkModeEnabled ? "#fff" : "#000",
     },
     picker: {
       height: responsiveHeight(vh, 5),
@@ -132,7 +137,7 @@ const getDynamicStyles = (vw, vh) => {
     },
     pickerText: {
       fontSize: responsiveFontSize(vw, 4),
-      color: '#000',
+      color: isDarkModeEnabled ? "#fff" : '#000',
     },
     slider: {
       width: responsiveWidth(vw, 50),

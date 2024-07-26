@@ -1,9 +1,10 @@
 import React from "react";
 import { View, Text, Pressable, StyleSheet, Dimensions } from "react-native";
-import { FontAwesome5, Ionicons } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "react-native";
+import { useDarkMode } from "../components/DarkModeContext"; // Import the dark mode context
 
 const { width, height } = Dimensions.get("window");
 
@@ -13,38 +14,41 @@ const responsiveFontSize = (percent: number) => (width * percent) / 100;
 
 const FirstAidPage = () => {
   const navigation = useNavigation();
+  const { isDarkModeEnabled } = useDarkMode(); // Consume the dark mode context
+
+  const dynamicStyles = getDynamicStyles(isDarkModeEnabled);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={dynamicStyles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#318CE7" />
     
-      <View style={styles.headerContainer}>
-        <View style={styles.header}>
-          <View style={styles.iconContainer}>
-            <FontAwesome5 name="first-aid" style={styles.firstAidIcon} />
+      <View style={dynamicStyles.headerContainer}>
+        <View style={dynamicStyles.header}>
+          <View style={dynamicStyles.iconContainer}>
+            <FontAwesome5 name="first-aid" style={dynamicStyles.firstAidIcon} />
           </View>
-          <Text style={styles.headerText}>First Aid</Text>
+          <Text style={dynamicStyles.headerText}>First Aid</Text>
         </View>
       </View>
-      <View style={styles.mainContainer}>
-        <View style={styles.buttonContainer}>
-          <Pressable style={styles.button} onPress={() => console.log("Cuts/Bruises")}>
-            <Text style={styles.buttonText}>Cuts/Bruises</Text>
+      <View style={dynamicStyles.mainContainer}>
+        <View style={dynamicStyles.buttonContainer}>
+          <Pressable style={dynamicStyles.button} onPress={() => console.log("Cuts/Bruises")}>
+            <Text style={dynamicStyles.buttonText}>Cuts/Bruises</Text>
           </Pressable>
         </View>
-        <View style={styles.buttonContainer}>
-          <Pressable style={styles.button} onPress={() => console.log("Burns")}>
-            <Text style={styles.buttonText}>Burns</Text>
+        <View style={dynamicStyles.buttonContainer}>
+          <Pressable style={dynamicStyles.button} onPress={() => console.log("Burns")}>
+            <Text style={dynamicStyles.buttonText}>Burns</Text>
           </Pressable>
         </View>
-        <View style={styles.buttonContainer}>
-          <Pressable style={styles.button} onPress={() => console.log("Shock")}>
-            <Text style={styles.buttonText}>Shock</Text>
+        <View style={dynamicStyles.buttonContainer}>
+          <Pressable style={dynamicStyles.button} onPress={() => console.log("Shock")}>
+            <Text style={dynamicStyles.buttonText}>Shock</Text>
           </Pressable>
         </View>
-        <View style={styles.buttonContainer}>
-          <Pressable style={styles.button} onPress={() => console.log("Others")}>
-            <Text style={styles.buttonText}>Others</Text>
+        <View style={dynamicStyles.buttonContainer}>
+          <Pressable style={dynamicStyles.button} onPress={() => console.log("Others")}>
+            <Text style={dynamicStyles.buttonText}>Others</Text>
           </Pressable>
         </View>
       </View>
@@ -52,10 +56,10 @@ const FirstAidPage = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const getDynamicStyles = (isDarkModeEnabled: boolean) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: isDarkModeEnabled ? "#121212" : "#fff",
   },
   headerContainer: {
     marginTop: responsiveHeight(6), // Adjusted to make space for the back icon
@@ -97,7 +101,7 @@ const styles = StyleSheet.create({
     width: responsiveWidth(90),
     marginVertical: responsiveHeight(1),
     elevation: 5,
-    backgroundColor: "#fff",
+    backgroundColor: isDarkModeEnabled ? "#121212" : "#fff",
     borderRadius: 20,
     overflow: "hidden",
     padding: responsiveFontSize(2),
@@ -105,7 +109,7 @@ const styles = StyleSheet.create({
   button: {
     width: "100%",
     paddingVertical: responsiveHeight(2),
-    backgroundColor: "#fbfaf3",
+    backgroundColor: isDarkModeEnabled ? "#333" : "#fbfaf3",
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 20,

@@ -8,6 +8,7 @@ import {
   Dimensions,
   Image,
   Alert,
+  Platform,
 } from "react-native";
 import { TextInput as RNPTextInput } from "react-native-paper";
 import { LinearGradient } from "expo-linear-gradient";
@@ -18,6 +19,7 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   sendEmailVerification,
+  onAuthStateChanged,
 } from "firebase/auth";
 import { setDoc, doc, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "../firebaseConfig"; // Ensure you import auth from your Firebase config correctly
@@ -52,6 +54,24 @@ const SignUpScreen: React.FC = () => {
       handleGoogleSignIn(authentication.accessToken);
     }
   }, [response]);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user && user.emailVerified) {
+        // Store user information in Firestore after verification
+        await setDoc(doc(db, "users", user.uid), {
+          firstname: firstname,
+          lastname: lastname,
+          email: email,
+          createdAt: serverTimestamp(),
+          interests: [], // Initialize with an empty array
+        });
+        navigation.navigate("HealthNewsInterest", { userId: user.uid });
+      }
+    });
+
+    return () => unsubscribe();
+  }, [firstname, lastname, email, navigation]);
 
   const handleGoogleSignIn = async (token: string) => {
     const credential = GoogleAuthProvider.credential(token);
@@ -95,21 +115,8 @@ const SignUpScreen: React.FC = () => {
       // Send verification email
       await sendEmailVerification(user);
 
-      // Store user information in Firestore
-      await setDoc(doc(db, "users", user.uid), {
-        firstname: firstname,
-        lastname: lastname,
-        email: email,
-        createdAt: serverTimestamp(),
-        interests: [], // Initialize with an empty array
-      });
-
       // Show verification note
-      Alert.alert(
-        "Verification Required",
-        "A verification email has been sent to your email address. Please verify your email before proceeding.",
-        [{ text: "OK", onPress: () => console.log("Verification email sent") }]
-      );
+      showVerificationAlert();
 
       // Clear input fields
       setFirstname("");
@@ -117,11 +124,22 @@ const SignUpScreen: React.FC = () => {
       setEmail("");
       setPassword("");
       setConfirmPassword("");
-
-      // Navigate to the interests selection screen
-      navigation.navigate("HealthNewsInterest", { userId: user.uid });
     } catch (error: any) {
       handleError(error);
+    }
+  };
+
+  const showVerificationAlert = () => {
+    if (Platform.OS === "web") {
+      window.alert(
+        "A verification email has been sent to your email address. Please verify your email before proceeding."
+      );
+    } else {
+      Alert.alert(
+        "Verification Required",
+        "A verification email has been sent to your email address. Please verify your email before proceeding.",
+        [{ text: "OK", onPress: () => console.log("Verification email sent") }]
+      );
     }
   };
 
@@ -167,20 +185,8 @@ const SignUpScreen: React.FC = () => {
             {error && <Text style={styles.errorText}>{error}</Text>}
             <RNPTextInput
               style={styles.input}
-              label="Firstname"
-              placeholder="Firstname"
-              mode="outlined"
-              value={firstname}
-              onChangeText={setFirstname}
-              placeholderTextColor="#545454"
-              outlineColor="#0b6fab"
-              activeOutlineColor="#175689"
-              theme={{ colors: { text: "#626262" } }}
-            />
-            <RNPTextInput
-              style={styles.input}
-              label="Lastname"
-              placeholder="Lastname"
+              label="Surname"
+              placeholder="Surname"
               mode="outlined"
               value={lastname}
               onChangeText={setLastname}
@@ -189,6 +195,19 @@ const SignUpScreen: React.FC = () => {
               activeOutlineColor="#175689"
               theme={{ colors: { text: "#626262" } }}
             />
+            <RNPTextInput
+              style={styles.input}
+              label="Other names"
+              placeholder="Other names"
+              mode="outlined"
+              value={firstname}
+              onChangeText={setFirstname}
+              placeholderTextColor="#545454"
+              outlineColor="#0b6fab"
+              activeOutlineColor="#175689"
+              theme={{ colors: { text: "#626262" } }}
+            />
+           
             <RNPTextInput
               style={styles.input}
               label="Email"
@@ -322,7 +341,6 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   orSignUpWith: {
-    // marginVertical: responsiveHeight(2),
     fontSize: responsiveFontSize(3.5),
     textAlign: "center",
     fontFamily: "Poppins-Regular",

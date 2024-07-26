@@ -14,7 +14,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { useNavigation, ParamListBase } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithCredential } from "firebase/auth";
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithCredential, sendEmailVerification } from "firebase/auth";
 import { db, auth } from "../firebaseConfig";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -114,7 +114,14 @@ const LoginScreen = () => {
         }
       }
 
-      await signInWithEmailAndPassword(auth, email, pass);
+      const userCredential = await signInWithEmailAndPassword(auth, email, pass);
+
+      // Check if email is verified
+      if (!userCredential.user.emailVerified) {
+        await sendEmailVerification(userCredential.user);
+        throw new Error("Email not verified. A verification email has been sent to your email address.");
+      }
+
       if (rememberMe) {
         if (Platform.OS === "web") {
           localStorage.setItem("emailOrUsername", emailOrUsername);

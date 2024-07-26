@@ -111,11 +111,11 @@ const InterestsScreen: React.FC<Props> = ({ route, navigation }) => {
   );
 };
 
-const responsiveWidth = (vw, percent) => vw * percent;
-const responsiveHeight = (vh, percent) => vh * percent;
-const responsiveFontSize = (vw, percent) => vw * percent;
+const responsiveWidth = (vw: number, percent: number) => vw * percent;
+const responsiveHeight = (vh: number, percent: number) => vh * percent;
+const responsiveFontSize = (vw: number, percent: number) => vw * percent;
 
-const getDynamicStyles = (vw, vh) => {
+const getDynamicStyles = (vw: number, vh: number) => {
   return StyleSheet.create({
     container: {
       flex: 1,
@@ -150,7 +150,7 @@ const getDynamicStyles = (vw, vh) => {
     buttonContainer: {
       flexDirection: "row",
       justifyContent: "space-around",
-      marginTop: responsiveHeight(vh, 2),
+      marginBottom: responsiveHeight(vh, 2),
     },
     button: {
       backgroundColor: "#318CE7",
