@@ -2,20 +2,17 @@ import * as imports from "./imports";
 import { useVoiceCommands, initVoiceCommands } from './voiceCommands';
 import { useNavigation } from '@react-navigation/native';
 import { db, auth } from "./firebaseConfig";
-import { collection, query, where, getDocs } from "firebase/firestore";
-import { View, TouchableOpacity, StyleSheet, Platform, KeyboardAvoidingView, SafeAreaView } from 'react-native';
+import { collection, query, where, getDocs, doc, onSnapshot } from "firebase/firestore";
+import { View, TouchableOpacity, StyleSheet, Platform, KeyboardAvoidingView, SafeAreaView, Text } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import React, { useEffect, useState, useRef } from 'react';
 import * as Notifications from 'expo-notifications';
 import { registerForPushNotificationsAsync, schedulePushNotification } from './registerPushNotifications';
-import HealthNewsInterest from "./screens/HealthNewsInterest";
 import SplashScreen from "./components/SplashScreen";
-import { DarkModeProvider } from './components/DarkModeContext'; // Import DarkModeProvider
-import { useDarkMode } from './components/DarkModeContext'; // Import useDarkMode hook
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'; // Import KeyboardAwareScrollView
+import { DarkModeProvider, useDarkMode } from './components/DarkModeContext';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 const {
-  Text,
   NavigationContainer,
   useFonts,
   AppLoading,
@@ -52,7 +49,6 @@ const {
   Stack,
 } = imports;
 
-// Initialize Notifications
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -74,6 +70,7 @@ const CenterButton = (props: any) => {
   const [firstName, setFirstName] = useState("");
   const { startRecording, stopRecording, isRecording } = useVoiceCommands();
   const navigation = useNavigation();
+  const { isDarkModeEnabled } = useDarkMode();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -109,71 +106,76 @@ const CenterButton = (props: any) => {
   return (
     <TouchableOpacity {...props} style={styles.centerButton} onPress={handleRecordButtonPress}>
       <View style={[styles.centerButtonContainer, { backgroundColor: isRecording ? "#FF6347" : "#318CE7" }]}>
-        <FontAwesome5 name="robot" color="#fff" size={responsiveFontSize(6)} />
+        <FontAwesome5 name="robot" color={isDarkModeEnabled ? "#fff" : "#fff"} size={responsiveFontSize(6)} />
       </View>
     </TouchableOpacity>
   );
 };
 
-const MainTabs = () => (
-  <Tab.Navigator
-    screenOptions={({ route }) => ({
-      tabBarShowLabel: true,
-      tabBarStyle: styles.tabBar,
-      tabBarHideOnKeyboard: true,
-      tabBarIcon: ({ color, size }) => {
-        let iconName: string;
-        if (route.name === "HomeTab") {
-          iconName = "home";
-        } else if (route.name === "FirstAidTab") {
-          iconName = "briefcase-medical";
-        } else if (route.name === "NewsPageTab") {
-          iconName = "newspaper";
-        } else if (route.name === "CounselorSessionTab") {
-          iconName = "user-friends";
-        }
+const MainTabs = () => {
+  const { isDarkModeEnabled } = useDarkMode(); 
+  const tabBarBackgroundColor = isDarkModeEnabled ? '#1E1E1E' : '#fff'; 
 
-        return <FontAwesome5 name={iconName} size={size} color={color} />;
-      },
-      tabBarLabel: ({ focused }) => {
-        let label: string | number | boolean | imports.React.ReactElement<any, string | imports.React.JSXElementConstructor<any>> | Iterable<imports.React.ReactNode> | null | undefined;
-        if (route.name === "HomeTab") {
-          label = "Home";
-        } else if (route.name === "FirstAidTab") {
-          label = "First Aid";
-        } else if (route.name === "NewsPageTab") {
-          label = "News";
-        } else if (route.name === "CounselorSessionTab") {
-          label = "Counselor";
-        }
-        return (
-          <Text
-            style={{
-              color: focused ? "#673ab7" : "#222",
-              fontSize: responsiveFontSize(3),
-              fontFamily: "Poppins-Regular",
-            }}
-          >
-            {label}
-          </Text>
-        );
-      },
-    })}
-  >
-    <Tab.Screen name="HomeTab" component={HomeStack} options={{ headerShown: false }} />
-    <Tab.Screen name="FirstAidTab" component={FirstAid} options={{ headerShown: false }} />
-    <Tab.Screen
-      name="CenterButton"
-      component={View}
-      options={{
-        tabBarButton: (props) => <CenterButton {...props} />,
-        headerShown: false,
-      }}
-    />
-    <Tab.Screen name="NewsPageTab" component={NewsPage} options={{ headerShown: false }} />
-    <Tab.Screen name="CounselorSessionTab" component={CounselorSession} options={{ headerShown: false }} />
-  </Tab.Navigator>
-);
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarShowLabel: true,
+        tabBarStyle: { ...styles.tabBar, backgroundColor: tabBarBackgroundColor },
+        tabBarHideOnKeyboard: true,
+        tabBarIcon: ({ color , size }) => {
+          let iconName: string;
+          if (route.name === "HomeTab") {
+            iconName = "home";
+          } else if (route.name === "FirstAidTab") {
+            iconName = "briefcase-medical";
+          } else if (route.name === "NewsPageTab") {
+            iconName = "newspaper";
+          } else if (route.name === "CounselorSessionTab") {
+            iconName = "user-friends";
+          }
+
+          return <FontAwesome5 name={iconName} size={size} color={isDarkModeEnabled ? "#fff" : color} />;
+        },
+        tabBarLabel: ({ focused }) => {
+          let label: string | number | boolean | imports.React.ReactElement<any, string | imports.React.JSXElementConstructor<any>> | Iterable<imports.React.ReactNode> | null | undefined;
+          if (route.name === "HomeTab") {
+            label = "Home";
+          } else if (route.name === "FirstAidTab") {
+            label = "First Aid";
+          } else if (route.name === "NewsPageTab") {
+            label = "News";
+          } else if (route.name === "CounselorSessionTab") {
+            label = "Counselor";
+          }
+          return (
+            <Text
+              style={{
+                color: focused ? "#318CE7" : isDarkModeEnabled ? "#fff" : "#222",
+                fontSize: responsiveFontSize(3),
+                fontFamily: "Poppins-Regular",
+              }}
+            >
+              {label}
+            </Text>
+          );
+        },
+      })}
+    >
+      <Tab.Screen name="HomeTab" component={HomeStack} options={{ headerShown: false }} />
+      <Tab.Screen name="FirstAidTab" component={FirstAid} options={{ headerShown: false }} />
+      <Tab.Screen
+        name="CenterButton"
+        component={View}
+        options={{
+          tabBarButton: (props) => <CenterButton {...props} />,
+          headerShown: false,
+        }}
+      />
+      <Tab.Screen name="NewsPageTab" component={NewsPage} options={{ headerShown: false }} />
+      <Tab.Screen name="CounselorSessionTab" component={CounselorSession} options={{ headerShown: false }} />
+    </Tab.Navigator>
+  );
+};
 
 const AppStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="SplashScreen">
@@ -195,10 +197,8 @@ const AppStack = () => (
     <Stack.Screen name="PreferencesScreen" component={PreferencesScreen} />
     <Stack.Screen name="AccessibilityScreen" component={AccessibilityScreen} />
     <Stack.Screen name="NotificationSettings" component={NotificationSettings} />
-    {/* <Stack.Screen name="MentalHealth" component={MentalHealth} /> */}
     <Stack.Screen name="AddMedication" component={AddMedication} />
     <Stack.Screen name="SymptomAssessment" component={SymptomAssessment} />
-    <Stack.Screen name="HealthNewsInterest" component={HealthNewsInterest} />
   </Stack.Navigator>
 );
 
@@ -265,21 +265,11 @@ const App: React.FC = () => {
 const styles = StyleSheet.create({
   tabBar: {
     position: "absolute",
-    bottom: 0,
+    bottom: responsiveHeight(0),
     height: responsiveHeight(8.75),
-    backgroundColor: "#fff",
-    borderTopRightRadius: responsiveHeight(1.5),
-    borderTopLeftRadius: responsiveHeight(1.5),
     paddingBottom: responsiveHeight(1.25),
+    alignSelf: 'center',
     width: "100%",
-    ...Platform.select({
-      web: {
-        boxShadow: "0px 0px 10px rgba(0,0,0,0.1)",
-      },
-      default: {
-        elevation: 5,
-      },
-    }),
   },
   centerButton: {
     top: -responsiveHeight(3.75),

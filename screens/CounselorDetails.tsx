@@ -99,7 +99,7 @@ const CounselorDetails: React.FC<CounselorDetailsProps> = ({ route }) => {
 const getDynamicStyles = (isDarkModeEnabled: boolean) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: isDarkModeEnabled ? "#121212" : "#fff",
+    backgroundColor: isDarkModeEnabled ? "#1E1E1E" : "#fff", // Use a light dark color for dark mode
   },
   scrollContainer: {
     flexGrow: 1,
@@ -189,7 +189,7 @@ const getDynamicStyles = (isDarkModeEnabled: boolean) => StyleSheet.create({
   },
   aboutContainer: {
     width: "100%",
-    backgroundColor: "#f8f9fa",
+    backgroundColor: isDarkModeEnabled ? "#383838" : "#f8f9fa",
     padding: responsiveWidth(5),
     borderRadius: responsiveWidth(2),
     marginBottom: responsiveHeight(3),

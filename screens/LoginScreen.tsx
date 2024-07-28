@@ -9,16 +9,20 @@ import {
   Image,
   Platform,
 } from "react-native";
-import { TextInput as RNPTextInput } from "react-native-paper";
+import { TextInput as RNPTextInput, Checkbox } from "react-native-paper";
 import { LinearGradient } from "expo-linear-gradient";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { useNavigation, ParamListBase } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithCredential, sendEmailVerification } from "firebase/auth";
+import {
+  signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithCredential,
+  sendEmailVerification,
+} from "firebase/auth";
 import { db, auth } from "../firebaseConfig";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import CustomCheckBox from "../components/CustomCheckBox";
 import * as Google from "expo-auth-session/providers/google";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
@@ -48,7 +52,7 @@ const LoginScreen = () => {
   });
 
   useEffect(() => {
-    if (response?.type === 'success') {
+    if (response?.type === "success") {
       const { authentication } = response;
       handleGoogleSignIn(authentication.accessToken);
     }
@@ -81,7 +85,7 @@ const LoginScreen = () => {
   const handleGoogleSignIn = async (token: string) => {
     const credential = GoogleAuthProvider.credential(token);
     try {
-      const userCredential = await signInWithCredential(auth, credential);
+      await signInWithCredential(auth, credential);
       navigation.navigate("MainTabs", {
         screen: "Home",
         params: { screen: "Homepage1" },
@@ -122,6 +126,13 @@ const LoginScreen = () => {
         throw new Error("Email not verified. A verification email has been sent to your email address.");
       }
 
+      const user = userCredential.user;
+
+      // Store the "Keep me signed in" preference in Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        keepMeSignedIn: rememberMe,
+      }, { merge: true });
+
       if (rememberMe) {
         if (Platform.OS === "web") {
           localStorage.setItem("emailOrUsername", emailOrUsername);
@@ -158,17 +169,15 @@ const LoginScreen = () => {
       case "auth/user-disabled":
         return "Your account has been disabled. Please contact support.";
       case "auth/user-not-found":
-        return "Invalid email or password.";
       case "auth/wrong-password":
-        return "Invalid email or password.";
       case "auth/invalid-credential":
-        return "Incorrect email or password.";
+        return "Invalid email or password.";
       case "auth/network-request-failed":
         return "Network error.";
+      case "auth/too-many-requests":
+        return "Too many login attempts. Please try again later.";
       default:
-        return (
-          error.message || "An unexpected error occurred. Please try again."
-        );
+        return error.message || "An unexpected error occurred. Please try again.";
     }
   };
 
@@ -220,11 +229,12 @@ const LoginScreen = () => {
               }}
             />
             <View style={styles.rememberMeContainer}>
-              <CustomCheckBox
-                value={rememberMe}
-                onValueChange={setRememberMe}
-                label="Remember Me"
+              <Checkbox
+                status={rememberMe ? 'checked' : 'unchecked'}
+                onPress={() => setRememberMe(!rememberMe)}
+                color="#1F75FE"
               />
+              <Text style={styles.rememberMeText}>Keep me signed in</Text>
             </View>
             <Pressable onPress={() => navigation.navigate("ForgetPassword")}>
               <Text style={styles.forgotPassword}>Forgot Password?</Text>
@@ -289,6 +299,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: responsiveHeight(2),
   },
+  rememberMeText: {
+    fontSize: responsiveFontSize(3.5),
+    color: "#1F75FE",
+    marginLeft: responsiveWidth(1),
+  },
   forgotPassword: {
     color: "#1F75FE",
     marginBottom: responsiveHeight(2),
@@ -311,7 +326,6 @@ const styles = StyleSheet.create({
     fontSize: responsiveFontSize(5),
   },
   orLoginWith: {
-    // marginVertical: responsiveHeight(2),
     fontSize: responsiveFontSize(3.5),
     fontFamily: "Poppins-Regular",
   },

@@ -15,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, NavigationProp, ParamListBase } from "@react-navigation/native";
 import { collection, onSnapshot, deleteDoc, doc } from "firebase/firestore";
 import { db } from "../firebaseConfig"; // Ensure this path is correct
+import { useDarkMode } from "../components/DarkModeContext";
 
 // Conditionally import based on the platform
 const TouchableOpacity = Platform.OS === 'web' ? require('react-native-web').TouchableOpacity : require('react-native').TouchableOpacity;
@@ -39,6 +40,7 @@ const NotificationPage: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedNotifications, setSelectedNotifications] = useState<Set<string>>(new Set());
+  const { isDarkModeEnabled } = useDarkMode();
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'medReminder'), (querySnapshot) => {
@@ -97,47 +99,33 @@ const NotificationPage: React.FC = () => {
         style={[
           styles.notificationItem,
           isSelected && styles.notificationItemSelected,
+          isDarkModeEnabled && styles.notificationItemDark,
+          isSelected && isDarkModeEnabled && styles.notificationItemSelectedDark,
         ]}
       >
         <View style={styles.notificationContent}>
-          <Text style={styles.notificationTitle}>{notification.medicationName}</Text>
-          <Text style={styles.notificationDescription}>
+          <Text style={[styles.notificationTitle, isDarkModeEnabled && styles.notificationTitleDark]}>{notification.medicationName}</Text>
+          <Text style={[styles.notificationDescription, isDarkModeEnabled && styles.notificationDescriptionDark]}>
             {notification.selectedForm} {notification.selectedUnit}
           </Text>
-          <Text style={styles.notificationDate}>{notification.frequency}</Text>
-          <Text style={styles.notificationTimes}>
+          <Text style={[styles.notificationDate, isDarkModeEnabled && styles.notificationDateDark]}>{notification.frequency}</Text>
+          <Text style={[styles.notificationTimes, isDarkModeEnabled && styles.notificationTimesDark]}>
             {notification.times.join(", ")}
           </Text>
         </View>
+        <Ionicons name="trash" size={responsiveFontSize(6)} color={isDarkModeEnabled ? "#fff" : "#2e2e2d"} />
       </TouchableOpacity>
     );
   };
 
-  if (loading) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-        <View style={styles.header}>
-          <Pressable style={styles.backButton} onPress={handleBackPress}>
-            <Ionicons name="arrow-back" size={responsiveFontSize(6)} color="#000" />
-          </Pressable>
-          <Text style={styles.headerText}>Notifications</Text>
-        </View>
-        <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Loading...</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, isDarkModeEnabled && styles.containerDark]}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <View style={styles.header}>
         <Pressable style={styles.backButton} onPress={handleBackPress}>
-          <Ionicons name="arrow-back" size={responsiveFontSize(6)} color="#000" />
+          <Ionicons name="arrow-back" size={responsiveFontSize(6)} color={isDarkModeEnabled ? "#fff" : "#000"} />
         </Pressable>
-        <Text style={styles.headerText}>Notifications</Text>
+        <Text style={[styles.headerText, isDarkModeEnabled && styles.headerTextDark]}>Notifications</Text>
         {selectedNotifications.size > 0 && (
           <Pressable style={styles.deleteButton} onPress={handleDelete}>
             <Ionicons name="trash" size={responsiveFontSize(6)} color="red" />
@@ -147,7 +135,7 @@ const NotificationPage: React.FC = () => {
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {notifications.length === 0 ? (
           <View style={styles.noNotificationsContainer}>
-            <Text style={styles.noNotificationsText}>No notifications available.</Text>
+            <Text style={[styles.noNotificationsText, isDarkModeEnabled && styles.noNotificationsTextDark]}>No notifications available.</Text>
           </View>
         ) : (
           notifications.map(renderNotificationItem)
@@ -161,6 +149,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+  },
+  containerDark: {
+    backgroundColor: "#121212",
   },
   header: {
     flexDirection: "row",
@@ -176,6 +167,9 @@ const styles = StyleSheet.create({
     fontSize: responsiveFontSize(5),
     fontWeight: "bold",
   },
+  headerTextDark: {
+    color: "#fff",
+  },
   deleteButton: {
     marginLeft: "auto",
   },
@@ -184,6 +178,9 @@ const styles = StyleSheet.create({
     paddingVertical: responsiveHeight(3),
   },
   notificationItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: responsiveHeight(3),
     backgroundColor: "#f9f9f9",
     borderRadius: responsiveWidth(2),
@@ -196,31 +193,50 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3.84,
     elevation: 5,
+    padding: responsiveWidth(4),
   },
   notificationItemSelected: {
     backgroundColor: "#d1e7ff",
   },
+  notificationItemDark: {
+    backgroundColor: "#333",
+  },
+  notificationItemSelectedDark: {
+    backgroundColor: "#555",
+  },
   notificationContent: {
-    padding: responsiveWidth(4),
+    flex: 1,
   },
   notificationTitle: {
     fontSize: responsiveFontSize(4),
     fontWeight: "bold",
     marginBottom: responsiveHeight(1),
   },
+  notificationTitleDark: {
+    color: "#fff",
+  },
   notificationDescription: {
     fontSize: responsiveFontSize(3.5),
     color: "#333",
     marginBottom: responsiveHeight(1),
   },
+  notificationDescriptionDark: {
+    color: "#ccc",
+  },
   notificationDate: {
     fontSize: responsiveFontSize(3),
     color: "#888",
+  },
+  notificationDateDark: {
+    color: "#bbb",
   },
   notificationTimes: {
     fontSize: responsiveFontSize(3),
     color: "#555",
     marginTop: responsiveHeight(1),
+  },
+  notificationTimesDark: {
+    color: "#999",
   },
   loadingContainer: {
     flex: 1,
@@ -231,6 +247,9 @@ const styles = StyleSheet.create({
     fontSize: responsiveFontSize(4),
     color: "#333",
   },
+  loadingTextDark: {
+    color: "#ccc",
+  },
   noNotificationsContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -240,69 +259,8 @@ const styles = StyleSheet.create({
     fontSize: responsiveFontSize(4),
     color: "#888",
   },
-  // Media queries for tablet
-  '@media (min-width: 768px)': {
-    header: {
-      paddingHorizontal: responsiveWidth(3),
-      paddingVertical: responsiveHeight(1.5),
-    },
-    headerText: {
-      fontSize: responsiveFontSize(4.5),
-    },
-    scrollContainer: {
-      paddingHorizontal: responsiveWidth(4),
-    },
-    notificationItem: {
-      marginBottom: responsiveHeight(2.5),
-      borderRadius: responsiveWidth(1.5),
-    },
-    notificationContent: {
-      padding: responsiveWidth(3.5),
-    },
-    notificationTitle: {
-      fontSize: responsiveFontSize(3.5),
-    },
-    notificationDescription: {
-      fontSize: responsiveFontSize(3),
-    },
-    notificationDate: {
-      fontSize: responsiveFontSize(2.5),
-    },
-    notificationTimes: {
-      fontSize: responsiveFontSize(2.5),
-    },
-  },
-  // Media queries for desktop
-  '@media (min-width: 1024px)': {
-    header: {
-      paddingHorizontal: responsiveWidth(2.5),
-      paddingVertical: responsiveHeight(1),
-    },
-    headerText: {
-      fontSize: responsiveFontSize(4),
-    },
-    scrollContainer: {
-      paddingHorizontal: responsiveWidth(3.5),
-    },
-    notificationItem: {
-      marginBottom: responsiveHeight(2),
-      borderRadius: responsiveWidth(1),
-    },
-    notificationContent: {
-      padding: responsiveWidth(3),
-    },
-    notificationTitle: {
-      fontSize: responsiveFontSize(3),
-    },
-    notificationDescription: {
-      fontSize: responsiveFontSize(2.5),
-    },
-    notificationDate: {
-      fontSize: responsiveFontSize(2),
-    },
-    notificationTimes: {
-      fontSize: responsiveFontSize(2),
-    },
+  noNotificationsTextDark: {
+    color: "#bbb",
   },
 });
 

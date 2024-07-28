@@ -18,10 +18,10 @@ import styled from "styled-components/native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { NavigationProp, ParamListBase } from "@react-navigation/native";
-import { db } from "../firebaseConfig"; // Ensure the correct path
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { db, auth } from "../firebaseConfig";
+import { collection, addDoc, serverTimestamp, doc, getDoc } from "firebase/firestore";
+import { useDarkMode } from "../components/DarkModeContext";
 
-// Conditionally import TouchableOpacity
 const TouchableOpacity = Platform.OS === 'web' ? require('react-native-web').TouchableOpacity : RNTouchableOpacity;
 
 interface CombinedScreenProps {
@@ -42,6 +42,7 @@ const CombinedScreen: React.FC<CombinedScreenProps> = ({ navigation }) => {
   const [times, setTimes] = useState<string[]>([]);
   const [screenWidth, setScreenWidth] = useState(Dimensions.get("window").width);
   const [screenHeight, setScreenHeight] = useState(Dimensions.get("window").height);
+  const { isDarkModeEnabled, toggleDarkMode } = useDarkMode();
 
   const forms = [
     "Capsule",
@@ -78,10 +79,28 @@ const CombinedScreen: React.FC<CombinedScreenProps> = ({ navigation }) => {
     };
   }, []);
 
+  useEffect(() => {
+    const fetchUserSettings = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        const userDocRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          if (userData && userData.isDarkModeEnabled) {
+            toggleDarkMode();
+          }
+        }
+      }
+    };
+
+    fetchUserSettings();
+  }, [toggleDarkMode]);
+
   const vw = screenWidth / 100;
   const vh = screenHeight / 100;
 
-  const dynamicStyles = getDynamicStyles(vw, vh);
+  const dynamicStyles = getDynamicStyles(vw, vh, isDarkModeEnabled);
 
   const handleTimeChange = (event: any, selectedTime?: Date) => {
     if (selectedTime) {
@@ -124,7 +143,7 @@ const CombinedScreen: React.FC<CombinedScreenProps> = ({ navigation }) => {
         [
           {
             text: "OK",
-            onPress: () => navigation.goBack(), // Navigate to previous screen
+            onPress: () => navigation.goBack(),
           },
         ],
         { cancelable: false }
@@ -141,52 +160,53 @@ const CombinedScreen: React.FC<CombinedScreenProps> = ({ navigation }) => {
         <KeyboardAvoidingView behavior={"padding"} style={{ flex: 1 }}>
           <Header vw={vw} vh={vh}>
             <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Icon name="arrow-back" size={responsiveFontSize(vw, 6)} color="#318CE7" />
+              <Icon name="arrow-back" size={responsiveFontSize(vw, 6)} color={isDarkModeEnabled ? "#fff" : "#000"} />
             </TouchableOpacity>
-            <HeaderText vw={vw}>Add Medicine</HeaderText>
+            <HeaderText vw={vw} isDarkModeEnabled={isDarkModeEnabled}>Add Medicine</HeaderText>
           </Header>
           <Image source={require("../assets/medicine.png")} style={dynamicStyles.icon} />
 
-          <FormContainer vw={vw} vh={vh}>
-            <SectionTitle vw={vw} vh={vh}>Medication Name</SectionTitle>
+          <FormContainer vw={vw} vh={vh} isDarkModeEnabled={isDarkModeEnabled}>
+            <SectionTitle vw={vw} vh={vh} isDarkModeEnabled={isDarkModeEnabled}>Medication Name</SectionTitle>
             <StyledInput
               vw={vw}
               placeholder="Enter the medication name"
               value={medicationName}
               onChangeText={setMedicationName}
-              placeholderTextColor="#888"
+              placeholderTextColor={isDarkModeEnabled ? "#ccc" : "#888"}
+              isDarkModeEnabled={isDarkModeEnabled}
             />
 
-            <SectionTitle vw={vw} vh={vh}>Form</SectionTitle>
+            <SectionTitle vw={vw} vh={vh} isDarkModeEnabled={isDarkModeEnabled}>Form</SectionTitle>
             <Row vw={vw} vh={vh}>
-              <DropdownButton vw={vw} vh={vh} onPress={() => setShowFormModal(true)}>
-                <DropdownButtonText vw={vw}>{selectedForm}</DropdownButtonText>
+              <DropdownButton vw={vw} vh={vh} onPress={() => setShowFormModal(true)} isDarkModeEnabled={isDarkModeEnabled}>
+                <DropdownButtonText vw={vw} isDarkModeEnabled={isDarkModeEnabled}>{selectedForm}</DropdownButtonText>
                 <Icon name="arrow-drop-down" size={responsiveFontSize(vw, 6)} color="#318CE7" />
               </DropdownButton>
             </Row>
 
-            <SectionTitle vw={vw} vh={vh}>Unit</SectionTitle>
+            <SectionTitle vw={vw} vh={vh} isDarkModeEnabled={isDarkModeEnabled}>Unit</SectionTitle>
             <Row vw={vw} vh={vh}>
-              <DropdownButton vw={vw} vh={vh} onPress={() => setShowUnitModal(true)}>
-                <DropdownButtonText vw={vw}>{selectedUnit}</DropdownButtonText>
+              <DropdownButton vw={vw} vh={vh} onPress={() => setShowUnitModal(true)} isDarkModeEnabled={isDarkModeEnabled}>
+                <DropdownButtonText vw={vw} isDarkModeEnabled={isDarkModeEnabled}>{selectedUnit}</DropdownButtonText>
                 <Icon name="arrow-drop-down" size={responsiveFontSize(vw, 6)} color="#318CE7" />
               </DropdownButton>
             </Row>
 
-            <SectionTitle vw={vw} vh={vh}>Frequency</SectionTitle>
+            <SectionTitle vw={vw} vh={vh} isDarkModeEnabled={isDarkModeEnabled}>Frequency</SectionTitle>
             <Row vw={vw} vh={vh}>
-              <DropdownButton vw={vw} vh={vh} onPress={() => setShowFrequencyModal(true)}>
-                <DropdownButtonText vw={vw}>
+              <DropdownButton vw={vw} vh={vh} onPress={() => setShowFrequencyModal(true)} isDarkModeEnabled={isDarkModeEnabled}>
+                <DropdownButtonText vw={vw} isDarkModeEnabled={isDarkModeEnabled}>
                   {customFrequency.trim() !== "" ? customFrequency : frequency}
                 </DropdownButtonText>
                 <Icon name="arrow-drop-down" size={responsiveFontSize(vw, 6)} color="#318CE7" />
               </DropdownButton>
             </Row>
 
-            <SectionTitle vw={vw} vh={vh}>Time</SectionTitle>
+            <SectionTitle vw={vw} vh={vh} isDarkModeEnabled={isDarkModeEnabled}>Time</SectionTitle>
             <Row vw={vw} vh={vh}>
-              <DropdownButton vw={vw} vh={vh} onPress={() => setShowTimePicker(true)}>
-                <DropdownButtonText vw={vw}>
+              <DropdownButton vw={vw} vh={vh} onPress={() => setShowTimePicker(true)} isDarkModeEnabled={isDarkModeEnabled}>
+                <DropdownButtonText vw={vw} isDarkModeEnabled={isDarkModeEnabled}>
                   {time.toLocaleTimeString([], {
                     hour: "2-digit",
                     minute: "2-digit",
@@ -196,10 +216,7 @@ const CombinedScreen: React.FC<CombinedScreenProps> = ({ navigation }) => {
               </DropdownButton>
             </Row>
            
-            <Text style={{ color: '#318CE7', fontSize: 16, fontWeight: 'bold' }}>Selected Times:</Text>
-            {times.map((time, index) => (
-              <Text key={index} style={{ color: '#318CE7' }}>{time}</Text>
-            ))}
+          
 
             <AddButton vw={vw} vh={vh} disabled={medicationName.trim() === ""} onPress={handleAddMedicine}>
               <AddButtonText vw={vw} disabled={medicationName.trim() === ""}>
@@ -227,20 +244,24 @@ const CombinedScreen: React.FC<CombinedScreenProps> = ({ navigation }) => {
               onRequestClose={() => setShowTimePicker(false)}
             >
               <CenteredModalContainer>
-                <ModalContent vw={vw}>
-                  <ModalTitle vw={vw} vh={vh}>Select Time</ModalTitle>
+                <ModalContent vw={vw} isDarkModeEnabled={isDarkModeEnabled}>
+                  <ModalTitle vw={vw} vh={vh} isDarkModeEnabled={isDarkModeEnabled}>Select Time</ModalTitle>
                   <input
                     type="time"
                     value={time.toLocaleTimeString('en-US', { hour12: false }).substring(0, 5)}
                     onChange={(e) => handleTimeChange({ type: 'set' }, new Date(`1970-01-01T${e.target.value}:00`))}
-                    style={{ width: '100%', padding: 10, borderRadius: 10, borderWidth: 1, borderColor: '#ccc', outline: 'none' }}
+                    style={{
+                      width: '100%', padding: 10, borderRadius: 10, borderWidth: 1, 
+                      borderColor: isDarkModeEnabled ? "#666" : "#ccc", outline: 'none',
+                      backgroundColor: isDarkModeEnabled ? "#383838" : "#fff", color: isDarkModeEnabled ? "#fff" : "#000"
+                    }}
                   />
                   <ButtonRow vw={vw} vh={vh}>
                     <CloseButton vw={vw} vh={vh} onPress={() => setShowTimePicker(false)}>
                       <CloseButtonText vw={vw}>Cancel</CloseButtonText>
                     </CloseButton>
-                    <ConfirmButton vw={vw} vh={vh} onPress={handleConfirmTime}>
-                      <ConfirmButtonText vw={vw}>OK</ConfirmButtonText>
+                    <ConfirmButton vw={vw} vh={vh} isDarkModeEnabled={isDarkModeEnabled} onPress={handleConfirmTime}>
+                      <ConfirmButtonText vw={vw} isDarkModeEnabled={isDarkModeEnabled}>OK</ConfirmButtonText>
                     </ConfirmButton>
                   </ButtonRow>
                 </ModalContent>
@@ -248,7 +269,6 @@ const CombinedScreen: React.FC<CombinedScreenProps> = ({ navigation }) => {
             </Modal>
           )}
 
-          {/* Medication Form Modal */}
           <Modal
             animationType="fade"
             transparent={true}
@@ -256,8 +276,8 @@ const CombinedScreen: React.FC<CombinedScreenProps> = ({ navigation }) => {
             onRequestClose={() => setShowFormModal(false)}
           >
             <ModalContainer>
-              <ModalContent vw={vw}>
-                <ModalTitle vw={vw} vh={vh}>Select Medication Form</ModalTitle>
+              <ModalContent vw={vw} isDarkModeEnabled={isDarkModeEnabled}>
+                <ModalTitle vw={vw} vh={vh} isDarkModeEnabled={isDarkModeEnabled}>Select Medication Form</ModalTitle>
                 <OptionsContainer vw={vw} vh={vh}>
                   {forms.map((form) => (
                     <OptionItem
@@ -268,8 +288,9 @@ const CombinedScreen: React.FC<CombinedScreenProps> = ({ navigation }) => {
                         setSelectedForm(form);
                         setShowFormModal(false);
                       }}
+                      isDarkModeEnabled={isDarkModeEnabled}
                     >
-                      <OptionText vw={vw}>{form}</OptionText>
+                      <OptionText vw={vw} isDarkModeEnabled={isDarkModeEnabled}>{form}</OptionText>
                     </OptionItem>
                   ))}
                 </OptionsContainer>
@@ -280,7 +301,6 @@ const CombinedScreen: React.FC<CombinedScreenProps> = ({ navigation }) => {
             </ModalContainer>
           </Modal>
 
-          {/* Unit Modal */}
           <Modal
             animationType="fade"
             transparent={true}
@@ -288,8 +308,8 @@ const CombinedScreen: React.FC<CombinedScreenProps> = ({ navigation }) => {
             onRequestClose={() => setShowUnitModal(false)}
           >
             <ModalContainer>
-              <ModalContent vw={vw}>
-                <ModalTitle vw={vw} vh={vh}>Select Unit</ModalTitle>
+              <ModalContent vw={vw} isDarkModeEnabled={isDarkModeEnabled}>
+                <ModalTitle vw={vw} vh={vh} isDarkModeEnabled={isDarkModeEnabled}>Select Unit</ModalTitle>
                 <OptionsContainer vw={vw} vh={vh}>
                   {units.map((unit) => (
                     <OptionItem
@@ -300,8 +320,9 @@ const CombinedScreen: React.FC<CombinedScreenProps> = ({ navigation }) => {
                         setSelectedUnit(unit);
                         setShowUnitModal(false);
                       }}
+                      isDarkModeEnabled={isDarkModeEnabled}
                     >
-                      <OptionText vw={vw}>{unit}</OptionText>
+                      <OptionText vw={vw} isDarkModeEnabled={isDarkModeEnabled}>{unit}</OptionText>
                     </OptionItem>
                   ))}
                 </OptionsContainer>
@@ -312,7 +333,6 @@ const CombinedScreen: React.FC<CombinedScreenProps> = ({ navigation }) => {
             </ModalContainer>
           </Modal>
 
-          {/* Frequency Modal */}
           <Modal
             animationType="fade"
             transparent={true}
@@ -320,8 +340,8 @@ const CombinedScreen: React.FC<CombinedScreenProps> = ({ navigation }) => {
             onRequestClose={() => setShowFrequencyModal(false)}
           >
             <ModalContainer>
-              <ModalContent vw={vw}>
-                <ModalTitle vw={vw} vh={vh}>Select Frequency</ModalTitle>
+              <ModalContent vw={vw} isDarkModeEnabled={isDarkModeEnabled}>
+                <ModalTitle vw={vw} vh={vh} isDarkModeEnabled={isDarkModeEnabled}>Select Frequency</ModalTitle>
                 <OptionsContainer vw={vw} vh={vh}>
                   {frequencies.map((freq) => (
                     <OptionItem
@@ -329,8 +349,9 @@ const CombinedScreen: React.FC<CombinedScreenProps> = ({ navigation }) => {
                       vw={vw}
                       vh={vh}
                       onPress={() => selectFrequency(freq)}
+                      isDarkModeEnabled={isDarkModeEnabled}
                     >
-                      <OptionText vw={vw}>{freq}</OptionText>
+                      <OptionText vw={vw} isDarkModeEnabled={isDarkModeEnabled}>{freq}</OptionText>
                     </OptionItem>
                   ))}
                   {frequency === "Other" && (
@@ -339,7 +360,8 @@ const CombinedScreen: React.FC<CombinedScreenProps> = ({ navigation }) => {
                       placeholder="Enter custom frequency"
                       value={customFrequency}
                       onChangeText={setCustomFrequency}
-                      placeholderTextColor="#888"
+                      placeholderTextColor={isDarkModeEnabled ? "#ccc" : "#888"}
+                      isDarkModeEnabled={isDarkModeEnabled}
                     />
                   )}
                 </OptionsContainer>
@@ -359,11 +381,11 @@ const responsiveWidth = (vw: number, percent: number) => vw * percent;
 const responsiveHeight = (vh: number, percent: number) => vh * percent;
 const responsiveFontSize = (vw: number, percent: number) => vw * percent;
 
-const getDynamicStyles = (vw: number, vh: number) => {
+const getDynamicStyles = (vw: number, vh: number, isDarkModeEnabled: boolean) => {
   return StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: "#fff", // Set to white
+      backgroundColor: isDarkModeEnabled ? "#1E1E1E" : "#fff",
     },
     scrollContainer: {
       flexGrow: 1,
@@ -378,12 +400,14 @@ const getDynamicStyles = (vw: number, vh: number) => {
     },
     input: {
       borderWidth: 1,
-      borderColor: "#ccc",
+      borderColor: isDarkModeEnabled ? "#666" : "#ccc",
       padding: 10,
       borderRadius: 10,
       width: "100%",
       marginBottom: 20,
       fontSize: responsiveFontSize(vw, 4),
+      backgroundColor: isDarkModeEnabled ? "#383838" : "#fff",
+      color: isDarkModeEnabled ? "#fff" : "#000",
       ...Platform.select({
         web: {
           outline: "none",
@@ -401,25 +425,26 @@ const Header = styled.View<{ vw: number; vh: number }>`
   padding: ${({ vh, vw }) => responsiveHeight(vh, 2)}px ${({ vw }) => responsiveWidth(vw, 5)}px;
 `;
 
-const HeaderText = styled.Text<{ vw: number }>`
-  color: #318CE7;
+const HeaderText = styled.Text<{ vw: number; isDarkModeEnabled: boolean }>`
+  color: ${({ isDarkModeEnabled }) => (isDarkModeEnabled ? "#fff" : "#318CE7")};
   font-size: ${({ vw }) => responsiveFontSize(vw, 5)}px;
   font-weight: bold;
 `;
 
-const FormContainer = styled.View<{ vw: number; vh: number }>`
+const FormContainer = styled.View<{ vw: number; vh: number; isDarkModeEnabled: boolean }>`
   width: 98%;
   align-self: center;
-  background-color: #fff;
+  background-color: ${({ isDarkModeEnabled }) => (isDarkModeEnabled ? "#1E1E1E" : "#fff")};
   padding: ${({ vh }) => responsiveHeight(vh, 3)}px;
   border-radius: 20px;
   margin: ${({ vh, vw }) => responsiveHeight(vh, 3)}px ${({ vw }) => responsiveWidth(vw, 5)}px;
 `;
 
-const SectionTitle = styled.Text<{ vw: number; vh: number }>`
+const SectionTitle = styled.Text<{ vw: number; vh: number; isDarkModeEnabled: boolean }>`
   font-size: ${({ vw }) => responsiveFontSize(vw, 4.5)}px;
   font-weight: bold;
   margin-bottom: ${({ vh }) => responsiveHeight(vh, 1.5)}px;
+  color: ${({ isDarkModeEnabled }) => (isDarkModeEnabled ? "#fff" : "#000")};
 `;
 
 const Row = styled.View<{ vw: number; vh: number }>`
@@ -429,20 +454,20 @@ const Row = styled.View<{ vw: number; vh: number }>`
   margin-bottom: ${({ vh }) => responsiveHeight(vh, 2)}px;
 `;
 
-const DropdownButton = styled.TouchableOpacity<{ vw: number; vh: number }>`
+const DropdownButton = styled.TouchableOpacity<{ vw: number; vh: number; isDarkModeEnabled: boolean }>`
   flex: 1;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   padding: ${({ vh }) => responsiveHeight(vh, 1.5)}px;
-  background-color: #f0f0f5;
+  background-color: ${({ isDarkModeEnabled }) => (isDarkModeEnabled ? "#333" : "#f0f0f5")};
   border-radius: 10px;
   margin: 0 ${({ vw }) => responsiveWidth(vw, 1)}px;
 `;
 
-const DropdownButtonText = styled.Text<{ vw: number }>`
+const DropdownButtonText = styled.Text<{ vw: number; isDarkModeEnabled: boolean }>`
   font-size: ${({ vw }) => responsiveFontSize(vw, 4)}px;
-  color: #318CE7;
+  color: ${({ isDarkModeEnabled }) => (isDarkModeEnabled ? "#fff" : "#318CE7")};
 `;
 
 const AddButton = styled.TouchableOpacity<{ disabled: boolean; vw: number; vh: number }>`
@@ -469,18 +494,19 @@ const CenteredModalContainer = styled(ModalContainer)`
   justify-content: center;
 `;
 
-const ModalContent = styled.View<{ vw: number }>`
+const ModalContent = styled.View<{ vw: number; isDarkModeEnabled: boolean }>`
   width: 80%;
-  background-color: #fff;
+  background-color: ${({ isDarkModeEnabled }) => (isDarkModeEnabled ? "#383838" : "#fff")};
   border-radius: 10px;
   padding: 20px;
   align-items: center;
 `;
 
-const ModalTitle = styled.Text<{ vw: number; vh: number }>`
+const ModalTitle = styled.Text<{ vw: number; vh: number; isDarkModeEnabled: boolean }>`
   font-size: ${({ vw }) => responsiveFontSize(vw, 5)}px;
   font-weight: bold;
   margin-bottom: ${({ vh }) => responsiveHeight(vh, 2)}px;
+  color: ${({ isDarkModeEnabled }) => (isDarkModeEnabled ? "#fff" : "#000")};
 `;
 
 const CloseButton = styled.TouchableOpacity<{ vw: number; vh: number }>`
@@ -495,15 +521,15 @@ const CloseButtonText = styled.Text<{ vw: number }>`
   font-size: ${({ vw }) => responsiveFontSize(vw, 4)}px;
 `;
 
-const ConfirmButton = styled.TouchableOpacity<{ vw: number; vh: number }>`
+const ConfirmButton = styled.TouchableOpacity<{ vw: number; vh: number; isDarkModeEnabled: boolean }>`
   margin-top: 20px;
   padding: 10px 20px;
-  background-color: #318CE7;
+  background-color: ${({ isDarkModeEnabled }) => (isDarkModeEnabled ? "#333" : "#318CE7")};
   border-radius: 10px;
 `;
 
-const ConfirmButtonText = styled.Text<{ vw: number }>`
-  color: #fff;
+const ConfirmButtonText = styled.Text<{ vw: number; isDarkModeEnabled: boolean }>`
+  color: ${({ isDarkModeEnabled }) => (isDarkModeEnabled ? "#fff" : "#000")};
   font-size: ${({ vw }) => responsiveFontSize(vw, 4)}px;
 `;
 
@@ -520,23 +546,23 @@ const OptionsContainer = styled.ScrollView<{ vw: number; vh: number }>`
   margin-bottom: ${({ vh }) => responsiveHeight(vh, 2)}px;
 `;
 
-const OptionItem = styled.TouchableOpacity<{ vw: number; vh: number }>`
+const OptionItem = styled.TouchableOpacity<{ vw: number; vh: number; isDarkModeEnabled: boolean }>`
   padding: ${({ vh }) => responsiveHeight(vh, 1.5)}px;
-  background-color: #f2f2f2;
+  background-color: ${({ isDarkModeEnabled }) => (isDarkModeEnabled ? "#333" : "#f2f2f2")};
   margin-bottom: ${({ vh }) => responsiveHeight(vh, 1)}px;
   border-radius: 10px;
   width: 100%;
   align-self: center;
 `;
 
-const OptionText = styled.Text<{ vw: number }>`
+const OptionText = styled.Text<{ vw: number; isDarkModeEnabled: boolean }>`
   font-size: ${({ vw }) => responsiveFontSize(vw, 4)}px;
-  color: #000;
+  color: ${({ isDarkModeEnabled }) => (isDarkModeEnabled ? "#fff" : "#000")};
 `;
 
-const StyledInput = styled(RNTextInput)<{ vw: number }>`
+const StyledInput = styled(RNTextInput)<{ vw: number; isDarkModeEnabled: boolean }>`
   border-width: 1px;
-  border-color: #ccc;
+  border-color: ${({ isDarkModeEnabled }) => (isDarkModeEnabled ? "#666" : "#ccc")};
   padding: 10px;
   border-radius: 10px;
   width: 100%;
@@ -548,6 +574,8 @@ const StyledInput = styled(RNTextInput)<{ vw: number }>`
     outline: none;
     box-shadow: none;
   }
+  background-color: ${({ isDarkModeEnabled }) => (isDarkModeEnabled ? "#383838" : "#fff")};
+  color: ${({ isDarkModeEnabled }) => (isDarkModeEnabled ? "#fff" : "#000")};
 `;
 
 export default CombinedScreen;

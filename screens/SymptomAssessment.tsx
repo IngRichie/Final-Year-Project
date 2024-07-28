@@ -10,6 +10,7 @@ import {
   Dimensions,
   Image,
   Platform,
+  KeyboardAvoidingView,
 } from 'react-native';
 import CustomStatusBar from '../components/StatusBar';
 import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -17,6 +18,7 @@ import axios from 'axios';
 import { db, auth } from '../firebaseConfig';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { useFocusEffect } from '@react-navigation/native';
+import { useDarkMode } from '../components/DarkModeContext';
 
 const { width, height } = Dimensions.get('window');
 
@@ -34,6 +36,7 @@ const SymptomAssessment: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [firstName, setFirstName] = useState<string>('');
+  const { isDarkModeEnabled } = useDarkMode();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -95,37 +98,39 @@ const SymptomAssessment: React.FC = () => {
     }
   };
 
+  const dynamicStyles = getDynamicStyles(isDarkModeEnabled);
+
   return (
-    <SafeAreaView style={styles.safeAreaView}>
+    <SafeAreaView style={dynamicStyles.safeAreaView}>
       <CustomStatusBar screenName={'Symptom Assessment'} />
 
-      <View style={styles.container}>
-        <View style={styles.warningContainer}>
-          <Text style={styles.warningText}>
+      <KeyboardAvoidingView style={dynamicStyles.container} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+        <View style={dynamicStyles.warningContainer}>
+          <Text style={dynamicStyles.warningText}>
             If you have serious symptoms, do not use CampCare. Please contact emergency services immediately.
           </Text>
         </View>
-        <ScrollView contentContainerStyle={styles.chatContainer}>
+        <ScrollView contentContainerStyle={dynamicStyles.chatContainer}>
           {messages.map((message: Message, index: number) => (
             <View
               key={index}
               style={[
-                styles.chatRow,
-                message.bot ? styles.botRow : styles.userRow,
+                dynamicStyles.chatRow,
+                message.bot ? dynamicStyles.botRow : dynamicStyles.userRow,
               ]}
             >
               {message.bot ? (
                 <>
-                  <View style={styles.thumbnailContainer}>
+                  <View style={dynamicStyles.thumbnailContainer}>
                     <Image
                       source={require('../assets/Campcare.png')}
-                      style={styles.thumbnail}
+                      style={dynamicStyles.thumbnail}
                     />
                   </View>
-                  <View style={styles.messageContainer}>
-                    <View style={[styles.chatBubble, styles.botBubble]}>
-                      <Text style={styles.nameText}>CampCare</Text>
-                      <Text style={styles.chatText}>
+                  <View style={dynamicStyles.messageContainer}>
+                    <View style={[dynamicStyles.chatBubble, dynamicStyles.botBubble]}>
+                      <Text style={dynamicStyles.nameText}>CampCare</Text>
+                      <Text style={dynamicStyles.chatText}>
                         {message.bot}
                       </Text>
                     </View>
@@ -133,15 +138,15 @@ const SymptomAssessment: React.FC = () => {
                 </>
               ) : (
                 <>
-                  <View style={styles.messageContainer}>
-                    <View style={[styles.chatBubble, styles.userBubble]}>
-                      <Text style={styles.nameText}>You</Text>
-                      <Text style={styles.chatText}>{message.user}</Text>
+                  <View style={dynamicStyles.messageContainer}>
+                    <View style={[dynamicStyles.chatBubble, dynamicStyles.userBubble]}>
+                      <Text style={dynamicStyles.nameText}>You</Text>
+                      <Text style={dynamicStyles.chatText}>{message.user}</Text>
                     </View>
                   </View>
-                  <View style={styles.thumbnailContainer}>
-                    <View style={styles.userThumbnail}>
-                      <Text style={styles.thumbnailText}>
+                  <View style={dynamicStyles.thumbnailContainer}>
+                    <View style={dynamicStyles.userThumbnail}>
+                      <Text style={dynamicStyles.thumbnailText}>
                         {firstName.charAt(0).toUpperCase()}
                       </Text>
                     </View>
@@ -151,27 +156,28 @@ const SymptomAssessment: React.FC = () => {
             </View>
           ))}
         </ScrollView>
-        {error && <Text style={styles.errorText}>{error}</Text>}
-        <View style={styles.inputContainer}>
+        {error && <Text style={dynamicStyles.errorText}>{error}</Text>}
+        <View style={dynamicStyles.inputContainer}>
           <TextInput
-            style={styles.textInput}
+            style={dynamicStyles.textInput}
             value={symptom}
             onChangeText={setSymptom}
             placeholder="Type a symptom"
-            placeholderTextColor="#6b6b6b"
+            placeholderTextColor={isDarkModeEnabled ? "#aaa" : "#6b6b6b"}
           />
-          <Pressable style={styles.sendButton} onPress={symptom ? handleSend : () => {}}>
-            <MaterialCommunityIcons name="send-circle" size={36} color="#1F75FE" />
+          <Pressable style={dynamicStyles.sendButton} onPress={symptom ? handleSend : () => {}}>
+            <MaterialCommunityIcons name="send-circle" size={responsiveFontSize(10)} color={isDarkModeEnabled ? "#fff" : "#1F75FE"} />
           </Pressable>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
 
-const styles = StyleSheet.create({
+const getDynamicStyles = (isDarkModeEnabled: boolean) => StyleSheet.create({
   safeAreaView: {
     flex: 1,
+    backgroundColor: isDarkModeEnabled ? "#1E1E1E" : "#fff",
   },
   container: {
     flex: 1,
@@ -179,15 +185,16 @@ const styles = StyleSheet.create({
   warningContainer: {
     paddingVertical: responsiveHeight(1),
     paddingHorizontal: responsiveWidth(5),
+    backgroundColor: isDarkModeEnabled ? "#333" : "#fff",
   },
   warningText: {
     fontSize: responsiveFontSize(4),
-    color: '#333',
+    color: isDarkModeEnabled ? "#fff" : '#333',
   },
   chatContainer: {
     flexGrow: 1,
     padding: responsiveWidth(2),
-    backgroundColor: '#fff',
+    backgroundColor: isDarkModeEnabled ? "#1E1E1E" : "#fff",
   },
   chatRow: {
     flexDirection: 'row',
@@ -228,7 +235,7 @@ const styles = StyleSheet.create({
   },
   nameText: {
     fontSize: responsiveFontSize(3),
-    color: '#666',
+    color: isDarkModeEnabled ? "#ccc" : '#666',
     marginBottom: responsiveHeight(0.5),
     fontWeight: 'bold',
   },
@@ -237,14 +244,14 @@ const styles = StyleSheet.create({
     padding: responsiveWidth(3),
   },
   userBubble: {
-    backgroundColor: '#e5e5ea',
+    backgroundColor: isDarkModeEnabled ? "#555" : '#e5e5ea',
   },
   botBubble: {
-    backgroundColor: '#d1f1ff',
+    backgroundColor: isDarkModeEnabled ? "#444" : '#d1f1ff',
   },
   chatText: {
     fontSize: responsiveFontSize(4),
-    color: '#000',
+    color: isDarkModeEnabled ? "#fff" : '#000',
   },
   errorText: {
     color: 'red',
@@ -256,7 +263,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: responsiveWidth(5),
     paddingVertical: responsiveHeight(3),
-    backgroundColor: '#fff',
+    backgroundColor: isDarkModeEnabled ? "#1E1E1E" : '#fff',
+    marginBottom: responsiveHeight(2), // Add margin to push input up when keyboard is active
   },
   textInput: {
     flex: 1,
@@ -267,14 +275,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: responsiveWidth(4),
     fontSize: responsiveFontSize(4),
     marginRight: responsiveWidth(2),
+    color: isDarkModeEnabled ? "#ccc" : '#000',
     ...Platform.select({
       web: {
-        outlineWidth: 0, // Remove the yellow border on web
+        outlineWidth: 0,
       },
     }),
   },
   sendButton: {
-    backgroundColor: '#fff',
     borderRadius: 20,
   },
 });

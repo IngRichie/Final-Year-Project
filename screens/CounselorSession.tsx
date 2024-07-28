@@ -17,6 +17,8 @@ import { useNavigation, NavigationProp, ParamListBase } from "@react-navigation/
 import CounselorCard from "../components/counselorCard"; // Adjust the import path as needed
 import counselors, { Counselor } from "../components/counselors"; // Adjust the import path as needed
 import { useDarkMode } from '../components/DarkModeContext'; // Import the dark mode context
+import { auth, db } from "../firebaseConfig"; // Ensure you have your Firebase config properly set up
+import { doc, getDoc } from 'firebase/firestore';
 
 const { width, height } = Dimensions.get("window");
 
@@ -26,10 +28,28 @@ const responsiveFontSize = (percent: number) => (width * percent) / 100;
 
 const CounselorSession: React.FC = () => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
-  const { isDarkModeEnabled } = useDarkMode(); // Consume the dark mode context
+  const { isDarkModeEnabled, toggleDarkMode } = useDarkMode(); // Consume the dark mode context
   const [selectedFeeling, setSelectedFeeling] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [filteredCounselors, setFilteredCounselors] = useState<Counselor[]>(counselors);
+
+  useEffect(() => {
+    const fetchUserSettings = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        const userDocRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          if (userData && userData.isDarkModeEnabled) {
+            toggleDarkMode(); // Toggle dark mode if user setting is true
+          }
+        }
+      }
+    };
+
+    fetchUserSettings();
+  }, [toggleDarkMode]);
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -134,7 +154,7 @@ const CounselorSession: React.FC = () => {
 const getDynamicStyles = (isDarkModeEnabled: boolean) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: isDarkModeEnabled ? "#121212" : "#fff",
+    backgroundColor: isDarkModeEnabled ? "#1E1E1E" : "#fff", // Use a light dark color for dark mode
   },
   header: {
     flexDirection: "row",
@@ -157,16 +177,13 @@ const getDynamicStyles = (isDarkModeEnabled: boolean) => StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     padding: responsiveHeight(1.4),
-    backgroundColor: "#e9ecef",
     borderRadius: responsiveFontSize(2),
-    backgroundColor: isDarkModeEnabled ? "#333" : "#f0f0f0",
-    
-    
+    backgroundColor: isDarkModeEnabled ? "#383838" : "#f0f0f0",
   },
   searchIcon: {
     fontSize: responsiveFontSize(6),
     marginRight: responsiveWidth(2),
-    color: isDarkModeEnabled ? "#888" : "#000",
+    color: isDarkModeEnabled ? "#fff" : "#000",
   },
   searchInput: {
     flex: 1,
@@ -179,7 +196,8 @@ const getDynamicStyles = (isDarkModeEnabled: boolean) => StyleSheet.create({
   sectionTitle: {
     fontSize: responsiveFontSize(5),
     fontWeight: "700",
-    marginBottom: responsiveHeight(2),
+    marginBottom: responsiveHeight(1),
+    marginTop: responsiveHeight(2),
     color: isDarkModeEnabled ? "#fff" : "#000",
   },
   cardContainer: {
@@ -188,13 +206,12 @@ const getDynamicStyles = (isDarkModeEnabled: boolean) => StyleSheet.create({
   },
   cardSpacing: {
     marginRight: responsiveWidth(5),
-    backgroundColor: isDarkModeEnabled ? "#333" : "#fff",
     borderRadius: responsiveWidth(2),
     overflow: "hidden",
   },
   noResultsText: {
     fontSize: responsiveFontSize(4),
-    color: isDarkModeEnabled ? "#aaa" : "#333",
+    color: isDarkModeEnabled ? "#fff" : "#333",
     textAlign: "center",
     marginVertical: responsiveHeight(2),
   },
@@ -234,7 +251,7 @@ const getDynamicStyles = (isDarkModeEnabled: boolean) => StyleSheet.create({
   additionalInfo: {
     paddingHorizontal: responsiveWidth(5),
     paddingVertical: responsiveHeight(3),
-    backgroundColor: isDarkModeEnabled ? "#333" : "#f5f5f5",
+    backgroundColor: isDarkModeEnabled ? "#383838" : "#f5f5f5",
     borderRadius: responsiveWidth(2),
     marginBottom: responsiveHeight(3),
   },
@@ -247,38 +264,6 @@ const getDynamicStyles = (isDarkModeEnabled: boolean) => StyleSheet.create({
   additionalInfoText: {
     fontSize: responsiveFontSize(4),
     color: isDarkModeEnabled ? "#ccc" : "#333",
-  },
-  '@media (min-width: 768px)': {
-    headerText: {
-      fontSize: responsiveFontSize(4),
-    },
-    searchInput: {
-      fontSize: responsiveFontSize(4),
-    },
-    sectionTitle: {
-      fontSize: responsiveFontSize(4),
-    },
-    cardSpacing: {
-      marginRight: responsiveWidth(4),
-    },
-    noResultsText: {
-      fontSize: responsiveFontSize(3.5),
-    },
-    feelingsTitle: {
-      fontSize: responsiveFontSize(4),
-    },
-    feelingIcon: {
-      fontSize: responsiveFontSize(7),
-    },
-    feelingText: {
-      fontSize: responsiveFontSize(3.5),
-    },
-    additionalInfoTitle: {
-      fontSize: responsiveFontSize(4),
-    },
-    additionalInfoText: {
-      fontSize: responsiveFontSize(3.5),
-    },
   },
 });
 

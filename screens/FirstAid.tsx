@@ -1,9 +1,8 @@
 import React from "react";
-import { View, Text, Pressable, StyleSheet, Dimensions } from "react-native";
+import { View, Text, Pressable, StyleSheet, Dimensions, StatusBar } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { StatusBar } from "react-native";
 import { useDarkMode } from "../components/DarkModeContext"; // Import the dark mode context
 
 const { width, height } = Dimensions.get("window");
@@ -20,8 +19,7 @@ const FirstAidPage = () => {
 
   return (
     <SafeAreaView style={dynamicStyles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#318CE7" />
-    
+      <StatusBar barStyle={isDarkModeEnabled ? "light-content" : "dark-content"} backgroundColor={isDarkModeEnabled ? "#1c1c1c" : "#318CE7"} />
       <View style={dynamicStyles.headerContainer}>
         <View style={dynamicStyles.header}>
           <View style={dynamicStyles.iconContainer}>
@@ -59,7 +57,7 @@ const FirstAidPage = () => {
 const getDynamicStyles = (isDarkModeEnabled: boolean) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: isDarkModeEnabled ? "#121212" : "#fff",
+    backgroundColor: isDarkModeEnabled ? "#1c1c1c" : "#fff",
   },
   headerContainer: {
     marginTop: responsiveHeight(6), // Adjusted to make space for the back icon
@@ -101,7 +99,7 @@ const getDynamicStyles = (isDarkModeEnabled: boolean) => StyleSheet.create({
     width: responsiveWidth(90),
     marginVertical: responsiveHeight(1),
     elevation: 5,
-    backgroundColor: isDarkModeEnabled ? "#121212" : "#fff",
+    backgroundColor: isDarkModeEnabled ? "#2a2a2a" : "#fff",
     borderRadius: 20,
     overflow: "hidden",
     padding: responsiveFontSize(2),

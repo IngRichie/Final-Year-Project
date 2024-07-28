@@ -1,24 +1,41 @@
-import * as React from "react";
+import React, { useEffect, useState } from "react";
 import { Text, StyleSheet, View, ScrollView, Switch, Dimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import StatusBar from "../components/StatusBar";
 import * as Speech from 'expo-speech';
 import Slider from '@react-native-community/slider';
 import ModalSelector from 'react-native-modal-selector';
 import { useDarkMode } from '../components/DarkModeContext';
+import { auth, db } from "../firebaseConfig";
+import { doc, getDoc } from 'firebase/firestore';
 
 const AccessibilityScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { isDarkModeEnabled, toggleDarkMode } = useDarkMode();
-  const [isVoiceOverEnabled, setIsVoiceOverEnabled] = React.useState(false);
-  const [selectedVoice, setSelectedVoice] = React.useState<string | null>(null);
-  const [rate, setRate] = React.useState<number>(1.0);
-  const [voices, setVoices] = React.useState<Speech.Voice[]>([]);
-  const [screenWidth, setScreenWidth] = React.useState(Dimensions.get("window").width);
-  const [screenHeight, setScreenHeight] = React.useState(Dimensions.get("window").height);
+  const [isVoiceOverEnabled, setIsVoiceOverEnabled] = useState(false);
+  const [selectedVoice, setSelectedVoice] = useState<string | null>(null);
+  const [rate, setRate] = useState<number>(1.0);
+  const [voices, setVoices] = useState<Speech.Voice[]>([]);
+  const [screenWidth, setScreenWidth] = useState(Dimensions.get("window").width);
+  const [screenHeight, setScreenHeight] = useState(Dimensions.get("window").height);
 
   const toggleVoiceOverSwitch = () => setIsVoiceOverEnabled(previousState => !previousState);
 
-  React.useEffect(() => {
+  useEffect(() => {
+    const fetchUserSettings = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        const userDocRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          if (userData && userData.isDarkModeEnabled) {
+            toggleDarkMode();
+          }
+        }
+      }
+    };
+
+    fetchUserSettings();
+
     Speech.getAvailableVoicesAsync().then(setVoices);
 
     const handleResize = ({ window }: any) => {
@@ -31,7 +48,7 @@ const AccessibilityScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     return () => {
       dimensionListener?.remove();
     };
-  }, []);
+  }, [toggleDarkMode]);
 
   const vw = screenWidth / 100;
   const vh = screenHeight / 100;
@@ -40,8 +57,6 @@ const AccessibilityScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
   return (
     <SafeAreaView style={dynamicStyles.container}>
-      <StatusBar screenName="Accessibility" />
-    
       <ScrollView contentContainerStyle={dynamicStyles.scrollContainer}>
         <View style={dynamicStyles.accessibilityItem}>
           <Text style={dynamicStyles.label}>Enable Voice Over</Text>
@@ -81,7 +96,7 @@ const AccessibilityScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             value={rate}
             onValueChange={(value) => setRate(value)}
           />
-          <Text>{rate.toFixed(1)}</Text>
+          <Text style={dynamicStyles.rateText}>{rate.toFixed(1)}</Text>
         </View>
         <View style={dynamicStyles.accessibilityItem}>
           <Text style={dynamicStyles.label}>Large Text</Text>
@@ -114,7 +129,7 @@ const getDynamicStyles = (vw: number, vh: number, isDarkModeEnabled: boolean) =>
   return StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: isDarkModeEnabled ? "#121212" : "#f0f4f8",
+      backgroundColor: isDarkModeEnabled ? "#1E1E1E" : "#f0f4f8",
     },
     scrollContainer: {
       padding: responsiveWidth(vw, 5),
@@ -125,7 +140,7 @@ const getDynamicStyles = (vw: number, vh: number, isDarkModeEnabled: boolean) =>
       alignItems: "center",
       paddingVertical: responsiveHeight(vh, 2),
       borderBottomWidth: 1,
-      borderBottomColor: isDarkModeEnabled ? "rgba(255, 255, 255, 0.3)" : "rgba(204, 204, 204, 0.3)",
+      borderBottomColor: isDarkModeEnabled ? "#383838" : "rgba(204, 204, 204, 0.3)",
     },
     label: {
       fontSize: responsiveFontSize(vw, 4.5),
@@ -141,6 +156,9 @@ const getDynamicStyles = (vw: number, vh: number, isDarkModeEnabled: boolean) =>
     },
     slider: {
       width: responsiveWidth(vw, 50),
+    },
+    rateText: {
+      color: isDarkModeEnabled ? "#fff" : "#000",
     },
   });
 };

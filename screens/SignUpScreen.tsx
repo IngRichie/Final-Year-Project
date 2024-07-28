@@ -19,7 +19,6 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   sendEmailVerification,
-  onAuthStateChanged,
 } from "firebase/auth";
 import { setDoc, doc, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "../firebaseConfig"; // Ensure you import auth from your Firebase config correctly
@@ -54,24 +53,6 @@ const SignUpScreen: React.FC = () => {
       handleGoogleSignIn(authentication.accessToken);
     }
   }, [response]);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user && user.emailVerified) {
-        // Store user information in Firestore after verification
-        await setDoc(doc(db, "users", user.uid), {
-          firstname: firstname,
-          lastname: lastname,
-          email: email,
-          createdAt: serverTimestamp(),
-          interests: [], // Initialize with an empty array
-        });
-        navigation.navigate("HealthNewsInterest", { userId: user.uid });
-      }
-    });
-
-    return () => unsubscribe();
-  }, [firstname, lastname, email, navigation]);
 
   const handleGoogleSignIn = async (token: string) => {
     const credential = GoogleAuthProvider.credential(token);
@@ -115,6 +96,15 @@ const SignUpScreen: React.FC = () => {
       // Send verification email
       await sendEmailVerification(user);
 
+      // Store user data in Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        firstname: firstname,
+        lastname: lastname,
+        email: email,
+        createdAt: serverTimestamp(),
+        interests: [], // Initialize with an empty array
+      });
+
       // Show verification note
       showVerificationAlert();
 
@@ -124,6 +114,9 @@ const SignUpScreen: React.FC = () => {
       setEmail("");
       setPassword("");
       setConfirmPassword("");
+
+      // Navigate to login screen after user is created
+      navigation.navigate("LoginScreen");
     } catch (error: any) {
       handleError(error);
     }
@@ -144,7 +137,7 @@ const SignUpScreen: React.FC = () => {
   };
 
   const handleError = (error: any) => {
-    let message;
+    let message: React.SetStateAction<string | null>;
     switch (error.code) {
       case "auth/email-already-in-use":
         message = "The email address is already in use by another account.";
@@ -207,7 +200,7 @@ const SignUpScreen: React.FC = () => {
               activeOutlineColor="#175689"
               theme={{ colors: { text: "#626262" } }}
             />
-           
+
             <RNPTextInput
               style={styles.input}
               label="Email"

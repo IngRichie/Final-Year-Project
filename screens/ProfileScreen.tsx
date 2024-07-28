@@ -1,125 +1,37 @@
-import * as React from "react";
-import { Text, StyleSheet, View, Pressable, Dimensions, ScrollView, Alert, Image, TextInput, KeyboardAvoidingView, Platform } from "react-native";
+import React, { useState, useEffect, useRef } from "react";
+import { StyleSheet, View, Text, Pressable, Dimensions, ScrollView, Alert, TextInput, Image, Platform, KeyboardAvoidingView } from "react-native";
 import { FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { getAuth } from "firebase/auth";
-import { getFirestore, doc, getDoc, updateDoc } from "firebase/firestore";
-import * as ImagePicker from 'expo-image-picker';
-import * as Device from 'expo-device';
-import * as Notifications from 'expo-notifications';
-import Constants from 'expo-constants';
-import StatusBar from "../components/StatusBar"; // Adjust path as per your project structure
+import { getAuth, updateEmail, EmailAuthProvider, reauthenticateWithCredential, deleteUser } from "firebase/auth";
+import { getFirestore, doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import { getStorage, ref, getDownloadURL, uploadBytes, deleteObject } from "firebase/storage";
+import * as ImagePicker from "expo-image-picker";
+import { useNavigation } from "@react-navigation/native";
+import { useDarkMode } from "../components/DarkModeContext"; // Import DarkModeContext
+import StatusBar from "../components/StatusBar";
 
 const { width, height } = Dimensions.get("window");
 
-const responsiveWidth = (percent: number) => (width * percent) / 100;
-const responsiveHeight = (percent: number) => (height * percent) / 100;
-const responsiveFontSize = (percent: number) => (width * percent) / 100;
-
-export async function registerForPushNotificationsAsync(): Promise<string | undefined> {
-  let token: string | undefined;
-
-  if (Platform.OS === 'android') {
-    await Notifications.setNotificationChannelAsync('default', {
-      name: 'default',
-      importance: Notifications.AndroidImportance.MAX,
-      vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#FF231F7C',
-    });
-  }
-
-  if (Platform.OS === 'web') {
-    console.log('Web platform detected, no push token required');
-    return;
-  }
-
-  if (Device.isDevice) {
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
-    if (existingStatus !== 'granted') {
-      const { status } = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
-    }
-    if (finalStatus !== 'granted') {
-      alert('Failed to get push token for push notification!');
-      return;
-    }
-
-    token = (await Notifications.getExpoPushTokenAsync({
-      projectId: Constants.manifest.extra?.eas?.projectId,
-    })).data;
-    console.log(token);
-  } else {
-    alert('Must use physical device for Push Notifications');
-  }
-
-  return token;
-}
-
-export async function schedulePushNotification(db: Firestore, userEmail: string) {
-  const now = new Date();
-  const currentTime = now.getTime();
-
-  const q = collection(db, 'medReminder');
-  const querySnapshot = await getDocs(q);
-
-  querySnapshot.forEach(async (doc) => {
-    const data = doc.data();
-    if (data.times && Array.isArray(data.times)) {
-      data.times.forEach(async (time: string) => {
-        const reminderTime = new Date();
-        const [hour, minute] = time.split(':');
-        const [hourPart, period] = hour.split(' ');
-        const formattedHour = period === 'PM' ? parseInt(hourPart) + 12 : parseInt(hourPart);
-        reminderTime.setHours(formattedHour);
-        reminderTime.setMinutes(parseInt(minute));
-        reminderTime.setSeconds(0);
-
-        const reminderTimestamp = reminderTime.getTime();
-
-        if (Math.abs(reminderTimestamp - currentTime) <= 5 * 60 * 1000) {
-          const notificationContent = {
-            title: `Medication Reminder`,
-            body: `It's time to take your ${data.medicationName} (${data.selectedForm}, ${data.selectedUnit})`,
-            data: { ...data },
-            timestamp: new Date().toISOString(),
-          };
-
-          if (Platform.OS === 'web') {
-            // Save notification to Firestore for web and let Firebase Extensions handle sending email
-            await addDoc(collection(db, 'notifications'), {
-              ...notificationContent,
-              email: userEmail,
-            });
-          } else {
-            // Schedule push notification for mobile devices
-            await Notifications.scheduleNotificationAsync({
-              content: {
-                title: notificationContent.title,
-                body: notificationContent.body,
-                sound: "default",
-                data: notificationContent.data,
-              },
-              trigger: { seconds: 2 },
-            });
-          }
-        }
-      });
-    }
-  });
-}
+const responsiveWidth = (percent) => (width * percent) / 100;
+const responsiveHeight = (percent) => (height * percent) / 100;
+const responsiveFontSize = (percent) => (width * percent) / 100;
 
 const Profile = () => {
-  const [editable, setEditable] = React.useState(false);
-  const [firstName, setFirstName] = React.useState("");
-  const [email, setEmail] = React.useState("");
-  const [phone, setPhone] = React.useState("9898712132");
-  const [profileImage, setProfileImage] = React.useState(require("../assets/profilephoto.png"));
+  const { isDarkModeEnabled } = useDarkMode(); // Use dark mode context
+  const navigation = useNavigation();
+
+  const [editable, setEditable] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [surname, setSurname] = useState("");
+  const [otherNames, setOtherNames] = useState("");
+  const [email, setEmail] = useState("");
+  const [profileImage, setProfileImage] = useState(null);
   const auth = getAuth();
   const db = getFirestore();
-  const fileInputRef = React.useRef(null);
+  const storage = getStorage();
+  const fileInputRef = useRef(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchUserData = async () => {
       const user = auth.currentUser;
       if (user) {
@@ -128,6 +40,15 @@ const Profile = () => {
           const userData = userDoc.data();
           setFirstName(userData.firstname);
           setEmail(userData.email);
+          setSurname(userData.lastname); // Assuming 'lastname' is the field name for surname in Firestore
+          setOtherNames(userData.firstname); // Display first name under other names
+          const imagePath = `profileImages/${user.uid}.png`;
+          try {
+            const profileImageUrl = await getDownloadURL(ref(storage, imagePath));
+            setProfileImage(profileImageUrl);
+          } catch (error) {
+            console.error("Error fetching profile image:", error);
+          }
         }
       }
     };
@@ -137,9 +58,47 @@ const Profile = () => {
 
   const handleProfilePictureChange = () => {
     if (Platform.OS === 'web') {
-      fileInputRef.current.click();
+      fileInputRef.current?.click();
     } else {
-      handleImagePicker();
+      Alert.alert(
+        "Select Image Source",
+        "Choose the source of your profile picture",
+        [
+          { text: "Cancel", style: "cancel" },
+          { text: "Camera", onPress: handleCamera },
+          { text: "Library", onPress: handleImagePicker }
+        ]
+      );
+    }
+  };
+
+  const handleCamera = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission Denied', 'Please grant permission to access the camera.');
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [4, 4],
+      quality: 1,
+    });
+
+    if (!result.canceled && result.assets?.length > 0) {
+      try {
+        const uploadedImageUrl = await uploadImageAsync(result.assets[0].uri);
+        setProfileImage(uploadedImageUrl);
+
+        const user = auth.currentUser;
+        if (user) {
+          await updateDoc(doc(db, "users", user.uid), {
+            profileImage: `profileImages/${user.uid}.png`,
+          });
+        }
+      } catch (error) {
+        Alert.alert("Error", "Failed to upload image. Please try again.");
+      }
     }
   };
 
@@ -157,69 +116,67 @@ const Profile = () => {
       quality: 1,
     });
 
-    if (!result.canceled) {
-      setProfileImage({ uri: result.assets[0].uri });
+    if (!result.canceled && result.assets?.length > 0) {
+      try {
+        const uploadedImageUrl = await uploadImageAsync(result.assets[0].uri);
+        setProfileImage(uploadedImageUrl);
+
+        const user = auth.currentUser;
+        if (user) {
+          await updateDoc(doc(db, "users", user.uid), {
+            profileImage: `profileImages/${user.uid}.png`,
+          });
+        }
+      } catch (error) {
+        Alert.alert("Error", "Failed to upload image. Please try again.");
+      }
     }
   };
 
-  const handleFileInputChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setProfileImage({ uri: reader.result });
+  const uploadImageAsync = async (uri) => {
+    const user = auth.currentUser;
+    if (!user) throw new Error("User not authenticated");
+
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response);
       };
-      reader.readAsDataURL(file);
-    }
+      xhr.onerror = function (e) {
+        console.log(e);
+        reject(new Error("Failed to upload image"));
+      };
+      xhr.responseType = "blob";
+      xhr.open("GET", uri, true);
+      xhr.send(null);
+    });
+
+    const fileRef = ref(storage, `profileImages/${user.uid}.png`);
+    await uploadBytes(fileRef, blob);
+
+    blob.close();
+
+    // Get the download URL to set it as the profile image immediately
+    return await getDownloadURL(fileRef);
   };
 
-  const handleCamera = async () => {
-    if (Platform.OS === 'web') {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      const video = document.createElement('video');
-      video.srcObject = stream;
-      video.play();
-      const canvas = document.createElement('canvas');
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      const context = canvas.getContext('2d');
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const dataUrl = canvas.toDataURL('image/png');
-      setProfileImage({ uri: dataUrl });
-      stream.getTracks().forEach(track => track.stop());
-    } else {
-      const { status } = await ImagePicker.requestCameraPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permission Denied', 'Please grant permission to access the camera.');
-        return;
+  const handleFileInputChange = async (event) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      try {
+        const uri = URL.createObjectURL(file);
+        const uploadedImageUrl = await uploadImageAsync(uri);
+        setProfileImage(uploadedImageUrl);
+
+        const user = auth.currentUser;
+        if (user) {
+          await updateDoc(doc(db, "users", user.uid), {
+            profileImage: `profileImages/${user.uid}.png`,
+          });
+        }
+      } catch (error) {
+        Alert.alert("Error", "Failed to upload image. Please try again.");
       }
-
-      const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 4],
-        quality: 1,
-      });
-
-      if (!result.canceled) {
-        setProfileImage({ uri: result.uri });
-      }
-    }
-  };
-
-  const openCameraAndLibrary = () => {
-    if (Platform.OS === 'web') {
-      handleProfilePictureChange();
-    } else {
-      Alert.alert(
-        "Upload Photo",
-        "Choose an option",
-        [
-          { text: "Camera", onPress: handleCamera },
-          { text: "Photo Library", onPress: handleImagePicker },
-          { text: "Cancel", style: "cancel" }
-        ]
-      );
     }
   };
 
@@ -231,9 +188,15 @@ const Profile = () => {
     try {
       const user = auth.currentUser;
       if (user) {
+        if (email !== user.email) {
+          await updateEmail(user, email);
+        }
+
         await updateDoc(doc(db, "users", user.uid), {
           firstname: firstName,
-          email: email
+          email: email,
+          lastname: surname, // Correct field name in Firestore
+          otherNames: otherNames,
         });
       }
       setEditable(false);
@@ -244,49 +207,124 @@ const Profile = () => {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    const user = auth.currentUser;
+    if (user) {
+      if (Platform.OS === 'web') {
+        const password = prompt("Please enter your password to confirm:");
+        if (password) {
+          try {
+            const credentials = EmailAuthProvider.credential(user.email, password);
+            await reauthenticateWithCredential(user, credentials);
+
+            // Delete user document from Firestore
+            await deleteDoc(doc(db, "users", user.uid));
+
+            // Delete profile image from Firebase Storage
+            const profileImageRef = ref(storage, `profileImages/${user.uid}.png`);
+            await deleteObject(profileImageRef);
+
+            // Delete user authentication
+            await deleteUser(user);
+
+            alert("Account Deleted", "Your account has been deleted successfully.");
+            navigation.navigate("SignUpScreen");
+          } catch (error) {
+            console.error("Error deleting account:", error);
+            alert("Error", "Failed to delete account.");
+          }
+        }
+      } else {
+        Alert.alert(
+          "Delete Account",
+          "Are you sure you want to delete your account? This action cannot be undone.",
+          [
+            {
+              text: "Cancel",
+              style: "cancel",
+            },
+            {
+              text: "Yes",
+              onPress: () => {
+                Alert.prompt(
+                  "Password Required",
+                  "Please enter your password to confirm",
+                  [
+                    {
+                      text: "Cancel",
+                      style: "cancel",
+                    },
+                    {
+                      text: "OK",
+                      onPress: async (password) => {
+                        try {
+                          const credentials = EmailAuthProvider.credential(user.email, password);
+                          await reauthenticateWithCredential(user, credentials);
+
+                          // Delete user document from Firestore
+                          await deleteDoc(doc(db, "users", user.uid));
+
+                          // Delete profile image from Firebase Storage
+                          const profileImageRef = ref(storage, `profileImages/${user.uid}.png`);
+                          await deleteObject(profileImageRef);
+
+                          // Delete user authentication
+                          await deleteUser(user);
+
+                          Alert.alert("Account Deleted", "Your account has been deleted successfully.", [
+                            {
+                              text: "OK",
+                              onPress: () => navigation.navigate("SignUpScreen"),
+                            },
+                          ]);
+                        } catch (error) {
+                          console.error("Error deleting account:", error);
+                          Alert.alert("Error", "Failed to delete account.");
+                        }
+                      },
+                    },
+                  ],
+                  "secure-text"
+                );
+              },
+            },
+          ]
+        );
+      }
+    }
+  };
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: isDarkModeEnabled ? "#1E1E1E" : "#f0f4f8" }]}>
       <StatusBar screenName="Profile" />
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={styles.container}
       >
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <Pressable
-            onPress={handleEditPress}
-            style={styles.editIconContainer}
-          >
-            <FontAwesome
-              name="pencil"
-              size={24}
-              color="#fff"
-              style={styles.editIcon}
-            />
+          <Pressable onPress={handleEditPress} style={styles.editIconContainer}>
+            <FontAwesome name="pencil" size={24} color="#fff" style={styles.editIcon} />
           </Pressable>
           <View style={styles.profileHeader}>
-            <Image source={profileImage} style={styles.profileImage} />
+            {profileImage ? (
+              <Image source={{ uri: profileImage }} style={styles.profileImage} />
+            ) : (
+              <FontAwesome name="user-circle-o" size={responsiveWidth(20)} color="#fff" style={styles.profileIcon} />
+            )}
             <View style={styles.profileInfo}>
               {editable ? (
                 <TextInput
-                  style={[styles.profileNameInput, styles.textInput]}
+                  style={[styles.profileNameInput, styles.textInput, { color: "#fff" }]}
                   value={firstName}
                   onChangeText={setFirstName}
                   editable={editable}
                 />
               ) : (
-                <Text style={styles.profileName}>{firstName}</Text>
+                <Text style={[styles.profileName, { color: "#fff" }]}>{firstName}</Text>
               )}
             </View>
-            <Pressable
-              onPress={openCameraAndLibrary}
-              style={styles.cameraIconContainer}
-            >
-              <MaterialCommunityIcons
-                name="camera"
-                size={24}
-                color="#fff"
-                style={styles.cameraIcon}
-              />
+            <Pressable onPress={handleProfilePictureChange} style={styles.cameraIconContainer}>
+              <MaterialCommunityIcons name="camera" size={24} color="#fff" style={styles.cameraIcon} />
             </Pressable>
             {Platform.OS === 'web' && (
               <input
@@ -298,7 +336,7 @@ const Profile = () => {
               />
             )}
           </View>
-          <View style={styles.profileDetails}>
+          <View style={[styles.profileDetails, { backgroundColor: isDarkModeEnabled ? "#333" : "#fff" }]}>
             <View style={styles.personalDetails}>
               <DetailRow
                 label="Email"
@@ -306,23 +344,35 @@ const Profile = () => {
                 editable={editable}
                 onChangeText={setEmail}
                 iconName="envelope-o"
+                isDarkModeEnabled={isDarkModeEnabled}
               />
               <DetailRow
-                label="Phone"
-                value={phone}
+                label="Surname"
+                value={surname}
                 editable={editable}
-                onChangeText={setPhone}
-                iconName="phone"
+                onChangeText={setSurname}
+                iconName="user"
+                isDarkModeEnabled={isDarkModeEnabled}
+              />
+              <DetailRow
+                label="Other Names"
+                value={otherNames}
+                editable={editable}
+                onChangeText={setOtherNames}
+                iconName="user"
+                isDarkModeEnabled={isDarkModeEnabled}
               />
             </View>
           </View>
         </ScrollView>
         {editable && (
-          <Pressable
-            onPress={handleSavePress}
-            style={styles.saveButton}
-          >
+          <Pressable onPress={handleSavePress} style={[styles.button, styles.saveButton]}>
             <Text style={styles.saveButtonText}>Save</Text>
+          </Pressable>
+        )}
+        {!editable && (
+          <Pressable onPress={handleDeleteAccount} style={[styles.button, styles.deleteButton]}>
+            <Text style={styles.deleteButtonText}>Delete Account</Text>
           </Pressable>
         )}
       </KeyboardAvoidingView>
@@ -335,28 +385,23 @@ const DetailRow = ({
   value,
   iconName,
   editable,
-  onChangeText
-}: {
-  label: string;
-  value?: string;
-  iconName: string;
-  editable?: boolean;
-  onChangeText?: (text: string) => void;
+  onChangeText,
+  isDarkModeEnabled,
 }) => {
   return (
     <Pressable style={styles.detailRow}>
       <FontAwesome name={iconName} size={24} color="#1F75FE" style={styles.detailIcon} />
       <View style={styles.detailTextContainer}>
-        <Text style={styles.label}>{label}</Text>
+        <Text style={[styles.label, { color: isDarkModeEnabled ? "#fff" : "#000" }]}>{label}</Text>
         {editable ? (
           <TextInput
-            style={[styles.valueInput, styles.textInput]}
+            style={[styles.valueInput, styles.textInput, { color: isDarkModeEnabled ? "#fff" : "#000" }]}
             value={value}
             onChangeText={onChangeText}
             editable={editable}
           />
         ) : (
-          <Text style={styles.value}>{value}</Text>
+          <Text style={[styles.value, { color: isDarkModeEnabled ? "#fff" : "#000" }]}>{value}</Text>
         )}
       </View>
     </Pressable>
@@ -366,7 +411,6 @@ const DetailRow = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f0f4f8",
   },
   scrollContainer: {
     flexGrow: 1,
@@ -381,6 +425,11 @@ const styles = StyleSheet.create({
     marginBottom: responsiveHeight(2),
     position: 'relative',
   },
+  profileIcon: {
+    width: responsiveWidth(20),
+    height: responsiveWidth(20),
+    borderRadius: responsiveWidth(10),
+  },
   profileImage: {
     width: responsiveWidth(20),
     height: responsiveWidth(20),
@@ -391,63 +440,70 @@ const styles = StyleSheet.create({
   },
   profileName: {
     fontSize: responsiveFontSize(6),
-    color: "#fff",
-    fontWeight: "bold",
+    fontWeight: 'bold',
+    color: '#fff',
   },
   profileNameInput: {
     fontSize: responsiveFontSize(6),
-    color: "#fff",
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   cameraIconContainer: {
-    position: "absolute",
+    position: 'absolute',
     bottom: responsiveHeight(5),
     right: responsiveWidth(4),
-    backgroundColor: "#1F75FE",
+    backgroundColor: '#1F75FE',
     borderRadius: 50,
     padding: responsiveWidth(1),
     borderWidth: 1,
-    borderColor: 'white'
+    borderColor: 'white',
   },
   cameraIcon: {
     fontSize: responsiveFontSize(5),
   },
   editIconContainer: {
     zIndex: 1,
-    position: "absolute",
+    position: 'absolute',
     top: responsiveHeight(19.5),
     right: responsiveWidth(8),
-    backgroundColor: "#1F75FE",
+    backgroundColor: '#1F75FE',
     borderRadius: 70,
     padding: responsiveWidth(1),
     width: responsiveFontSize(9),
     height: responsiveFontSize(9),
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
-  saveButton: {
-    position: "absolute",
-    bottom: responsiveHeight(2),
+  button: {
+    position: 'absolute',
     left: responsiveWidth(5),
     right: responsiveWidth(5),
-    backgroundColor: "#1F75FE",
     borderRadius: 10,
     padding: responsiveHeight(2),
     alignItems: 'center',
   },
-  saveButtonText: {
-    color: "#fff",
-    fontSize: responsiveFontSize(4),
-    fontWeight: "bold",
+  saveButton: {
+    bottom: responsiveHeight(6),
+    backgroundColor: '#1F75FE',
   },
-  editIcon: {
-    fontSize: responsiveFontSize(5),
+  deleteButton: {
+    bottom: responsiveHeight(2),
+    backgroundColor: 'red',
+    marginTop: responsiveHeight(2),
+  },
+  saveButtonText: {
+    color: '#fff',
+    fontSize: responsiveFontSize(4),
+    fontWeight: 'bold',
+  },
+  deleteButtonText: {
+    color: '#fff',
+    fontSize: responsiveFontSize(4),
+    fontWeight: 'bold',
   },
   profileDetails: {
-    backgroundColor: "#fff",
     padding: responsiveWidth(5),
     borderRadius: 10,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -461,11 +517,11 @@ const styles = StyleSheet.create({
     marginBottom: responsiveHeight(2),
   },
   detailRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingVertical: responsiveHeight(2),
     borderBottomWidth: 1,
-    borderBottomColor: "rgba(204, 204, 204, 0.3)",
+    borderBottomColor: 'rgba(204, 204, 204, 0.3)',
     justifyContent: 'space-between',
   },
   detailIcon: {
@@ -477,15 +533,12 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: responsiveFontSize(4.5),
-    color: "#000",
   },
   value: {
     fontSize: responsiveFontSize(3.5),
-    color: "#666",
   },
   valueInput: {
     fontSize: responsiveFontSize(3.5),
-    color: "#666",
   },
   textInput: {
     ...Platform.select({

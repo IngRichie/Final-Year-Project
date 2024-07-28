@@ -3,7 +3,8 @@ import { StyleSheet, Text, View, Pressable, Dimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, NavigationProp, ParamListBase } from "@react-navigation/native";
 import { FontAwesome } from "@expo/vector-icons";
-import StatusBar from "../components/StatusBar"; // Adjust the path based on your project structure
+import StatusBar from "../components/StatusBar";
+import { useDarkMode } from "../components/DarkModeContext";
 
 const { width, height } = Dimensions.get("window");
 
@@ -13,49 +14,45 @@ const responsiveFontSize = (percent: number) => (width * percent) / 100;
 
 const Settings = () => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
+  const { isDarkModeEnabled } = useDarkMode();
 
   const handlePress = (buttonText: string) => {
-    // Map button text to screen component
     const screenComponents: { [key: string]: React.ComponentType } = {
-      Profile: require("./ProfileScreen").default, // Adjust path as needed
-      Privacy: require("./PrivacyScreen").default, // Adjust path as needed
-      Notifications: require("./NotificationScreen").default, // Adjust path as needed
-      Preferences: require("./PreferencesScreen").default, // Adjust path as needed
+      Profile: require("./ProfileScreen").default,
+      Privacy: require("./PrivacyScreen").default,
+      Notifications: require("./NotificationScreen").default,
     };
 
-    // Navigate using the mapped screen component
     navigation.navigate(buttonText, {});
   };
 
+  const dynamicStyles = getDynamicStyles(isDarkModeEnabled);
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={dynamicStyles.container}>
       <StatusBar screenName="Settings" />
-      <View style={styles.buttonContainer}>
-        <Pressable style={styles.button} onPress={() => handlePress("Profile")}>
-          <FontAwesome name="user" size={24} color="#1F75FE" style={styles.buttonIcon} />
-          <Text style={styles.buttonText}>Profile</Text>
+      <View style={dynamicStyles.buttonContainer}>
+        <Pressable style={dynamicStyles.button} onPress={() => handlePress("ProfileScreen")}>
+          <FontAwesome name="user" size={24} color="#1F75FE" style={dynamicStyles.buttonIcon} />
+          <Text style={dynamicStyles.buttonText}>Profile</Text>
         </Pressable>
-        <Pressable style={styles.button} onPress={() => handlePress("Privacy")}>
-          <FontAwesome name="lock" size={24} color="#1F75FE" style={styles.buttonIcon} />
-          <Text style={styles.buttonText}>Privacy</Text>
+        <Pressable style={dynamicStyles.button} onPress={() => handlePress("AccessibilityScreen")}>
+          <FontAwesome name="lock" size={24} color="#1F75FE" style={dynamicStyles.buttonIcon} />
+          <Text style={dynamicStyles.buttonText}>Accessibility</Text>
         </Pressable>
-        <Pressable style={styles.button} onPress={() => handlePress("Notifications")}>
-          <FontAwesome name="bell" size={24} color="#1F75FE" style={styles.buttonIcon} />
-          <Text style={styles.buttonText}>Notifications</Text>
-        </Pressable>
-        <Pressable style={styles.button} onPress={() => handlePress("Preferences")}>
-          <FontAwesome name="sliders" size={24} color="#1F75FE" style={styles.buttonIcon} />
-          <Text style={styles.buttonText}>Preferences</Text>
+        <Pressable style={dynamicStyles.button} onPress={() => handlePress("Notifications")}>
+          <FontAwesome name="bell" size={24} color="#1F75FE" style={dynamicStyles.buttonIcon} />
+          <Text style={dynamicStyles.buttonText}>Notifications</Text>
         </Pressable>
       </View>
     </SafeAreaView>
   );
 };
 
-const styles = StyleSheet.create({
+const getDynamicStyles = (isDarkModeEnabled: boolean) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: isDarkModeEnabled ? "#121212" : "#fff",
   },
   buttonContainer: {
     marginTop: responsiveHeight(5),
@@ -64,24 +61,16 @@ const styles = StyleSheet.create({
   button: {
     width: responsiveWidth(90),
     height: responsiveHeight(8),
-    backgroundColor: "#fbfaf3",
+    backgroundColor: isDarkModeEnabled ? "#333" : "#fbfaf3",
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: responsiveWidth(5),
     marginBottom: responsiveHeight(2),
     borderRadius: 8,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
   },
   buttonText: {
     fontSize: responsiveFontSize(5),
-    color: "#3a3a3a",
+    color: isDarkModeEnabled ? "#ccc" : "#3a3a3a",
     marginLeft: 15,
   },
   buttonIcon: {

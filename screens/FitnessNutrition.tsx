@@ -1,18 +1,20 @@
 import * as React from "react";
-import {
-  Text,
-  StyleSheet,
-  View,
-  ScrollView,
-  Pressable,
-  Dimensions,
-  Image,
-  Linking,
-  Platform,
+import { useState, useEffect } from "react";
+import { 
+  Text, 
+  StyleSheet, 
+  View, 
+  ScrollView, 
+  Pressable, 
+  Dimensions, 
+  Image, 
+  Linking, 
+  Platform, 
+  SafeAreaView 
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { FontAwesome } from "@expo/vector-icons";
 import StatusBar from "../components/StatusBar"; // Adjust path as per your project structure
+import { useDarkMode } from "../components/DarkModeContext"; // Import the dark mode context
 
 const { width, height } = Dimensions.get("window");
 
@@ -21,6 +23,8 @@ const responsiveHeight = (percent: number) => (height * percent) / 100;
 const responsiveFontSize = (percent: number) => (width * percent) / 100;
 
 const FitnessNutritionScreen = ({ navigation }) => {
+  const { isDarkModeEnabled } = useDarkMode(); // Get the dark mode state
+
   const resources = [
     {
       id: 1,
@@ -52,27 +56,29 @@ const FitnessNutritionScreen = ({ navigation }) => {
     },
   ];
 
-  const openLink = (link) => {
+  const openLink = (link: string) => {
     Linking.openURL(link);
   };
 
+  const dynamicStyles = getDynamicStyles(isDarkModeEnabled);
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={dynamicStyles.container}>
       <StatusBar screenName="Fitness & Nutrition" />
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <ScrollView contentContainerStyle={dynamicStyles.scrollContainer}>
         {resources.map((resource) => (
           <Pressable
             key={resource.id}
             style={[
-              styles.resourceCard,
-              Platform.OS === 'web' && styles.webResourceCard
+              dynamicStyles.resourceCard,
+              Platform.OS === 'web' && dynamicStyles.webResourceCard
             ]}
             onPress={() => openLink(resource.link)}
           >
-            <Image source={{ uri: resource.imageUrl }} style={styles.resourceImage} />
-            <View style={styles.resourceInfo}>
-              <Text style={styles.resourceTitle}>{resource.title}</Text>
-              <Text style={styles.resourceDescription}>{resource.description}</Text>
+            <Image source={{ uri: resource.imageUrl }} style={dynamicStyles.resourceImage} />
+            <View style={dynamicStyles.resourceInfo}>
+              <Text style={dynamicStyles.resourceTitle}>{resource.title}</Text>
+              <Text style={dynamicStyles.resourceDescription}>{resource.description}</Text>
             </View>
           </Pressable>
         ))}
@@ -81,18 +87,18 @@ const FitnessNutritionScreen = ({ navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const getDynamicStyles = (isDarkModeEnabled: boolean) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f0f4f8",
+    backgroundColor: isDarkModeEnabled ? "#121212" : "#f0f4f8",
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     padding: responsiveWidth(5),
-    backgroundColor: "#fff",
+    backgroundColor: isDarkModeEnabled ? "#1E1E1E" : "#fff",
     borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
+    borderBottomColor: isDarkModeEnabled ? "#666" : "#ddd",
   },
   backButton: {
     marginRight: responsiveWidth(3),
@@ -108,7 +114,7 @@ const styles = StyleSheet.create({
   resourceCard: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#fff",
+    backgroundColor: isDarkModeEnabled ? "#1E1E1E" : "#fff",
     padding: responsiveWidth(3),
     borderRadius: 10,
     shadowColor: "#000",
@@ -136,12 +142,12 @@ const styles = StyleSheet.create({
   resourceTitle: {
     fontSize: responsiveFontSize(4.5),
     fontWeight: "bold",
-    color: "#000",
+    color: isDarkModeEnabled ? "#fff" : "#000",
     marginBottom: responsiveHeight(1),
   },
   resourceDescription: {
     fontSize: responsiveFontSize(3.5),
-    color: "#666",
+    color: isDarkModeEnabled ? "#ccc" : "#666",
   },
 });
 
