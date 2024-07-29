@@ -1,50 +1,52 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, ChangeEvent } from "react";
 import { StyleSheet, View, Text, Pressable, Image, Dimensions, Alert, Linking, Platform } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDarkMode } from "../components/DarkModeContext";
-import { getAuth } from "firebase/auth";
+import { useProfileImage } from "../components/ProfileImageContext";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFirestore, doc, onSnapshot, updateDoc } from "firebase/firestore";
 import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
 import * as ImagePicker from "expo-image-picker";
+import { firebaseConfig, auth, db, storage } from "../firebaseConfig";
 
 const { width, height } = Dimensions.get("window");
 
-const responsiveWidth = (percent) => (width * percent) / 100;
-const responsiveHeight = (percent) => (height * percent) / 100;
-const responsiveFontSize = (percent) => (width * percent) / 100;
+const responsiveWidth = (percent: number) => (width * percent) / 100;
+const responsiveHeight = (percent: number) => (height * percent) / 100;
+const responsiveFontSize = (percent: number) => (width * percent) / 100;
 
-const Menu = ({ navigation }) => {
-  const [email, setEmail] = useState(null);
-  const [profileImage, setProfileImage] = useState(null);
+const Menu = ({ navigation }: { navigation: any }) => {
+  const [email, setEmail] = useState<string | null>(null);
+  const { profileImage, setProfileImage } = useProfileImage();
   const { isDarkModeEnabled, toggleDarkMode } = useDarkMode();
-  const auth = getAuth();
-  const db = getFirestore();
-  const storage = getStorage();
-  const fileInputRef = useRef(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    const user = auth.currentUser;
-    if (user) {
-      const userDocRef = doc(db, "users", user.uid);
-      const unsubscribe = onSnapshot(userDocRef, async (doc) => {
-        const userData = doc.data();
-        if (userData) {
-          setEmail(userData.email);
-          const imagePath = `profileImages/${user.uid}.png`;
-          try {
-            const profileImageUrl = await getDownloadURL(ref(storage, imagePath));
-            setProfileImage(profileImageUrl);
-          } catch (error) {
-            console.error("Error fetching profile image:", error);
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const userDocRef = doc(db, "users", user.uid);
+        const unsubscribeSnapshot = onSnapshot(userDocRef, async (doc) => {
+          const userData = doc.data();
+          if (userData) {
+            setEmail(userData.email);
+            if (userData.profileImage) {
+              const profileImageUrl = await getDownloadURL(ref(storage, userData.profileImage));
+              setProfileImage(profileImageUrl);
+            }
           }
-        }
-      });
+        });
 
-      return () => unsubscribe();
-    }
-  }, []);
+        return () => unsubscribeSnapshot();
+      } else {
+        setEmail(null);
+        setProfileImage(null);
+      }
+    });
+
+    return () => unsubscribeAuth();
+  }, [auth, db, storage]);
 
   const handleProfilePictureChange = () => {
     if (Platform.OS === 'web') {
@@ -85,11 +87,11 @@ const Menu = ({ navigation }) => {
     }
   };
 
-  const uploadImageAsync = async (uri) => {
+  const uploadImageAsync = async (uri: string) => {
     const user = auth.currentUser;
     if (!user) throw new Error("User not authenticated");
 
-    const blob = await new Promise((resolve, reject) => {
+    const blob: Blob = await new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       xhr.onload = function () {
         resolve(xhr.response);
@@ -108,11 +110,10 @@ const Menu = ({ navigation }) => {
 
     blob.close();
 
-    // Get the download URL to set it as the profile image immediately
     return await getDownloadURL(fileRef);
   };
 
-  const handleFileInputChange = async (event) => {
+  const handleFileInputChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       try {
@@ -306,7 +307,7 @@ const Menu = ({ navigation }) => {
   );
 };
 
-const getDynamicStyles = (isDarkModeEnabled) => StyleSheet.create({
+const getDynamicStyles = (isDarkModeEnabled: boolean) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: isDarkModeEnabled ? "#1E1E1E" : "#fff",

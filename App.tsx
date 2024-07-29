@@ -10,6 +10,7 @@ import * as Notifications from 'expo-notifications';
 import { registerForPushNotificationsAsync, schedulePushNotification } from './registerPushNotifications';
 import SplashScreen from "./components/SplashScreen";
 import { DarkModeProvider, useDarkMode } from './components/DarkModeContext';
+import { ProfileImageProvider, useProfileImage } from './components/ProfileImageContext';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 const {
@@ -240,24 +241,26 @@ const App: React.FC = () => {
 
   return (
     <DarkModeProvider>
-      <SafeAreaView style={{ flex: 1 }}>
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0} // Adjust as needed
-        >
-          <NavigationContainer>
-            <Drawer.Navigator
-              drawerContent={(props) => <Menu {...props} />}
-              screenOptions={({ route }) => ({
-                swipeEnabled: false,
-              })}
-            >
-              <Drawer.Screen name="Home" component={AppStack} options={{ headerShown: false }} />
-            </Drawer.Navigator>
-          </NavigationContainer>
-        </KeyboardAvoidingView>
-      </SafeAreaView>
+      <ProfileImageProvider>
+        <SafeAreaView style={{ flex: 1 }}>
+          <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0} // Adjust as needed
+          >
+            <NavigationContainer>
+              <Drawer.Navigator
+                drawerContent={(props) => <Menu {...props} />}
+                screenOptions={({ route }) => ({
+                  swipeEnabled: false,
+                })}
+              >
+                <Drawer.Screen name="Home" component={AppStack} options={{ headerShown: false }} />
+              </Drawer.Navigator>
+            </NavigationContainer>
+          </KeyboardAvoidingView>
+        </SafeAreaView>
+      </ProfileImageProvider>
     </DarkModeProvider>
   );
 };

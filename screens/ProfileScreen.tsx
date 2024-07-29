@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, ChangeEvent } from "react";
 import { StyleSheet, View, Text, Pressable, Dimensions, ScrollView, Alert, TextInput, Image, Platform, KeyboardAvoidingView } from "react-native";
 import { FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -7,17 +7,19 @@ import { getFirestore, doc, getDoc, updateDoc, deleteDoc } from "firebase/firest
 import { getStorage, ref, getDownloadURL, uploadBytes, deleteObject } from "firebase/storage";
 import * as ImagePicker from "expo-image-picker";
 import { useNavigation } from "@react-navigation/native";
-import { useDarkMode } from "../components/DarkModeContext"; // Import DarkModeContext
+import { useDarkMode } from "../components/DarkModeContext";
+import { useProfileImage } from "../components/ProfileImageContext";
 import StatusBar from "../components/StatusBar";
 
 const { width, height } = Dimensions.get("window");
 
-const responsiveWidth = (percent) => (width * percent) / 100;
-const responsiveHeight = (percent) => (height * percent) / 100;
-const responsiveFontSize = (percent) => (width * percent) / 100;
+const responsiveWidth = (percent: number) => (width * percent) / 100;
+const responsiveHeight = (percent: number) => (height * percent) / 100;
+const responsiveFontSize = (percent: number) => (width * percent) / 100;
 
 const Profile = () => {
-  const { isDarkModeEnabled } = useDarkMode(); // Use dark mode context
+  const { isDarkModeEnabled } = useDarkMode();
+  const { profileImage, setProfileImage } = useProfileImage();
   const navigation = useNavigation();
 
   const [editable, setEditable] = useState(false);
@@ -25,11 +27,14 @@ const Profile = () => {
   const [surname, setSurname] = useState("");
   const [otherNames, setOtherNames] = useState("");
   const [email, setEmail] = useState("");
-  const [profileImage, setProfileImage] = useState(null);
+  const [newProfileImage, setNewProfileImage] = useState<File | null>(null);
+  const [password, setPassword] = useState("");
+  const [showPasswordPrompt, setShowPasswordPrompt] = useState(false);
+
   const auth = getAuth();
   const db = getFirestore();
   const storage = getStorage();
-  const fileInputRef = useRef(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -40,21 +45,25 @@ const Profile = () => {
           const userData = userDoc.data();
           setFirstName(userData.firstname);
           setEmail(userData.email);
-          setSurname(userData.lastname); // Assuming 'lastname' is the field name for surname in Firestore
-          setOtherNames(userData.firstname); // Display first name under other names
+          setSurname(userData.lastname);
+          setOtherNames(userData.firstname);
           const imagePath = `profileImages/${user.uid}.png`;
           try {
             const profileImageUrl = await getDownloadURL(ref(storage, imagePath));
             setProfileImage(profileImageUrl);
           } catch (error) {
-            console.error("Error fetching profile image:", error);
+            if (error.code === 'storage/object-not-found') {
+              console.log("Profile image does not exist.");
+            } else {
+              console.error("Error fetching profile image:", error);
+            }
           }
         }
       }
     };
 
     fetchUserData();
-  }, []);
+  }, [auth, db, storage]);
 
   const handleProfilePictureChange = () => {
     if (Platform.OS === 'web') {
@@ -133,11 +142,11 @@ const Profile = () => {
     }
   };
 
-  const uploadImageAsync = async (uri) => {
+  const uploadImageAsync = async (uri: string) => {
     const user = auth.currentUser;
     if (!user) throw new Error("User not authenticated");
 
-    const blob = await new Promise((resolve, reject) => {
+    const blob = await new Promise<Blob>((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       xhr.onload = function () {
         resolve(xhr.response);
@@ -160,7 +169,7 @@ const Profile = () => {
     return await getDownloadURL(fileRef);
   };
 
-  const handleFileInputChange = async (event) => {
+  const handleFileInputChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       try {
@@ -195,7 +204,7 @@ const Profile = () => {
         await updateDoc(doc(db, "users", user.uid), {
           firstname: firstName,
           email: email,
-          lastname: surname, // Correct field name in Firestore
+          lastname: surname,
           otherNames: otherNames,
         });
       }
@@ -217,14 +226,17 @@ const Profile = () => {
             const credentials = EmailAuthProvider.credential(user.email, password);
             await reauthenticateWithCredential(user, credentials);
 
-            // Delete user document from Firestore
             await deleteDoc(doc(db, "users", user.uid));
 
-            // Delete profile image from Firebase Storage
-            const profileImageRef = ref(storage, `profileImages/${user.uid}.png`);
-            await deleteObject(profileImageRef);
+            try {
+              const profileImageRef = ref(storage, `profileImages/${user.uid}.png`);
+              await deleteObject(profileImageRef);
+            } catch (error) {
+              if (error.code !== 'storage/object-not-found') {
+                throw error;
+              }
+            }
 
-            // Delete user authentication
             await deleteUser(user);
 
             alert("Account Deleted", "Your account has been deleted successfully.");
@@ -235,61 +247,46 @@ const Profile = () => {
           }
         }
       } else {
-        Alert.alert(
-          "Delete Account",
-          "Are you sure you want to delete your account? This action cannot be undone.",
-          [
-            {
-              text: "Cancel",
-              style: "cancel",
-            },
-            {
-              text: "Yes",
-              onPress: () => {
-                Alert.prompt(
-                  "Password Required",
-                  "Please enter your password to confirm",
-                  [
-                    {
-                      text: "Cancel",
-                      style: "cancel",
-                    },
-                    {
-                      text: "OK",
-                      onPress: async (password) => {
-                        try {
-                          const credentials = EmailAuthProvider.credential(user.email, password);
-                          await reauthenticateWithCredential(user, credentials);
+        setShowPasswordPrompt(true);
+      }
+    }
+  };
 
-                          // Delete user document from Firestore
-                          await deleteDoc(doc(db, "users", user.uid));
+  const handlePasswordSubmit = async () => {
+    const user = auth.currentUser;
+    if (user && password) {
+      try {
+        const credentials = EmailAuthProvider.credential(user.email, password);
+        await reauthenticateWithCredential(user, credentials);
 
-                          // Delete profile image from Firebase Storage
-                          const profileImageRef = ref(storage, `profileImages/${user.uid}.png`);
-                          await deleteObject(profileImageRef);
+        await deleteDoc(doc(db, "users", user.uid));
 
-                          // Delete user authentication
-                          await deleteUser(user);
+        try {
+          const profileImageRef = ref(storage, `profileImages/${user.uid}.png`);
+          await deleteObject(profileImageRef);
+        } catch (error) {
+          if (error.code !== 'storage/object-not-found') {
+            throw error;
+          }
+        }
 
-                          Alert.alert("Account Deleted", "Your account has been deleted successfully.", [
-                            {
-                              text: "OK",
-                              onPress: () => navigation.navigate("SignUpScreen"),
-                            },
-                          ]);
-                        } catch (error) {
-                          console.error("Error deleting account:", error);
-                          Alert.alert("Error", "Failed to delete account.");
-                        }
-                      },
-                    },
-                  ],
-                  "secure-text"
-                );
-              },
-            },
-          ]
-        );
+        await deleteUser(user);
+
+        Alert.alert("Account Deleted", "Your account has been deleted successfully.", [
+          {
+            text: "OK",
+            onPress: () => navigation.navigate("SignUpScreen"),
+          },
+        ]);
+      } catch (error) {
+        console.error("Error deleting account:", error);
+        if (error.code === 'auth/invalid-credential') {
+          Alert.alert("Error", "Invalid credentials. Please try again.");
+        } else {
+          Alert.alert("Error", "Failed to delete account.");
+        }
+      } finally {
+        setShowPasswordPrompt(false);
       }
     }
   };
@@ -376,6 +373,29 @@ const Profile = () => {
           </Pressable>
         )}
       </KeyboardAvoidingView>
+
+      {showPasswordPrompt && (
+        <View style={styles.passwordPromptContainer}>
+          <View style={styles.passwordPrompt}>
+            <Text style={styles.passwordPromptText}>Enter Password:</Text>
+            <TextInput
+              style={styles.passwordInput}
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              autoFocus
+            />
+            <View style={styles.passwordPromptButtons}>
+              <Pressable onPress={() => setShowPasswordPrompt(false)} style={styles.passwordPromptButton}>
+                <Text style={styles.passwordPromptButtonText}>Cancel</Text>
+              </Pressable>
+              <Pressable onPress={handlePasswordSubmit} style={styles.passwordPromptButton}>
+                <Text style={styles.passwordPromptButtonText}>OK</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -387,6 +407,13 @@ const DetailRow = ({
   editable,
   onChangeText,
   isDarkModeEnabled,
+}: {
+  label: string;
+  value: string;
+  iconName: string;
+  editable: boolean;
+  onChangeText: (text: string) => void;
+  isDarkModeEnabled: boolean;
 }) => {
   return (
     <Pressable style={styles.detailRow}>
@@ -547,6 +574,42 @@ const styles = StyleSheet.create({
         boxShadow: 'none',
       },
     }),
+  },
+  passwordPromptContainer: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  passwordPrompt: {
+    width: '80%',
+    padding: 20,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    elevation: 10,
+  },
+  passwordPromptText: {
+    marginBottom: 10,
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  passwordInput: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
+  },
+  passwordPromptButtons: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+  passwordPromptButton: {
+    marginLeft: 10,
+  },
+  passwordPromptButtonText: {
+    fontSize: 16,
+    color: '#1F75FE',
   },
 });
 

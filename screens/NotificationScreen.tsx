@@ -1,3 +1,4 @@
+// NotificationScreen.js
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -17,7 +18,6 @@ import { collection, onSnapshot, deleteDoc, doc } from "firebase/firestore";
 import { db } from "../firebaseConfig"; // Ensure this path is correct
 import { useDarkMode } from "../components/DarkModeContext";
 
-// Conditionally import based on the platform
 const TouchableOpacity = Platform.OS === 'web' ? require('react-native-web').TouchableOpacity : require('react-native').TouchableOpacity;
 
 const { width, height } = Dimensions.get("window");
@@ -35,7 +35,7 @@ type Notification = {
   times: string[];
 };
 
-const NotificationPage: React.FC = () => {
+const NotificationScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -264,4 +264,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default NotificationPage;
+export default NotificationScreen;

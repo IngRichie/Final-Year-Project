@@ -221,7 +221,7 @@ const Title = styled.Text`
 `;
 
 const NoMedicationsText = styled.Text`
-  color: #000;
+  color: ${({ isDarkModeEnabled }) => (isDarkModeEnabled ? "#fff" : "#000")};
   font-size: ${responsiveFontSize(4)}px;
   text-align: center;
   margin-top: ${responsiveHeight(2.5)}px;
