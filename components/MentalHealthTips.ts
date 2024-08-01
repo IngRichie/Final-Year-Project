@@ -1,164 +1,159 @@
-import { MentalHealthTip } from '../types'; 
+import { MentalHealthTip } from "../types";
 
-
+const images = {
+  selfCompassion: require('../assets/tipsImages/self compassion.png'),
+  regularExercise: require('../assets/tipsImages/regular exercise.png'),
+  healthyDiet: require('../assets/tipsImages/healthy diet.png'),
+  creativeActivities: require('../assets/tipsImages/creative activities.png'),
+  disconnectFromTech: require('../assets/tipsImages/disconnect from tech.png'),
+  qualitySleep: require('../assets/tipsImages/quality sleep.png'),
+  mindfulMeditation: require('../assets/tipsImages/mindful meditation.png'),
+  helpingOthers: require('../assets/tipsImages/helping others.png'),
+  familyAndFriends: require('../assets/tipsImages/family and friends.png'),
+  playfulness: require('../assets/tipsImages/playfullness.png'),
+  expressGratitude: require('../assets/tipsImages/express gratitude.png'),
+  practiceDeepBreathing: require('../assets/tipsImages/practice deep breathing.png'),
+  engageInHobbies: require('../assets/tipsImages/hobbie.png'),
+  stayHydrated: require('../assets/tipsImages/water.png'),
+  limitCaffeineAlcohol: require('../assets/tipsImages/coffee and alcohol.png'),
+  connectWithNature: require('../assets/tipsImages/nature.png'),
+  journalizing: require('../assets/tipsImages/Journalizying.png'),
+  seekSupport: require('../assets/tipsImages/seek support.png'),
+  practiceForgiveness: require('../assets/tipsImages/practice forgiveness.png'),
+  laughOften: require('../assets/tipsImages/laugh often.png'),
+  stayOrganized: require('../assets/tipsImages/stay organized.png'),
+  practiceYoga: require('../assets/tipsImages/practice yoga.png'),
+  limitScreenTime: require('../assets/tipsImages/disconnect from tech.png'),
+  limitNewsConsumption: require('../assets/tipsImages/limit news consomtion.png'),
+  spendTimeWithPets: require('../assets/tipsImages/spend time with pets.png'),
+};
 
 const mentalHealthTips: MentalHealthTip[] = [
   {
     tip: "Practice Self-Compassion",
     description: "Treat yourself with kindness and avoid harsh self-criticism to build resilience.",
-    //: "https://www.psychologytoday.com",
-    image: "../assets/tipsImages/self compassion.png"
+    image: images.selfCompassion,
   },
   {
     tip: "Regular Exercise",
     description: "Engage in physical activities, such as walking for 30 minutes daily, to boost your mood and overall health.",
-    //: "https://www.nimh.nih.gov",
-    image: "../assets/tipsImages/regular exercise.png"
+    image: images.regularExercise,
   },
   {
     tip: "Healthy Diet",
     description: "Eat nutritious meals and stay hydrated to improve energy levels and focus. Limit caffeine and alcohol intake.",
-    //: "https://www.nimh.nih.gov",
-    image: "../assets/tipsImages/healthy diet.png"
+    image: images.healthyDiet,
   },
   {
     tip: "Creative Activities",
     description: "Try new recipes, write, paint, or engage in any creative activity to boost your mental well-being.",
-    //: "https://www.mhanational.org",
-    image: "../assets/tipsImages/creative activities.png" 
+    image: images.creativeActivities,
   },
   {
     tip: "Disconnect from Technology",
     description: "Take breaks from screens to reduce stress and improve mental health.",
-    //: "https://www.talkspace.com",
-    image: "../assets/tipsImages/disconnect from tech.png"
+    image: images.disconnectFromTech,
   },
   {
     tip: "Quality Sleep",
     description: "Ensure you get enough good-quality sleep, as it significantly impacts both mental and physical health.",
-    //: "https://www.nhs.uk",
-    image: "../assets/tipsImages/quality sleep.png"
+    image: images.qualitySleep,
   },
   {
     tip: "Mindfulness and Meditation",
     description: "Practice mindfulness and meditation to stay present, reduce stress, and improve emotional health.",
-    //: "https://medlineplus.gov",
-    image: "../assets/tipsImages/mindful meditation.png"
+    image: images.mindfulMeditation,
   },
   {
     tip: "Volunteer",
     description: "Helping others can provide a sense of purpose and improve your mental health.",
-    //: "https://www.psychologytoday.com",
-    image: "../assets/tipsImages/helping others.png"
+    image: images.helpingOthers,
   },
   {
     tip: "Positive Social Interactions",
     description: "Spend quality time with friends and family to combat loneliness and improve your mental health.",
-    //: "https://www.nhs.uk",
-    image: "../assets/tipsImages/family and friends.png"
+    image: images.familyAndFriends,
   },
   {
     tip: "Laughter and Play",
     description: "Incorporate humor and playfulness into your life to reduce anxiety and increase happiness.",
-    //: "https://www.psychologytoday.com",
-    image: "../assets/tipsImages/playfullness.png"
+    image: images.playfulness,
   },
   {
     tip: "Express Gratitude",
     description: "Regularly noting things you are thankful for can boost your mental health.",
-    //: "https://www.mhanational.org",
-    image: "../assets/tipsImages/"
+    image: images.expressGratitude,
   },
   {
     tip: "Practice Deep Breathing",
     description: "Engage in deep breathing exercises to help reduce stress and promote relaxation.",
-    //: "https://medlineplus.gov",
-    image: "../assets/tipsImages/"
+    image: images.practiceDeepBreathing,
   },
   {
     tip: "Engage in Hobbies",
     description: "Spend time on activities you enjoy to improve your mood and overall well-being.",
-    //: "https://www.nimh.nih.gov",
-    image: "../assets/tipsImages/hobbie.png"
+    image: images.engageInHobbies,
   },
- 
   {
     tip: "Stay Hydrated",
     description: "Drink plenty of water throughout the day to maintain energy levels and focus.",
-    //: "https://www.mhanational.org",
-    image: "../assets/tipsImages/water.png"
+    image: images.stayHydrated,
   },
   {
     tip: "Limit Caffeine and Alcohol",
     description: "Be mindful of your intake as they can affect your mood and well-being.",
-    //: "https://www.nimh.nih.gov",
-    image: "../assets/tipsImages/coffee and alcohol.png"
+    image: images.limitCaffeineAlcohol,
   },
   {
     tip: "Connect with Nature",
     description: "Spend time outdoors to boost your mental health and reduce stress.",
-    //: "https://www.mhanational.org",
-    image: "../assets/tipsImages/nature.png"
+    image: images.connectWithNature,
   },
   {
     tip: "Journalizing",
     description: "Writing down your thoughts and feelings can help process emotions and reduce stress.",
-    //: "https://www.mhanational.org",
-    image: "../assets/tipsImages/Journalizying.png"
+    image: images.journalizing,
   },
   {
     tip: "Seek Support",
     description: "Reach out to friends, family, or a mental health professional when you need help.",
-    //: "https://www.psychologytoday.com",
-    image: "../assets/tipsImages/seek support.png"
+    image: images.seekSupport,
   },
   {
     tip: "Practice Forgiveness",
     description: "Let go of grudges to improve your mental and emotional well-being.",
-    //: "https://www.psychologytoday.com",
-    image: "../assets/tipsImages/practice forgiveness.png"
+    image: images.practiceForgiveness,
   },
   {
     tip: "Laugh Often",
     description: "Find humor in everyday situations to reduce stress and increase joy.",
-    //: "https://www.mhanational.org",
-    image: "../assets/tipsImages/laugh often.png"
+    image: images.laughOften,
   },
   {
     tip: "Stay Organized",
     description: "Keep your living and working spaces tidy to reduce stress and improve focus.",
-    //: "https://www.nimh.nih.gov",
-    image: "../assets/tipsImages/stay organized.png"
+    image: images.stayOrganized,
   },
   {
     tip: "Practice Yoga",
     description: "Engage in yoga to improve flexibility, reduce stress, and promote mental clarity.",
-    //: "https://medlineplus.gov",
-    image: "../assets/tipsImages/practice yoga.png"
+    image: images.practiceYoga,
   },
   {
     tip: "Limit Screen Time",
     description: "Reduce the amount of time spent on electronic devices to decrease stress.",
-    //: "https://www.psychologytoday.com",
-    image: "../assets/tipsImages/disconnect from tech.png"
+    image: images.limitScreenTime,
   },
-
   {
     tip: "Limit News Consumption",
     description: "Avoid overexposure to negative news to maintain a positive mindset.",
-    //: "https://www.mhanational.org",
-    image: "../assets/tipsImages/limit news consomtion.png"
+    image: images.limitNewsConsumption,
   },
   {
     tip: "Spend Time with Pets",
     description: "Interacting with animals can reduce stress and increase happiness.",
-    //: "https://www.psychologytoday.com",
-    image: "../assets/tipsImages/spend time with pets.png"
+    image: images.spendTimeWithPets,
   },
- 
-
-]
+];
 
 export default mentalHealthTips;
-
-   

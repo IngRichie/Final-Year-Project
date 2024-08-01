@@ -22,8 +22,9 @@ import {
 } from "firebase/auth";
 import { setDoc, doc, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "../firebaseConfig"; // Ensure you import auth from your Firebase config correctly
-import * as Google from "expo-auth-session/providers/google";
+// import * as Google from "expo-auth-session/providers/google";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { log } from "console";
 
 const { width, height } = Dimensions.get("window");
 
@@ -54,28 +55,28 @@ const SignUpScreen: React.FC = () => {
     }
   }, [response]);
 
-  const handleGoogleSignIn = async (token: string) => {
-    const credential = GoogleAuthProvider.credential(token);
-    try {
-      const userCredential = await signInWithCredential(auth, credential);
-      const user = userCredential.user;
+  // const handleGoogleSignIn = async (token: string) => {
+  //   const credential = GoogleAuthProvider.credential(token);
+  //   try {
+  //     const userCredential = await signInWithCredential(auth, credential);
+  //     const user = userCredential.user;
 
-      await setDoc(doc(db, "users", user.uid), {
-        firstname: user.displayName?.split(" ")[0] || "",
-        lastname: user.displayName?.split(" ")[1] || "",
-        email: user.email,
-        createdAt: serverTimestamp(),
-        interests: [], // Initialize with an empty array
-      });
+  //     await setDoc(doc(db, "users", user.uid), {
+  //       firstname: user.displayName?.split(" ")[0] || "",
+  //       lastname: user.displayName?.split(" ")[1] || "",
+  //       email: user.email,
+  //       createdAt: serverTimestamp(),
+  //       interests: [], // Initialize with an empty array
+  //     });
 
-      navigation.navigate("MainTabs", {
-        screen: "Home",
-        params: { screen: "Homepage1" },
-      });
-    } catch (error) {
-      console.error("Google Sign-In error:", error);
-    }
-  };
+  //     navigation.navigate("MainTabs", {
+  //       screen: "Home",
+  //       params: { screen: "Homepage1" },
+  //     });
+  //   } catch (error) {
+  //     console.error("Google Sign-In error:", error);
+  //   }
+  // };
 
   const onSignUpPress = async () => {
     setError(null);
@@ -163,6 +164,8 @@ const SignUpScreen: React.FC = () => {
         message = "An unexpected error occurred. Please try again.";
     }
     setError(message);
+    console.log(error.code);
+    
   };
 
   return (
@@ -248,8 +251,8 @@ const SignUpScreen: React.FC = () => {
                 <Text style={styles.signupText}>Sign Up</Text>
               </Pressable>
             </LinearGradient>
-            <Text style={styles.orSignUpWith}>Or Sign Up with</Text>
-            <Pressable
+            {/* <Text style={styles.orSignUpWith}>Or Sign Up with</Text> */}
+            {/* <Pressable
               style={styles.googleButton}
               onPress={() => promptAsync()}
             >
@@ -259,7 +262,7 @@ const SignUpScreen: React.FC = () => {
                 color="#fff"
               />
               <Text style={styles.googleButtonText}>Sign Up with Google</Text>
-            </Pressable>
+            </Pressable> */}
           </View>
 
           <View style={styles.haveAnAccount}>

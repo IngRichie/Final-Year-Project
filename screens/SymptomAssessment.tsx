@@ -77,17 +77,18 @@ const SymptomAssessment: React.FC = () => {
       try {
         const options = {
           method: 'POST',
-          url: 'https://endlessmedicalapi1.p.rapidapi.com/UpdateFeature',
+          url: 'https://your-google-gemini-api-endpoint',
           headers: {
-            'x-rapidapi-key': '2cc6301901mshbbe1253dc40a9edp1c490ejsncb1308e1613d',
-            'x-rapidapi-host': 'endlessmedicalapi1.p.rapidapi.com',
+            'Authorization': `Bearer your_google_gemini_api_key`,
             'Content-Type': 'application/json',
           },
-          data: { Name: 'symptom', Value: symptom },
+          data: {
+            prompt: `Symptom: ${symptom}`,
+          },
         };
 
         const response = await axios.request(options);
-        const botResponse = response.data.Status === 'ok' ? response.data.Diagnoses : 'No relevant information found.';
+        const botResponse = response.data?.output?.text || 'No relevant information found.';
 
         setMessages((prevMessages: any) => [...prevMessages, { user: symptom, bot: botResponse }]);
         setError(null);
@@ -264,7 +265,7 @@ const getDynamicStyles = (isDarkModeEnabled: boolean) => StyleSheet.create({
     paddingHorizontal: responsiveWidth(5),
     paddingVertical: responsiveHeight(3),
     backgroundColor: isDarkModeEnabled ? "#1E1E1E" : '#fff',
-    marginBottom: responsiveHeight(2), // Add margin to push input up when keyboard is active
+    marginBottom: responsiveHeight(2),
   },
   textInput: {
     flex: 1,

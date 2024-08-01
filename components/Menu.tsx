@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, ChangeEvent } from "react";
-import { StyleSheet, View, Text, Pressable, Image, Dimensions, Alert, Linking, Platform } from "react-native";
+import { StyleSheet, View, Text, Image, Dimensions, Alert, Linking, Platform, Pressable } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -8,7 +8,7 @@ import { useProfileImage } from "../components/ProfileImageContext";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFirestore, doc, onSnapshot, updateDoc } from "firebase/firestore";
 import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
-import * as ImagePicker from "expo-image-picker";
+
 import { firebaseConfig, auth, db, storage } from "../firebaseConfig";
 
 const { width, height } = Dimensions.get("window");
@@ -47,91 +47,6 @@ const Menu = ({ navigation }: { navigation: any }) => {
 
     return () => unsubscribeAuth();
   }, [auth, db, storage]);
-
-  const handleProfilePictureChange = () => {
-    if (Platform.OS === 'web') {
-      fileInputRef.current?.click();
-    } else {
-      handleImagePicker();
-    }
-  };
-
-  const handleImagePicker = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permission Denied', 'Please grant permission to access the photo library.');
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 4],
-      quality: 1,
-    });
-
-    if (!result.canceled && result.assets?.length > 0) {
-      try {
-        const uploadedImageUrl = await uploadImageAsync(result.assets[0].uri);
-        setProfileImage(uploadedImageUrl);
-
-        const user = auth.currentUser;
-        if (user) {
-          await updateDoc(doc(db, "users", user.uid), {
-            profileImage: `profileImages/${user.uid}.png`,
-          });
-        }
-      } catch (error) {
-        Alert.alert("Error", "Failed to upload image. Please try again.");
-      }
-    }
-  };
-
-  const uploadImageAsync = async (uri: string) => {
-    const user = auth.currentUser;
-    if (!user) throw new Error("User not authenticated");
-
-    const blob: Blob = await new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.onload = function () {
-        resolve(xhr.response);
-      };
-      xhr.onerror = function (e) {
-        console.log(e);
-        reject(new Error("Failed to upload image"));
-      };
-      xhr.responseType = "blob";
-      xhr.open("GET", uri, true);
-      xhr.send(null);
-    });
-
-    const fileRef = ref(storage, `profileImages/${user.uid}.png`);
-    await uploadBytes(fileRef, blob);
-
-    blob.close();
-
-    return await getDownloadURL(fileRef);
-  };
-
-  const handleFileInputChange = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      try {
-        const uri = URL.createObjectURL(file);
-        const uploadedImageUrl = await uploadImageAsync(uri);
-        setProfileImage(uploadedImageUrl);
-
-        const user = auth.currentUser;
-        if (user) {
-          await updateDoc(doc(db, "users", user.uid), {
-            profileImage: `profileImages/${user.uid}.png`,
-          });
-        }
-      } catch (error) {
-        Alert.alert("Error", "Failed to upload image. Please try again.");
-      }
-    }
-  };
 
   const handleLogOut = async () => {
     try {
@@ -173,9 +88,9 @@ const Menu = ({ navigation }: { navigation: any }) => {
           ) : (
             <FontAwesome
               name="user-circle-o"
-              size={responsiveFontSize(18)}
+              size={responsiveFontSize(30)}
               color="#dadada"
-              style={dynamicStyles.profileIcon}
+              style={dynamicStyles.placeholderIcon}
             />
           )}
           <Text style={dynamicStyles.username}>{email}</Text>
@@ -191,21 +106,7 @@ const Menu = ({ navigation }: { navigation: any }) => {
       </LinearGradient>
 
       <View style={dynamicStyles.menuItems}>
-        <Pressable
-          style={({ pressed }) => [
-            dynamicStyles.menuItem,
-            { backgroundColor: pressed ? (isDarkModeEnabled ? "#333" : "#f0f0f0") : "transparent" },
-          ]}
-          onPress={() => navigation.navigate("SymptomAssessment")}
-        >
-          <Ionicons
-            name="pulse-outline"
-            size={responsiveFontSize(7)}
-            color="#1F75FE"
-            style={dynamicStyles.menuIcon}
-          />
-          <Text style={dynamicStyles.menuItemText}>Symptom Assessment</Text>
-        </Pressable>
+        
 
         <Pressable
           style={({ pressed }) => [
@@ -228,7 +129,7 @@ const Menu = ({ navigation }: { navigation: any }) => {
             dynamicStyles.menuItem,
             { backgroundColor: pressed ? (isDarkModeEnabled ? "#333" : "#f0f0f0") : "transparent" },
           ]}
-          onPress={() => Linking.openURL("https://webapps.knust.edu.gh/uhs/appointments/")}
+          onPress={() => navigation.navigate("ClinicAppointment")}
         >
           <Ionicons
             name="medkit-outline"
@@ -330,7 +231,9 @@ const getDynamicStyles = (isDarkModeEnabled: boolean) => StyleSheet.create({
     width: responsiveFontSize(30),
     height: responsiveFontSize(30),
     borderRadius: responsiveFontSize(15),
-    backgroundColor: '#dadada',
+  },
+  placeholderIcon: {
+    marginBottom: responsiveHeight(1),
   },
   username: {
     fontFamily: "Poppins-SemiBold",

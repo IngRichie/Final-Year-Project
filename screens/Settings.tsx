@@ -18,8 +18,7 @@ const Settings = () => {
 
   const handlePress = (buttonText: string) => {
     const screenComponents: { [key: string]: React.ComponentType } = {
-      Profile: require("./ProfileScreen").default,
-      Privacy: require("./PrivacyScreen").default,
+
       Notifications: require("./NotificationScreen").default,
     };
 

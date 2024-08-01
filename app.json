@@ -10,7 +10,8 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#ffffff",
+      "plugins": ["@config-plugins/react-native-webrtc"]
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -56,7 +57,7 @@
     "scheme": "campcare",
     "extra": {
       "eas": {
-        "projectId": "1fbe589b-f3e9-451e-aa03-3c03c066f2e2"
+        "projectId": "1:1059483302799:web:76fc228f72abffb147e9fa"
       }
     }
   }

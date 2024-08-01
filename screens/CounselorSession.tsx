@@ -42,7 +42,7 @@ const CounselorSession: React.FC = () => {
         if (userDoc.exists()) {
           const userData = userDoc.data();
           if (userData && userData.isDarkModeEnabled) {
-            toggleDarkMode(); // Toggle dark mode if user setting is true
+            toggleDarkMode(); 
           }
         }
       }
@@ -67,12 +67,7 @@ const CounselorSession: React.FC = () => {
     navigation.goBack();
   };
 
-  const feelings = [
-    { name: "Happy", icon: "smile-o" },
-    { name: "Calm", icon: "meh-o" },
-    { name: "Relax", icon: "frown-o" },
-    { name: "Focus", icon: "eye" },
-  ];
+ 
 
   const dynamicStyles = getDynamicStyles(isDarkModeEnabled);
 
@@ -118,26 +113,7 @@ const CounselorSession: React.FC = () => {
             <Text style={dynamicStyles.noResultsText}>No counselors found</Text>
           )}
           <Text style={dynamicStyles.feelingsTitle}>How are you feeling today?</Text>
-          <View style={dynamicStyles.feelingsContainer}>
-            {feelings.map((feeling, index) => (
-              <Pressable
-                key={index}
-                style={dynamicStyles.feeling}
-                onPress={() => setSelectedFeeling(feeling.name)}
-              >
-                <View
-                  style={[
-                    dynamicStyles.feelingIconContainer,
-                    selectedFeeling === feeling.name &&
-                      dynamicStyles.selectedFeelingIconContainer,
-                  ]}
-                >
-                  <FontAwesome name={feeling.icon} style={dynamicStyles.feelingIcon} />
-                </View>
-                <Text style={dynamicStyles.feelingText}>{feeling.name}</Text>
-              </Pressable>
-            ))}
-          </View>
+          
           <View style={dynamicStyles.additionalInfo}>
             <Text style={dynamicStyles.additionalInfoTitle}>Why Counseling?</Text>
             <Text style={dynamicStyles.additionalInfoText}>

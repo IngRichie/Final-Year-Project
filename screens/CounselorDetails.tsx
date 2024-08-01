@@ -27,6 +27,8 @@ interface Counselor {
   experience: number;
   rating: number;
   specialization: string;
+  contact: string;
+  email: string;
 }
 
 interface CounselorDetailsProps {
@@ -47,10 +49,15 @@ const CounselorDetails: React.FC<CounselorDetailsProps> = ({ route }) => {
   };
 
   const handleBookAppointmentPress = () => {
-    navigation.navigate("BookAppointment", { counselor });
+    navigation.navigate("CounselorAppointment", { counselor });
   };
 
   const dynamicStyles = getDynamicStyles(isDarkModeEnabled);
+  const availabilityStyle = {
+    color: isDarkModeEnabled 
+      ? (counselor.available ? "#0f0" : "#f00") 
+      : (counselor.available ? "#0f0" : "#f00"),
+  };
 
   return (
     <SafeAreaView style={dynamicStyles.container}>
@@ -73,6 +80,11 @@ const CounselorDetails: React.FC<CounselorDetailsProps> = ({ route }) => {
           </View>
           <Text style={dynamicStyles.counselorPosition}>{counselor.position}</Text>
           <Text style={dynamicStyles.counselorExperience}>Experience: {counselor.experience} years</Text>
+          <Text style={dynamicStyles.counselorContact}>Contact: {counselor.contact}</Text>
+          <Text style={dynamicStyles.counselorEmail}>Email: {counselor.email}</Text>
+          <Text style={[dynamicStyles.counselorAvailability, availabilityStyle]}>
+            Available: {counselor.available ? "Yes" : "No"}
+          </Text>
         </View>
         <View style={dynamicStyles.buttonGroup}>
           <Pressable style={dynamicStyles.videoCallButton} onPress={() => { /* Handle Video Call */ }}>
@@ -85,7 +97,7 @@ const CounselorDetails: React.FC<CounselorDetailsProps> = ({ route }) => {
           </Pressable>
         </View>
         <View style={dynamicStyles.aboutContainer}>
-          <Text style={dynamicStyles.aboutTitle}>About Therapists</Text>
+          <Text style={dynamicStyles.aboutTitle}>About Therapist</Text>
           <Text style={dynamicStyles.aboutDescription}>{counselor.description}</Text>
         </View>
         <Pressable style={dynamicStyles.bookNowButton} onPress={handleBookAppointmentPress}>
@@ -159,6 +171,17 @@ const getDynamicStyles = (isDarkModeEnabled: boolean) => StyleSheet.create({
   counselorExperience: {
     fontSize: responsiveFontSize(3.5),
     color: isDarkModeEnabled ? "#ccc" : "#666",
+  },
+  counselorContact: {
+    fontSize: responsiveFontSize(3.5),
+    color: isDarkModeEnabled ? "#ccc" : "#666",
+  },
+  counselorEmail: {
+    fontSize: responsiveFontSize(3.5),
+    color: isDarkModeEnabled ? "#ccc" : "#666",
+  },
+  counselorAvailability: {
+    fontSize: responsiveFontSize(3.5),
   },
   buttonGroup: {
     flexDirection: "row",

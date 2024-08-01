@@ -17,7 +17,7 @@ export type RootStackParamList = {
   PrivacyScreen: undefined;
   PreferencesScreen: undefined;
   AccessibilityScreen: undefined;
-  NotificationSettings: undefined;
+
   MentalHealth: undefined;
   Homepage: undefined;
   Homepage1: undefined;
@@ -43,3 +43,9 @@ export type MentalHealthTip = {
   // source: string;
   image: string;
 };
+
+export interface Appointment {
+  date: string;
+  time: string;
+  reason: string;
+}

@@ -56,9 +56,9 @@ export async function schedulePushNotification(db: Firestore, userEmail: string)
     if (data.times && Array.isArray(data.times)) {
       data.times.forEach(async (time: string) => {
         const reminderTime = new Date();
-        const [hourMinute, period] = time.split(' ');
-        const [hour, minute] = hourMinute.split(':');
-        const formattedHour = period === 'PM' ? parseInt(hour) + 12 : parseInt(hour);
+        const [hour, minute] = time.split(':');
+        const [hourPart, period] = hour.split(' ');
+        const formattedHour = period === 'PM' ? parseInt(hourPart) + 12 : parseInt(hourPart);
         reminderTime.setHours(formattedHour);
         reminderTime.setMinutes(parseInt(minute));
         reminderTime.setSeconds(0);
@@ -74,11 +74,13 @@ export async function schedulePushNotification(db: Firestore, userEmail: string)
           };
 
           if (Platform.OS === 'web') {
+            // Save notification to Firestore for web and let Firebase Extensions handle sending email
             await addDoc(collection(db, 'notifications'), {
               ...notificationContent,
               email: userEmail,
             });
           } else {
+            // Schedule push notification for mobile devices
             await Notifications.scheduleNotificationAsync({
               content: {
                 title: notificationContent.title,

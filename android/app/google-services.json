@@ -1,42 +1,34 @@
 {
   "project_info": {
-    "project_number": "549195152079",
-    "firebase_url": "https://campcare-93295-default-rtdb.firebaseio.com",
-    "project_id": "campcare-93295",
-    "storage_bucket": "campcare-93295.appspot.com"
+    "project_number": "1059483302799",
+    "project_id": "campcare-a3cff",
+    "storage_bucket": "campcare-a3cff.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:549195152079:android:b9dd4e35b59fe96cdad5ba",
+        "mobilesdk_app_id": "1:1059483302799:android:3076db66f24e53b347e9fa",
         "android_client_info": {
           "package_name": "com.campcare"
         }
       },
       "oauth_client": [
         {
-          "client_id": "549195152079-0ugv32rckrki3a9l95rjem1dp3kc2pg7.apps.googleusercontent.com",
+          "client_id": "1059483302799-00c6h93reifafdgg69agpv29sv1nrso2.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBviJWgruUO9ICsv1jSgzTn9vIosWR7wkQ"
+          "current_key": "AIzaSyDsSGG9SF-S04V9a9U-4WuccCV3lzyDo8A"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "549195152079-0ugv32rckrki3a9l95rjem1dp3kc2pg7.apps.googleusercontent.com",
+              "client_id": "1059483302799-00c6h93reifafdgg69agpv29sv1nrso2.apps.googleusercontent.com",
               "client_type": 3
-            },
-            {
-              "client_id": "549195152079-366ujglsn1t97ke7qh4gfeh3vo4pjcjs.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.campcare"
-              }
             }
           ]
         }

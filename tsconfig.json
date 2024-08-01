@@ -9,6 +9,7 @@
     "noEmit": true,
     "jsx": "react"
   },
-  "include": ["src", "env.d.ts"],
-  "exclude": ["node_modules"]
+  "include": ["src", "env.d.ts", "zegocloud.d.ts"],
+  "exclude": ["node_modules"],
+
 }

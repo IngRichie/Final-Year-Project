@@ -82,18 +82,18 @@ const LoginScreen = () => {
     checkStoredCredentials();
   }, []);
 
-  const handleGoogleSignIn = async (token: string) => {
-    const credential = GoogleAuthProvider.credential(token);
-    try {
-      await signInWithCredential(auth, credential);
-      navigation.navigate("MainTabs", {
-        screen: "Home",
-        params: { screen: "Homepage1" },
-      });
-    } catch (error) {
-      console.error("Google Sign-In error:", error);
-    }
-  };
+  // const handleGoogleSignIn = async (token: string) => {
+  //   const credential = GoogleAuthProvider.credential(token);
+  //   try {
+  //     await signInWithCredential(auth, credential);
+  //     navigation.navigate("MainTabs", {
+  //       screen: "Home",
+  //       params: { screen: "Homepage1" },
+  //     });
+  //   } catch (error) {
+  //     console.error("Google Sign-In error:", error);
+  //   }
+  // };
 
   const onLoginPress = async (emailInput?: string, passwordInput?: string) => {
     try {
@@ -251,11 +251,11 @@ const LoginScreen = () => {
               </Pressable>
             </LinearGradient>
           </View>
-          <Text style={styles.orLoginWith}>Or Login with</Text>
-          <Pressable style={styles.googleButton} onPress={() => promptAsync()}>
+          {/* <Text style={styles.orLoginWith}>Or Login with</Text> */}
+          {/* <Pressable style={styles.googleButton} onPress={() => promptAsync()}>
             <FontAwesome name="google" size={responsiveFontSize(5)} color="#fff" />
             <Text style={styles.googleButtonText}>Login with Google</Text>
-          </Pressable>
+          </Pressable> */}
           <View style={styles.dontHaveAnContainer}>
             <Text style={styles.dontHaveAn}>Don't have an account yet?</Text>
             <Pressable style={styles.signUp} onPress={() => navigation.navigate("SignUpScreen")}>

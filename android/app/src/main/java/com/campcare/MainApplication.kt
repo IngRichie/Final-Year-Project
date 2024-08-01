@@ -4,7 +4,7 @@ package com.campcare
 
 import android.app.Application
 import android.content.res.Configuration
-
+import com.reactnativevosk.VoskPackage;
 import com.facebook.react.PackageList
 import com.facebook.react.ReactApplication
 import com.facebook.react.ReactNativeHost
@@ -13,6 +13,8 @@ import com.facebook.react.ReactHost
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.load
 import com.facebook.react.defaults.DefaultReactNativeHost
 import com.facebook.soloader.SoLoader
+import com.twiliorn.library.TwilioPackage
+
 
 import expo.modules.ApplicationLifecycleDispatcher
 import expo.modules.ReactNativeHostWrapper
@@ -25,6 +27,8 @@ class MainApplication : Application(), ReactApplication {
           override fun getPackages(): List<ReactPackage> {
             // Packages that cannot be autolinked yet can be added manually here, for example:
             // packages.add(new MyReactNativePackage());
+            List<ReactPackage> packages = new PackageList(this).getPackages();
+    packages.add(new TwilioPackage());
             return PackageList(this).packages
           }
 
@@ -54,6 +58,14 @@ class MainApplication : Application(), ReactApplication {
     super.onConfigurationChanged(newConfig)
     ApplicationLifecycleDispatcher.onConfigurationChanged(this, newConfig)
   }
+
+  @Override
+  protected List<ReactPackage> getPackages() {
+        @SuppressWarnings("UnnecessaryLocalVariable")
+        List<ReactPackage> packages = new PackageList(this).getPackages();
+        packages.add(new VoskPackage()); 
+        return packages;
+    }
 }
 
 
@@ -65,3 +77,12 @@ protected List<ReactPackage> getPackages() {
         new VoicePackage() // Add this line
     );
 }
+
+
+    @Override
+    protected List<ReactPackage> getPackages() {
+        @SuppressWarnings("UnnecessaryLocalVariable")
+        List<ReactPackage> packages = new PackageList(this).getPackages();
+        packages.add(new TwilioPackage()); // add this line
+        return packages;
+    }

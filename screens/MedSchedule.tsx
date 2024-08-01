@@ -7,9 +7,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
 import { db } from '../firebaseConfig';
 import { collection, query, onSnapshot, doc, deleteDoc, DocumentData, QuerySnapshot } from 'firebase/firestore';
-import { useDarkMode } from '../components/DarkModeContext'; // Import the dark mode context
+import { useDarkMode } from '../components/DarkModeContext';
 
-// Conditionally import based on the platform
 const TouchableOpacity = Platform.OS === 'web' ? require('react-native-web').TouchableOpacity : require('react-native').TouchableOpacity;
 
 const { width, height } = Dimensions.get('window');
@@ -18,10 +17,7 @@ const responsiveWidth = (percent: number) => (width * percent) / 100;
 const responsiveHeight = (percent: number) => (height * percent) / 100;
 const responsiveFontSize = (percent: number) => (width * percent) / 100;
 
-type MedicationReminderScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'MedicationReminderScreen'
->;
+type MedicationReminderScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'MedicationReminderScreen'>;
 
 type Props = {
   navigation: MedicationReminderScreenNavigationProp;
@@ -38,7 +34,7 @@ type Medication = {
 };
 
 const MedicationReminderScreen: React.FC<Props> = ({ navigation }) => {
-  const { isDarkModeEnabled } = useDarkMode(); // Consume the dark mode context
+  const { isDarkModeEnabled } = useDarkMode();
   const [selectedDate, setSelectedDate] = useState(new Date().getDate());
   const [currentMonth, setCurrentMonth] = useState('');
   const [currentYear, setCurrentYear] = useState('');
@@ -49,7 +45,6 @@ const MedicationReminderScreen: React.FC<Props> = ({ navigation }) => {
     setCurrentMonth(date.toLocaleString('default', { month: 'long' }));
     setCurrentYear(date.getFullYear().toString());
 
-    // Fetch medications
     const medQuery = query(collection(db, 'medReminder'));
     const unsubscribe = onSnapshot(medQuery, (querySnapshot: QuerySnapshot<DocumentData>) => {
       const medsData = querySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id })) as Medication[];
@@ -57,7 +52,7 @@ const MedicationReminderScreen: React.FC<Props> = ({ navigation }) => {
       console.log('Medications fetched: ', medsData);
     });
 
-    return () => unsubscribe(); // Cleanup on unmount
+    return () => unsubscribe();
   }, []);
 
   const dates = Array.from({ length: 7 }, (_, i) => {
@@ -112,14 +107,13 @@ const MedicationReminderScreen: React.FC<Props> = ({ navigation }) => {
   );
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: isDarkModeEnabled ? "#1c1c1c" : "#318ce7" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: isDarkModeEnabled ? '#1c1c1c' : '#318ce7' }}>
       <Container>
         <Header>
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Icon name='arrow-back' size={responsiveFontSize(6)} color='#fff' />
           </TouchableOpacity>
           <MonthText>{`${currentMonth} ${currentYear}`}</MonthText>
-          <Icon name='notifications-none' size={responsiveFontSize(6)} color='#fff' />
         </Header>
         <DateScrollerContainer>
           <FlatList
@@ -146,7 +140,7 @@ const MedicationReminderScreen: React.FC<Props> = ({ navigation }) => {
                     <MedicationFrequency>{med.frequency ? med.frequency : 'No frequency set'}</MedicationFrequency>
                   </MedicationInfo>
                   <TouchableOpacity onPress={() => confirmDeleteMedication(med.id)}>
-                    <Icon name='delete' size={responsiveFontSize(6)} color={isDarkModeEnabled ? "#fff" : "#2e2e2d"} />
+                    <Icon name='delete' size={responsiveFontSize(6)} color={isDarkModeEnabled ? '#fff' : '#2e2e2d'} />
                   </TouchableOpacity>
                 </MedicationItem>
               ))}
@@ -172,7 +166,6 @@ const Header = styled.View`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-
 `;
 
 const MonthText = styled.Text`
@@ -207,7 +200,7 @@ const DateText = styled.Text<{ selected: boolean }>`
 
 const MedicationsContainer = styled.View<{ isDarkModeEnabled: boolean }>`
   flex: 1;
-  background-color: ${({ isDarkModeEnabled }) => (isDarkModeEnabled ? "#1c1c1c" : "#fff")};
+  background-color: ${({ isDarkModeEnabled }) => (isDarkModeEnabled ? '#1c1c1c' : '#fff')};
   margin-top: ${responsiveHeight(2.5)}px;
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
@@ -221,7 +214,7 @@ const Title = styled.Text`
 `;
 
 const NoMedicationsText = styled.Text`
-  color: ${({ isDarkModeEnabled }) => (isDarkModeEnabled ? "#fff" : "#000")};
+  color: #8c8c8c;
   font-size: ${responsiveFontSize(4)}px;
   text-align: center;
   margin-top: ${responsiveHeight(2.5)}px;
@@ -231,7 +224,7 @@ const MedicationItem = styled.View<{ isDarkModeEnabled: boolean }>`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  background-color: ${({ isDarkModeEnabled }) => (isDarkModeEnabled ? "#333" : "#f2f2f2")};
+  background-color: ${({ isDarkModeEnabled }) => (isDarkModeEnabled ? '#333' : '#f2f2f2')};
   padding: ${responsiveHeight(1.75)}px;
   border-radius: 10px;
   margin-bottom: ${responsiveHeight(2.5)}px;
@@ -240,13 +233,13 @@ const MedicationItem = styled.View<{ isDarkModeEnabled: boolean }>`
 const MedicationInfo = styled.View``;
 
 const MedicationName = styled.Text<{ isDarkModeEnabled: boolean }>`
-  color: ${({ isDarkModeEnabled }) => (isDarkModeEnabled ? "#fff" : "#000")};
+  color: ${({ isDarkModeEnabled }) => (isDarkModeEnabled ? '#fff' : '#000')};
   font-size: ${responsiveFontSize(4)}px;
   font-weight: bold;
 `;
 
 const MedicationDosage = styled.Text<{ isDarkModeEnabled: boolean }>`
-  color: ${({ isDarkModeEnabled }) => (isDarkModeEnabled ? "#fff" : "#000")};
+  color: ${({ isDarkModeEnabled }) => (isDarkModeEnabled ? '#fff' : '#000')};
   font-size: ${responsiveFontSize(3.5)}px;
   margin-top: ${responsiveHeight(1.25)}px;
 `;
@@ -263,7 +256,7 @@ const MedicationFrequency = styled.Text`
   margin-top: ${responsiveHeight(1.25)}px;
 `;
 
-const AddButton = styled.TouchableOpacity`
+const AddButton = styled(TouchableOpacity)`
   position: absolute;
   right: ${responsiveWidth(5)}px;
   bottom: ${responsiveHeight(5)}px;

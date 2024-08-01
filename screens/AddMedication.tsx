@@ -215,8 +215,6 @@ const CombinedScreen: React.FC<CombinedScreenProps> = ({ navigation }) => {
                 <Icon name="arrow-drop-down" size={responsiveFontSize(vw, 6)} color="#318CE7" />
               </DropdownButton>
             </Row>
-           
-          
 
             <AddButton vw={vw} vh={vh} disabled={medicationName.trim() === ""} onPress={handleAddMedicine}>
               <AddButtonText vw={vw} disabled={medicationName.trim() === ""}>
@@ -251,7 +249,7 @@ const CombinedScreen: React.FC<CombinedScreenProps> = ({ navigation }) => {
                     value={time.toLocaleTimeString('en-US', { hour12: false }).substring(0, 5)}
                     onChange={(e) => handleTimeChange({ type: 'set' }, new Date(`1970-01-01T${e.target.value}:00`))}
                     style={{
-                      width: '100%', padding: 10, borderRadius: 10, borderWidth: 1, 
+                      width: '100%', padding: 10, borderRadius: 10, borderWidth: 1,
                       borderColor: isDarkModeEnabled ? "#666" : "#ccc", outline: 'none',
                       backgroundColor: isDarkModeEnabled ? "#383838" : "#fff", color: isDarkModeEnabled ? "#fff" : "#000"
                     }}

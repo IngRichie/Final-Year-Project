@@ -142,6 +142,8 @@ android {
 }
 
 dependencies {
+        implementation project(':react-native-vosk')
+
 implementation project(':react-native-voice')
   implementation "com.facebook.react:react-android"
     implementation project(':react-native-jitsi-meet')
@@ -164,6 +166,7 @@ implementation project(':react-native-voice')
     }
 
 
+    implementation project(':react-native-twilio-video-webrtc')
 
 
 

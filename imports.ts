@@ -30,7 +30,7 @@ import FitnessNutrition from "./screens/FitnessNutrition";
 import Settings from "./screens/Settings";
 
 import CounselorDetails from "./screens/CounselorDetails";
-import BookAppointment from "./screens/BookAppointment";
+import BookAppointment from "./screens/CounselorAppointment";
 import AddMedication from "./screens/AddMedication";
 import Menu from "./components/Menu";
 import WelcomeScreen from "./screens/WelcomeScreen";
@@ -40,10 +40,9 @@ import ForgetPassword from "./screens/ForgetPassword";
 import NewsPage from "./screens/NewsPage";
 import NotificationScreen from "./screens/NotificationScreen";
 import ProfileScreen from "./screens/ProfileScreen";
-import PrivacyScreen from "./screens/PrivacyScreen";
-import PreferencesScreen from "./screens/PreferencesScreen";
+
+
 import AccessibilityScreen from "./screens/AccessibilityScreen";
-import NotificationSettings from "./screens/NotificationSettings";
 import MentalHealth from "./screens/MentalHealth";
 import { RootStackParamList } from "./types";
 
@@ -98,10 +97,8 @@ export {
   NewsPage,
   NotificationScreen,
   ProfileScreen,
-  PrivacyScreen,
-  PreferencesScreen,
+
   AccessibilityScreen,
-  NotificationSettings,
   MentalHealth,
   RootStackParamList,
   responsiveWidth,

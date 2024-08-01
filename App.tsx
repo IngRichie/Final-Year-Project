@@ -11,7 +11,11 @@ import { registerForPushNotificationsAsync, schedulePushNotification } from './r
 import SplashScreen from "./components/SplashScreen";
 import { DarkModeProvider, useDarkMode } from './components/DarkModeContext';
 import { ProfileImageProvider, useProfileImage } from './components/ProfileImageContext';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import MoodHistory from './screens/MoodHistory';
+import ClinicAppointment from "./screens/ClinicAppointment";
+import ConfirmationScreen from "./screens/ConfirmationScreen";
+import CounselorAppointment from "./screens/CounselorAppointment";
+
 
 const {
   NavigationContainer,
@@ -19,7 +23,7 @@ const {
   AppLoading,
   Homepage1,
   FirstAid,
-  SymptomAssessment,
+  
   CounselorSession,
   DailyTipDetailScreen,
   MedSchedule,
@@ -36,7 +40,7 @@ const {
   NewsPage,
   NotificationScreen,
   ProfileScreen,
-  PrivacyScreen,
+
   PreferencesScreen,
   AccessibilityScreen,
   NotificationSettings,
@@ -106,9 +110,9 @@ const CenterButton = (props: any) => {
 
   return (
     <TouchableOpacity {...props} style={styles.centerButton} onPress={handleRecordButtonPress}>
-      <View style={[styles.centerButtonContainer, { backgroundColor: isRecording ? "#FF6347" : "#318CE7" }]}>
+      {/* <View style={[styles.centerButtonContainer, { backgroundColor: isRecording ? "#FF6347" : "#318CE7" }]}>
         <FontAwesome5 name="robot" color={isDarkModeEnabled ? "#fff" : "#fff"} size={responsiveFontSize(6)} />
-      </View>
+      </View> */}
     </TouchableOpacity>
   );
 };
@@ -119,63 +123,66 @@ const MainTabs = () => {
 
   return (
     <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarShowLabel: true,
-        tabBarStyle: { ...styles.tabBar, backgroundColor: tabBarBackgroundColor },
-        tabBarHideOnKeyboard: true,
-        tabBarIcon: ({ color , size }) => {
-          let iconName: string;
-          if (route.name === "HomeTab") {
-            iconName = "home";
-          } else if (route.name === "FirstAidTab") {
-            iconName = "briefcase-medical";
-          } else if (route.name === "NewsPageTab") {
-            iconName = "newspaper";
-          } else if (route.name === "CounselorSessionTab") {
-            iconName = "user-friends";
-          }
+    screenOptions={({ route }) => ({
+      tabBarShowLabel: true,
+      tabBarStyle: { ...styles.tabBar, backgroundColor: tabBarBackgroundColor },
+      tabBarHideOnKeyboard: true,
+      tabBarIcon: ({ color, size, focused }) => {
+        let iconName: string;
+        let iconColor = isDarkModeEnabled ? "#fff" : color;
 
-          return <FontAwesome5 name={iconName} size={size} color={isDarkModeEnabled ? "#fff" : color} />;
-        },
-        tabBarLabel: ({ focused }) => {
-          let label: string | number | boolean | imports.React.ReactElement<any, string | imports.React.JSXElementConstructor<any>> | Iterable<imports.React.ReactNode> | null | undefined;
-          if (route.name === "HomeTab") {
-            label = "Home";
-          } else if (route.name === "FirstAidTab") {
-            label = "First Aid";
-          } else if (route.name === "NewsPageTab") {
-            label = "News";
-          } else if (route.name === "CounselorSessionTab") {
-            label = "Counselor";
-          }
-          return (
-            <Text
-              style={{
-                color: focused ? "#318CE7" : isDarkModeEnabled ? "#fff" : "#222",
-                fontSize: responsiveFontSize(3),
-                fontFamily: "Poppins-Regular",
-              }}
-            >
-              {label}
-            </Text>
-          );
-        },
-      })}
-    >
-      <Tab.Screen name="HomeTab" component={HomeStack} options={{ headerShown: false }} />
-      <Tab.Screen name="FirstAidTab" component={FirstAid} options={{ headerShown: false }} />
-      <Tab.Screen
-        name="CenterButton"
-        component={View}
-        options={{
-          tabBarButton: (props) => <CenterButton {...props} />,
-          headerShown: false,
-        }}
-      />
-      <Tab.Screen name="NewsPageTab" component={NewsPage} options={{ headerShown: false }} />
-      <Tab.Screen name="CounselorSessionTab" component={CounselorSession} options={{ headerShown: false }} />
-    </Tab.Navigator>
-  );
+        if (route.name === "HomeTab") {
+          iconName = "home";
+        } else if (route.name === "FirstAidTab") {
+          iconName = "briefcase-medical";
+        } else if (route.name === "NewsPageTab") {
+          iconName = "newspaper";
+        } else if (route.name === "CounselorSessionTab") {
+          iconName = "user-friends";
+        }
+
+        return <FontAwesome5 name={iconName} size={size} color={focused ? (isDarkModeEnabled ? "#fff" : "#318CE7") : iconColor} />;
+      },
+      tabBarLabel: ({ focused }) => {
+        let label: string | number | boolean | imports.React.ReactElement<any, string | imports.React.JSXElementConstructor<any>> | Iterable<imports.React.ReactNode> | null | undefined;
+        if (route.name === "HomeTab") {
+          label = "Home";
+        } else if (route.name === "FirstAidTab") {
+          label = "First Aid";
+        } else if (route.name === "NewsPageTab") {
+          label = "News";
+        } else if (route.name === "CounselorSessionTab") {
+          label = "Counselor";
+        }
+        return (
+          <Text
+            style={{
+              color: focused ? "#318CE7" : isDarkModeEnabled ? "#fff" : "#222",
+              fontSize: responsiveFontSize(3),
+              fontFamily: "Poppins-Regular",
+            }}
+          >
+            {label}
+          </Text>
+        );
+      },
+    })}
+  >
+    <Tab.Screen name="HomeTab" component={HomeStack} options={{ headerShown: false }} />
+    <Tab.Screen name="FirstAidTab" component={FirstAid} options={{ headerShown: false }} />
+    <Tab.Screen
+      name="CenterButton"
+      component={View}
+      options={{
+        tabBarButton: (props) => <CenterButton {...props} />,
+        headerShown: false,
+      }}
+    />
+    <Tab.Screen name="NewsPageTab" component={NewsPage} options={{ headerShown: false }} />
+    <Tab.Screen name="CounselorSessionTab" component={CounselorSession} options={{ headerShown: false }} />
+  </Tab.Navigator>
+);
+
 };
 
 const AppStack = () => (
@@ -194,12 +201,14 @@ const AppStack = () => (
     <Stack.Screen name="NewsPage" component={NewsPage} />
     <Stack.Screen name="NotificationScreen" component={NotificationScreen} />
     <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
-    <Stack.Screen name="PrivacyScreen" component={PrivacyScreen} />
-    <Stack.Screen name="PreferencesScreen" component={PreferencesScreen} />
     <Stack.Screen name="AccessibilityScreen" component={AccessibilityScreen} />
-    <Stack.Screen name="NotificationSettings" component={NotificationSettings} />
     <Stack.Screen name="AddMedication" component={AddMedication} />
-    <Stack.Screen name="SymptomAssessment" component={SymptomAssessment} />
+    <Stack.Screen name="MentalHealth" component={MentalHealth} />
+    <Stack.Screen name="MoodHistory" component={MoodHistory} />
+    <Stack.Screen name="ClinicAppointment" component={ClinicAppointment} />
+    <Stack.Screen name="Confirmation" component={ConfirmationScreen} />
+    <Stack.Screen name="CounselorAppointment" component={CounselorAppointment} />
+
   </Stack.Navigator>
 );
 
